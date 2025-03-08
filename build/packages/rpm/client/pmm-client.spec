@@ -125,6 +125,7 @@ install -m 0660 queries-mr.yaml $RPM_BUILD_ROOT/usr/local/percona/pmm/collectors
 install -m 0660 queries-lr.yaml $RPM_BUILD_ROOT/usr/local/percona/pmm/collectors/custom-queries/postgresql/low-resolution/
 install -m 0755 -d $RPM_BUILD_ROOT/%{_unitdir}
 install -m 0644 config/pmm-agent.service %{buildroot}/%{_unitdir}/pmm-agent.service
+install -m 0755 bin/clickhouse_exporter $RPM_BUILD_ROOT/usr/local/percona/pmm-client/
 
 
 %clean
@@ -211,6 +212,8 @@ fi
 %config %{_unitdir}/pmm-agent.service
 %attr(0660,pmm-agent,pmm-agent) %ghost /usr/local/percona/pmm/config/pmm-agent.yaml
 %attr(-,pmm-agent,pmm-agent) /usr/local/percona/pmm
+%dir /usr/local/percona/pmm-client
+/usr/local/percona/pmm-client/clickhouse_exporter
 
 %changelog
 * Fri Nov 8 2024 Nurlan Moldomurov <nurlan.moldomurov@percona.com>
