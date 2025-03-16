@@ -1,5 +1,6 @@
 /.idea/
 /.vscode/
+/vendor/
 *.iml
 
 /api/nginx/*.pem
