@@ -1,195 +1,224 @@
-
 ###############################################################################
-# Packaging Targets: Build completo (tarball, RPM, DEB e release)
+# Makefile COMPLETO para build, empacotamento e publicação do PMM
+# sem atalhos, replicando todas as etapas, com criação do arquivo VERSION
+# em $(ROOT_DIR) para uso pelos scripts.
+#
+# Autor: Marlon Costa <marlon.costa@datacosmos.com.br>
+# Empresa: Datacosmos
+# Versão: 5.1
+# Data: 15/03/2025
+#
+# Licenciado sob a Apache License, Version 2.0
+# (http://www.apache.org/licenses/LICENSE-2.0)
+#
+# Histórico de alterações:
+#   v5.0 - Versão integral com ROOT_DIR=/tmp/pmm-build e PATH_TO_SCRIPTS=build/scripts
+#   v5.1 (15/03/2025) - Inclusão do target write-version para criar $(ROOT_DIR)/VERSION
 ###############################################################################
 
-# Nome do pacote
+SHELL := /bin/bash
+
+# -----------------------------------------------------------------------------
+# Variáveis Principais
+# -----------------------------------------------------------------------------
 PKG_NAME         := pmm
-# Obtém a versão sanitizada a partir do Git (usa somente a tag principal, sem sufixos)
-VERSION          := $(shell git describe --tags --abbrev=0 | sed 's/^v//')
-# Distribuição – ex.: "el7" para CentOS/OL7 (ajuste conforme necessário)
-DIST             := el7
-# Arquitetura – geralmente "noarch" para binários Go
-ARCH             := noarch
-# Diretório base do rpmbuild (normalmente ~/rpmbuild)
-RPM_TOPDIR       := $(HOME)/rpmbuild
+VERSION          ?= $(shell cat VERSION 2>/dev/null | tr -d '\n')
+VERSION          ?= 3.0.0
 
-# Diretório do submódulo que contém os arquivos de empacotamento (usaremos branch v3)
-SUBMODULE_DIR    := pmm-submodules
-# Define a branch do submódulo que deve ser usada
-SUBMODULE_BRANCH := v3
-SUBMODULES_DIR := $(SUBMODULE_DIR)/sources
-BIN_DIR        := bin
-SUBMODULES := $(shell find $(SUBMODULES_DIR) -maxdepth 1 -mindepth 1 -type d ! -name 'pmm-*')
+GIT_BRANCH       ?= v3
+DESTINATION      ?= experimental
 
+# Diretório onde ficam os scripts de build
+PATH_TO_SCRIPTS  ?= build/scripts
 
-# Agora, utilize os specs do repositório local (não os do submodule)
-SPEC_FILE        := build/packages/rpm/server/SPECS/pmm-managed.spec
+# Diretório "raiz" que os scripts usarão dentro dos containers
+ROOT_DIR         ?= /tmp/pmm-build
 
-# Variáveis para o commit atual (full commit) e short commit
-CUR_COMMIT     := $(shell git rev-parse HEAD)
-SHORT_COMMIT   := $(shell echo $(CUR_COMMIT) | cut -c1-7)
+# Distribuição e arquitetura para o empacotamento
+DIST             ?= el9
+ARCH             ?= noarch
 
-.PHONY: update-submodules build-tarball build-rpm build-deb pkg-release pkg-all
+# Repositório para todas as imagens Docker
+IMAGE_REGISTRY   ?= gru.ocir.io/grq1iurfepyg/pmm
+BASE_DOCKER_TAG  ?= rpmbuild:3
 
-## Atualiza os submódulos (se necessário)
-update-submodules:
-	@echo "Verificando configuração do submódulo..."
-	
-	# Verifica se o submódulo está registrado
-	@if ! git config --file .gitmodules submodule.$(SUBMODULE_DIR).url > /dev/null; then \
-		echo "Registrando submódulo..."; \
-		git submodule add -b $(SUBMODULE_BRANCH) https://github.com/Percona-Lab/pmm-submodules.git $(SUBMODULE_DIR); \
-	fi
+# Imagens para Release (client, server, watchtower)
+CLIENT_IMAGE     := $(IMAGE_REGISTRY)/pmm-client:$(VERSION)-rc
+SERVER_IMAGE     := $(IMAGE_REGISTRY)/pmm-server:$(VERSION)-rc
+WATCHTOWER_IMAGE := $(IMAGE_REGISTRY)/pmm-watchtower:$(VERSION)-rc
 
-	# Sincroniza URLs configuradas
-	@git submodule sync --recursive -- $(SUBMODULE_DIR)
+# Tag dinâmica para a imagem do server (com timestamp)
+DOCKER_SERVER_TAG := $(IMAGE_REGISTRY)/pmm-server:$(shell date -u '+%Y%m%d%H%M')
 
-	# Inicializa se necessário
-	@if [ ! -f $(SUBMODULE_DIR)/.git ]; then \
-		echo "Inicializando submódulo..."; \
-		git submodule update --init --recursive -- $(SUBMODULE_DIR); \
-	fi
+# -----------------------------------------------------------------------------
+# Alvos Principais
+# -----------------------------------------------------------------------------
+.PHONY: all prepare submodules write-version build-rpmbuild-image client server watchtower devcontainer test-api test-e2e release
 
-	@echo "Forçando atualização para o HEAD do branch $(SUBMODULE_BRANCH)..."
-	@cd $(SUBMODULE_DIR) && \
-		git fetch --force origin "+refs/heads/$(SUBMODULE_BRANCH):refs/remotes/origin/$(SUBMODULE_BRANCH)" && \
-		git checkout -B $(SUBMODULE_BRANCH) origin/$(SUBMODULE_BRANCH) && \
-		git reset --hard origin/$(SUBMODULE_BRANCH) && \
-		git clean -ffdx
+# Cria o arquivo $(ROOT_DIR)/VERSION com o formato: <version>-<release>
+.PHONY: write-version
+write-version:
+	@echo "==> [Version] Gerando arquivo VERSION em $(ROOT_DIR)..."
+	@mkdir -p $(ROOT_DIR)
+	@echo "$$(git describe --tags --abbrev=0 | sed 's/^v//')-$$(git rev-list --count HEAD)" > $(ROOT_DIR)/VERSION
 
-	@echo "Atualizando submódulos recursivamente..."
-	@git submodule update --recursive --remote --checkout --force
+prepare: submodules write-version
+	@echo "==> [Prepare] Versão do PMM: $(VERSION)"
+	@echo "    Branch:       $(GIT_BRANCH)"
+	@echo "    Imagens:      $(IMAGE_REGISTRY)"
+	@echo "    DESTINATION:  $(DESTINATION)"
+	@echo "    ROOT_DIR:     $(ROOT_DIR)"
 
-	@echo "Estado final verificado:"
-	@git submodule status --recursive
+submodules:
+	@echo "==> [Submódulos] Atualizando submódulos (branch: $(GIT_BRANCH))..."
+	git submodule update --init --jobs 10
+	git submodule status
 
-###############################################################################
-# Submodule Build Configuration
-###############################################################################
+# -----------------------------------------------------------------------------
+# 1) Build da imagem base rpmbuild (deve estar pronta antes dos scripts)
+# -----------------------------------------------------------------------------
+.PHONY: rpm-buildx rpm-build
 
-# Formato: <nome>,<diretorio>,<comandos>,<binarios (padrões separados por |)>
-SUBMODULE_CONFIGS ?= \
-    azure_metrics,$(SUBMODULES_DIR)/azure_metrics_exporter/src/github.com/percona/azure_metrics_exporter,"make build","azure_metrics_exporter|tools/*_helper" \
-    grafana,$(SUBMODULES_DIR)/grafana/src/github.com/grafana/grafana,"make build-go","bin/grafana-*" \
-    node_exporter,$(SUBMODULES_DIR)/node_exporter/src/github.com/prometheus/node_exporter,"make build","node_exporter" \
-    toolkit,$(SUBMODULES_DIR)/percona-toolkit/src/github.com/percona/percona-toolkit,"perl Makefile.PL && make","bin/pt-*"
+rpm-buildx:
+	@echo "==> [rpmbuild] Criando/Verificando builder Buildx..."
+	docker buildx create --use --name pmmbuilder --driver docker-container || true
+	docker buildx inspect pmmbuilder --bootstrap
 
-# Delimitadores
-FIELD_SEP := ,
-BIN_SEP := |
+rpm-build: rpm-buildx
+	@echo "==> [rpmbuild] Build e push da imagem base (linux/amd64 e linux/arm64)..."
+	cd build/docker/rpmbuild && \
+	  docker buildx build --pull --platform linux/amd64,linux/arm64 \
+		--tag $(IMAGE_REGISTRY)/$(BASE_DOCKER_TAG) \
+		-f Dockerfile.el9 \
+		--push .
 
-###############################################################################
-# Submodule Build System
-###############################################################################
+build-rpmbuild-image: rpm-build
+	@echo "==> [rpmbuild] Imagem base rpmbuild pronta."
 
-.PHONY: build-submodules clean-bin list-targets
+# -----------------------------------------------------------------------------
+# 2) Build do Client
+# -----------------------------------------------------------------------------
+.PHONY: client-source client-binary client-srpm client-rpm client-docker client
 
-define NEWLINE
+client-source:
+	@echo "==> [Client] build-client-source"
+	@[ -x "$(PATH_TO_SCRIPTS)/build-client-source" ] || \
+	  (echo "ERRO: 'build-client-source' não encontrado."; exit 1)
+	@ROOT_DIR=$(ROOT_DIR) $(PATH_TO_SCRIPTS)/build-client-source
 
+client-binary: client-source
+	@echo "==> [Client] build-client-binary"
+	@[ -x "$(PATH_TO_SCRIPTS)/build-client-binary" ] || \
+	  (echo "ERRO: 'build-client-binary' não encontrado."; exit 1)
+	@ROOT_DIR=$(ROOT_DIR) $(PATH_TO_SCRIPTS)/build-client-binary
 
-endef
+client-srpm: client-binary
+	@echo "==> [Client] build-client-srpm"
+	@[ -x "$(PATH_TO_SCRIPTS)/build-client-srpm" ] || \
+	  (echo "ERRO: 'build-client-srpm' não encontrado."; exit 1)
+	@ROOT_DIR=$(ROOT_DIR) $(PATH_TO_SCRIPTS)/build-client-srpm $(IMAGE_REGISTRY)/$(BASE_DOCKER_TAG)
 
-## Compila submódulos com múltiplos binários
-build-submodules: update-submodules
-	@echo "🚀 Iniciando construção de submódulos..."
-	@mkdir -p $(BIN_DIR)
-	$(foreach cfg,$(subst \,, ,$(SUBMODULE_CONFIGS)), \
-		$(eval _fields := $(subst $(FIELD_SEP), ,$(cfg))) \
-		$(eval name := $(word 1,$(_fields))) \
-		$(eval dir := $(word 2,$(_fields))) \
-		$(eval cmds := $(subst ",,$(word 3,$(_fields)))) \
-		$(eval bins := $(subst $(BIN_SEP), ,$(subst ",,$(word 4,$(_fields))))) \
-		\
-		@echo "$(NEWLINE)🔧 Processando [$(name)]"; \
-		@echo "📂 Diretório: $(dir)"; \
-		if [ -d "$(dir)" ]; then \
-			echo "🛠️  Executando: $(cmds)"; \
-			(cd "$(dir)" && eval "$(cmds)") || exit 1; \
-			echo "📦 Binários para copiar: $(bins)"; \
-			$(foreach pattern,$(bins), \
-				$(eval full_pattern := $(dir)/$(pattern)) \
-				@echo "🔍 Procurando: $(full_pattern)"; \
-				found=0; \
-				for file in $$(find "$(dir)" -type f -executable -path "$(full_pattern)" 2>/dev/null); do \
-					found=1; \
-					echo "⚡ Copiando: $$file"; \
-					cp -v "$$file" $(BIN_DIR)/; \
-				done; \
-				if [ $$found -eq 0 ]; then \
-					echo "⚠️  Nenhum binário encontrado para: $(pattern)"; \
-				fi; \
-			) \
-		else \
-			echo "❌ Diretório não encontrado!"; \
-			exit 1; \
-		fi; \
-	)
-	@echo "$(NEWLINE)✅ Construção concluída! Resultados:"
-	@tree -h $(BIN_DIR)
+client-rpm: client-srpm
+	@echo "==> [Client] build-client-rpm"
+	@[ -x "$(PATH_TO_SCRIPTS)/build-client-rpm" ] || \
+	  (echo "ERRO: 'build-client-rpm' não encontrado."; exit 1)
+	@ROOT_DIR=$(ROOT_DIR) $(PATH_TO_SCRIPTS)/build-client-rpm $(IMAGE_REGISTRY)/$(BASE_DOCKER_TAG)
 
-## Lista todos os targets configurados
-list-targets:
-	@echo "🎯 Targets configurados:"
-	@$(foreach cfg,$(subst \,, ,$(SUBMODULE_CONFIGS)), \
-		$(eval name := $(word 1,$(subst $(FIELD_SEP), ,$(cfg)))) \
-		echo "- $(name)"; \
-	)
+client-docker: client-binary
+	@echo "==> [Client] build-client-docker"
+	@[ -x "$(PATH_TO_SCRIPTS)/build-client-docker" ] || \
+	  (echo "ERRO: 'build-client-docker' não encontrado."; exit 1)
+	@ROOT_DIR=$(ROOT_DIR) PUSH_DOCKER=1 DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) \
+	  $(PATH_TO_SCRIPTS)/build-client-docker
 
-## Limpa binários
-clean-bin:
-	@echo "🧹 Limpando binários..."
-	rm -rf $(BIN_DIR)
+client: client-source client-binary client-srpm client-rpm client-docker
+	@echo "==> [Client] Build completo do client finalizado."
 
-## Cria o tarball do código-fonte usando git archive (que respeita o .gitignore)
-build-tarball: build-submodules
-	@echo "Criando tarball do código-fonte..."
-	@mkdir -p $(RPM_TOPDIR)/SOURCES
-	# Gera o tarball com prefixo baseado no SHORT_COMMIT (ajuste crítico)
-	git archive --format=tar --prefix=$(PKG_NAME)-$(CUR_COMMIT)/ HEAD > $(PKG_NAME)-$(SHORT_COMMIT).tar
-	gzip -f $(PKG_NAME)-$(SHORT_COMMIT).tar
-	@mv $(PKG_NAME)-$(SHORT_COMMIT).tar.gz $(RPM_TOPDIR)/SOURCES/
-	@echo "Tarball criado em $(RPM_TOPDIR)/SOURCES/$(PKG_NAME)-$(SHORT_COMMIT).tar.gz"
+# -----------------------------------------------------------------------------
+# 3) Build do Server
+# -----------------------------------------------------------------------------
+.PHONY: server-packages server-docker server
 
-## Configura o ambiente de rpmbuild, copia o arquivo .spec local e executa o rpmbuild
-build-rpm: build-tarball
-	@echo "Configurando ambiente de rpmbuild..."
-	@mkdir -p $(RPM_TOPDIR)/{BUILD,RPMS,SPECS,SRPMS}
-	@if [ ! -f "$(SPEC_FILE)" ]; then \
-	  echo "Erro: Arquivo spec não encontrado em $(SPEC_FILE)"; \
-	  exit 1; \
+server-packages:
+	@echo "==> [Server] build-server-rpm-all"
+	@[ -x "$(PATH_TO_SCRIPTS)/build-server-rpm-all" ] || \
+	  (echo "ERRO: 'build-server-rpm-all' não encontrado."; exit 1)
+	@ROOT_DIR=$(ROOT_DIR) RPMBUILD_DOCKER_IMAGE=$(IMAGE_REGISTRY)/$(BASE_DOCKER_TAG) \
+	  RPMBUILD_DIST="$(DIST)" $(PATH_TO_SCRIPTS)/build-server-rpm-all
+
+server-docker: server-packages
+	@echo "==> [Server] build-server-docker"
+	@[ -x "$(PATH_TO_SCRIPTS)/build-server-docker" ] || \
+	  (echo "ERRO: 'build-server-docker' não encontrado."; exit 1)
+	@ROOT_DIR=$(ROOT_DIR) DOCKER_SERVER_TAG=$(DOCKER_SERVER_TAG) \
+	  RPMBUILD_DOCKER_IMAGE=$(IMAGE_REGISTRY)/$(BASE_DOCKER_TAG) \
+	  RPMBUILD_DIST="$(DIST)" DOCKERFILE=Dockerfile.$(DIST) \
+	  $(PATH_TO_SCRIPTS)/build-server-docker
+	@echo "[Server] Tagging e push da imagem 'latest'"
+	docker tag $(DOCKER_SERVER_TAG) $(IMAGE_REGISTRY)/pmm-server:latest
+	docker push $(IMAGE_REGISTRY)/pmm-server:latest
+
+server: server-packages server-docker
+	@echo "==> [Server] Build completo do servidor finalizado."
+
+# -----------------------------------------------------------------------------
+# 4) Watchtower (opcional)
+# -----------------------------------------------------------------------------
+.PHONY: watchtower
+watchtower:
+	@echo "==> [Watchtower] build-watchtower (opcional)"
+	@[ -x "$(PATH_TO_SCRIPTS)/build-watchtower" ] && \
+	  ROOT_DIR=$(ROOT_DIR) $(PATH_TO_SCRIPTS)/build-watchtower || \
+	  echo "Aviso: 'build-watchtower' não encontrado."
+
+# -----------------------------------------------------------------------------
+# 5) Devcontainer (opcional)
+# -----------------------------------------------------------------------------
+.PHONY: devcontainer
+devcontainer:
+	@echo "==> [Devcontainer] Trigger build (condicional: $(GIT_BRANCH), $(DESTINATION))"
+	@if [ "$(GIT_BRANCH)" = "v3" ] && [ "$(DESTINATION)" = "experimental" ]; then \
+	    curl -L -X POST -H "Accept: application/vnd.github+json" -d '{"ref":"v3"}' \
+	      "https://api.github.com/repos/percona/pmm/actions/workflows/devcontainer.yml/dispatches"; \
 	else \
-	  echo "Arquivo spec encontrado: $(SPEC_FILE)"; \
+	    echo "Condição não satisfeita. Devcontainer não acionado."; \
 	fi
-	@echo "Copiando arquivo .spec..."
-	@cp $(SPEC_FILE) $(RPM_TOPDIR)/SPECS/
-	# @echo "Atualizando macros de commit no arquivo spec..."
-	sed -i "s/^%global commit.*/%global commit          $(CUR_COMMIT)/" $(RPM_TOPDIR)/SPECS/$(notdir $(SPEC_FILE))
-	@echo "Executando rpmbuild..."
-	rpmbuild -ba $(RPM_TOPDIR)/SPECS/$(notdir $(SPEC_FILE)) \
-	  --define "version $(VERSION)" \
-	  --define "dist $(DIST)" \
-	  --define "commit $(CUR_COMMIT)" \
-	  --define "shortcommit $(SHORT_COMMIT)" \
-	  --define "_topdir $(RPM_TOPDIR)"
-	@echo "Pacote RPM gerado em $(RPM_TOPDIR)/RPMS/$(ARCH)/"
 
-## Converte o pacote RPM gerado para um pacote DEB utilizando alien
-build-deb: build-rpm
-	@echo "Convertendo RPM para DEB..."
-	alien -k --verbose --to-deb $(RPM_TOPDIR)/RPMS/$(ARCH)/*.rpm
-	@echo "Pacote DEB gerado."
+# -----------------------------------------------------------------------------
+# 6) Testes (API, E2E)
+# -----------------------------------------------------------------------------
+.PHONY: test-api test-e2e
+test-api:
+	@echo "==> [Testes] Executando testes de API (placeholder)..."
+	@[ -x "$(PATH_TO_SCRIPTS)/run-api-tests" ] && \
+	  ROOT_DIR=$(ROOT_DIR) $(PATH_TO_SCRIPTS)/run-api-tests || \
+	  echo "Aviso: 'run-api-tests' não encontrado."
 
-## Consolida os artefatos (tarball, RPM e DEB) em um diretório "release"
-pkg-release: build-deb
-	@echo "Organizando artefatos para release..."
-	@mkdir -p release
-	@cp $(RPM_TOPDIR)/SOURCES/$(PKG_NAME)-$(CUR_COMMIT).tar.gz release/
-	@cp $(RPM_TOPDIR)/RPMS/$(ARCH)/*.rpm release/
-	@cp $(PKG_NAME)*.deb release/
-	@echo "Artefatos consolidados no diretório 'release'."
+test-e2e:
+	@echo "==> [Testes] Placeholder para testes E2E."
+	@echo "Adicione seu script de testes E2E se necessário."
 
-## Executa todas as etapas de empacotamento
-pkg-all: update-submodules build-tarball build-rpm build-deb pkg-release
-	@echo "Build completo de pacotes finalizado."
+# -----------------------------------------------------------------------------
+# 8) Alvo Final de Build Completo
+# -----------------------------------------------------------------------------
+.PHONY: all
+all: prepare build-rpmbuild-image client server watchtower devcontainer test-api test-e2e rpm-build
+	@echo "==> [ALL] Processo COMPLETO de build do PMM finalizado."
 
+# -----------------------------------------------------------------------------
+# 9) Release: Push final das Imagens Docker
+# -----------------------------------------------------------------------------
+.PHONY: build-datacosmos
+build-datacosmos:
+	@echo "==> [RELEASE] Publicando as imagens Docker do PMM..."
+	@echo "Push do client:     $(CLIENT_IMAGE)"
+	docker push $(CLIENT_IMAGE) || echo "Aviso: falha no push do client"
+	@echo "Push do server:     $(SERVER_IMAGE)"
+	docker push $(SERVER_IMAGE) || echo "Aviso: falha no push do server"
+	@echo "Push do watchtower: $(WATCHTOWER_IMAGE)"
+	docker push $(WATCHTOWER_IMAGE) || echo "Aviso: falha no push do watchtower"
+	@echo "==> [RELEASE] Processo de release finalizado."
+
+###############################################################################
+# Fim do Makefile
+###############################################################################
