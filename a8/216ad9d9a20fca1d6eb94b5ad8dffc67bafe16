@@ -1,0 +1,19 @@
+.github/workflows/upstream-sync.yml
+  s_ec497534621881::t_67af35efd3ab4e 28-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "a8216ad9d9a20fca1d6eb94b5ad8dffc67bafe16",
+  "prompts": {},
+  "sessions": {
+    "s_ec497534621881": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "44b505e8-f8c5-4afa-bd2c-114a19a35757",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
