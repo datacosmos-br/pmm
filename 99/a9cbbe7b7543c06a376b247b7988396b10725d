@@ -1,0 +1,25 @@
+ui/apps/pmm/src/contexts/navigation/navigation.utils.tsx
+  s_68ab3b967b2582::t_16491e6fdc9bf0 129-131
+ui/apps/pmm/src/types/services.types.ts
+  s_68ab3b967b2582::t_ac76c7e3d90e68 9,21
+ui/apps/pmm/src/contexts/navigation/navigation.constants.ts
+  s_68ab3b967b2582::t_9e1682b8e68bc8 769-810,817
+ui/apps/pmm/src/lib/constants.ts
+  s_68ab3b967b2582::t_ac76c7e3d90e68 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "99a9cbbe7b7543c06a376b247b7988396b10725d",
+  "prompts": {},
+  "sessions": {
+    "s_68ab3b967b2582": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7627480e-5c4e-4864-8518-e3cbf3982b1a",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
