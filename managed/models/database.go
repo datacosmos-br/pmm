@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-//nolint:lll
 package models
 
 import (
@@ -84,6 +83,8 @@ var DefaultAgentEncryptionColumnsV3 = []encryption.Table{
 }
 
 // databaseSchema maps schema version from schema_migrations table (id column) to a slice of DDL queries.
+//
+//nolint:lll
 var databaseSchema = [][]string{
 	1: {
 		`CREATE TABLE schema_migrations (
@@ -1181,6 +1182,10 @@ var databaseSchema = [][]string{
 		`DROP TABLE IF EXISTS percona_sso_details`,
 	},
 	118: {
+		`ALTER TABLE dumps ADD COLUMN encrypted boolean NOT NULL DEFAULT false`,
+		`UPDATE dumps SET encrypted = false`,
+	},
+	119: {
 		`ALTER TABLE agents ADD COLUMN clickhouse_options JSONB`,
 		`UPDATE agents SET clickhouse_options = '{}'::jsonb`,
 	},
@@ -1276,7 +1281,8 @@ func SetupDB(ctx context.Context, sqlDB *sql.DB, params SetupDBParams) (*reform.
 		if params.HANodeID != "" {
 			return nil, fmt.Errorf("cannot auto-provision database in HA mode: %w", errCV)
 		}
-		if err := initWithRoot(params); err != nil {
+		err := initWithRoot(params)
+		if err != nil {
 			return nil, err
 		}
 		errCV = checkVersion(ctx, db)
@@ -1286,7 +1292,8 @@ func SetupDB(ctx context.Context, sqlDB *sql.DB, params SetupDBParams) (*reform.
 		return nil, errCV
 	}
 
-	if err := migrateDB(db, params); err != nil {
+	err := migrateDB(db, params)
+	if err != nil {
 		return nil, err
 	}
 
@@ -1470,7 +1477,8 @@ func migrateDB(db *reform.DB, params SetupDBParams) error {
 			queries = append(queries, fmt.Sprintf(`INSERT INTO schema_migrations (id) VALUES (%d)`, version))
 			for _, q := range queries {
 				q = strings.TrimSpace(q)
-				if _, err := tx.Exec(q); err != nil {
+				_, err := tx.Exec(q)
+				if err != nil {
 					return errors.Wrapf(err, "failed to execute statement:\n%s", q)
 				}
 			}
@@ -1569,7 +1577,7 @@ func setupPMMServerHAAgents(q *reform.Querier, params SetupDBParams) error {
 
 	node, err := createNodeWithID(q, nodeID, GenericNodeType, &CreateNodeParams{
 		NodeName:        params.HANodeID,
-		Address:         "127.0.0.1",
+		Address:         LocalhostAddr,
 		CustomLabels:    labels,
 		IsPMMServerNode: true,
 	})
@@ -1600,7 +1608,7 @@ func setupPMMServerAgents(q *reform.Querier, params SetupDBParams) error {
 	// create PMM Server Node and associated Agents
 	node, err := createNodeWithID(q, PMMServerNodeID, GenericNodeType, &CreateNodeParams{
 		NodeName:        "pmm-server",
-		Address:         "127.0.0.1",
+		Address:         LocalhostAddr,
 		IsPMMServerNode: true,
 	})
 	if err != nil {

@@ -47,7 +47,10 @@ func TestCheckPortChanged(t *testing.T) {
 
 		sqlDB, mock, err := sqlmock.New()
 		require.NoError(t, err)
-		defer sqlDB.Close() //nolint:errcheck
+		t.Cleanup(func() {
+			_ = mock.ExpectClose()
+			assert.NoError(t, sqlDB.Close())
+		})
 
 		db := reform.NewDB(sqlDB, postgresql.Dialect, reform.NewPrintfLogger(t.Logf))
 
@@ -67,7 +70,10 @@ func TestCheckPortChanged(t *testing.T) {
 
 		sqlDB, mock, err := sqlmock.New()
 		require.NoError(t, err)
-		defer sqlDB.Close() //nolint:errcheck
+		t.Cleanup(func() {
+			_ = mock.ExpectClose()
+			assert.NoError(t, sqlDB.Close())
+		})
 
 		db := reform.NewDB(sqlDB, postgresql.Dialect, reform.NewPrintfLogger(t.Logf))
 
@@ -120,7 +126,10 @@ func TestCheckPortChanged(t *testing.T) {
 
 		sqlDB, mock, err := sqlmock.New()
 		require.NoError(t, err)
-		defer sqlDB.Close() //nolint:errcheck
+		t.Cleanup(func() {
+			_ = mock.ExpectClose()
+			assert.NoError(t, sqlDB.Close())
+		})
 
 		db := reform.NewDB(sqlDB, postgresql.Dialect, reform.NewPrintfLogger(t.Logf))
 
@@ -173,7 +182,10 @@ func TestCheckPortChanged(t *testing.T) {
 
 		sqlDB, mock, err := sqlmock.New()
 		require.NoError(t, err)
-		defer sqlDB.Close() //nolint:errcheck
+		t.Cleanup(func() {
+			_ = mock.ExpectClose()
+			assert.NoError(t, sqlDB.Close())
+		})
 
 		db := reform.NewDB(sqlDB, postgresql.Dialect, reform.NewPrintfLogger(t.Logf))
 
@@ -226,7 +238,10 @@ func TestCheckPortChanged(t *testing.T) {
 
 		sqlDB, mock, err := sqlmock.New()
 		require.NoError(t, err)
-		defer sqlDB.Close() //nolint:errcheck
+		t.Cleanup(func() {
+			_ = mock.ExpectClose()
+			assert.NoError(t, sqlDB.Close())
+		})
 
 		db := reform.NewDB(sqlDB, postgresql.Dialect, reform.NewPrintfLogger(t.Logf))
 

@@ -146,7 +146,7 @@ func CurrentUserHTTPResponse(err error) (int, map[string]string) {
 // do makes HTTP request with given parameters, and decodes JSON response with 200 OK status
 // to respBody. It returns wrapped clientError on any other status, or other fatal errors.
 // Ctx is used only for cancelation.
-func (c *Client) do(ctx context.Context, method, path, rawQuery string, headers http.Header, body []byte, target interface{}) error {
+func (c *Client) do(ctx context.Context, method, path, rawQuery string, headers http.Header, body []byte, target any) error { //nolint:funcorder
 	u := url.URL{
 		Scheme:   "http",
 		Host:     c.addr,
@@ -187,7 +187,8 @@ func (c *Client) do(ctx context.Context, method, path, rawQuery string, headers 
 	}
 
 	if len(b) != 0 && target != nil {
-		if err = json.Unmarshal(b, target); err != nil {
+		err = json.Unmarshal(b, target)
+		if err != nil {
 			return errors.WithStack(err)
 		}
 	}
@@ -260,7 +261,7 @@ func (c *Client) GetUserID(ctx context.Context) (int, error) {
 		return 0, err
 	}
 
-	var m map[string]interface{}
+	var m map[string]any
 	err = c.do(ctx, http.MethodGet, "/api/user", "", authHeaders, nil, &m)
 	if err != nil {
 		return 0, err
@@ -298,7 +299,7 @@ func (c *Client) getAuthUser(ctx context.Context, authHeaders http.Header, l *lo
 	}
 
 	// https://grafana.com/docs/http_api/user/#actual-user - works only with Basic Auth
-	var m map[string]interface{}
+	var m map[string]any
 	err := c.do(ctx, http.MethodGet, "/api/user", "", authHeaders, nil, &m)
 	if err != nil {
 		if hasAuthorizationHeader(authHeaders) {
@@ -332,7 +333,7 @@ func (c *Client) getAuthUser(ctx context.Context, authHeaders http.Header, l *lo
 	}
 
 	// works only with Basic auth
-	var s []interface{}
+	var s []any
 	if err := c.do(ctx, http.MethodGet, "/api/user/orgs", "", authHeaders, nil, &s); err != nil {
 		return authUser{
 			role:   none,
@@ -341,7 +342,7 @@ func (c *Client) getAuthUser(ctx context.Context, authHeaders http.Header, l *lo
 	}
 
 	for _, el := range s {
-		m, _ := el.(map[string]interface{})
+		m, _ := el.(map[string]any)
 		if m == nil {
 			continue
 		}
@@ -407,7 +408,8 @@ func (c *Client) getAnonymousRoleFromSettings(ctx context.Context, l *logrus.Ent
 
 func (c *Client) getFrontendSettings(ctx context.Context) (frontendSettingsFull, error) {
 	var settings frontendSettingsFull
-	if err := c.do(ctx, http.MethodGet, "/api/frontend/settings", "", nil, nil, &settings); err != nil {
+	err := c.do(ctx, http.MethodGet, "/api/frontend/settings", "", nil, nil, &settings)
+	if err != nil {
 		return frontendSettingsFull{}, err
 	}
 
@@ -541,8 +543,9 @@ func (c *Client) getRoleForServiceToken(ctx context.Context, token string) (role
 	header := http.Header{}
 	header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
 
-	var k map[string]interface{}
-	if err := c.do(ctx, http.MethodGet, "/api/auth/serviceaccount", "", header, nil, &k); err != nil {
+	var k map[string]any
+	err := c.do(ctx, http.MethodGet, "/api/auth/serviceaccount", "", header, nil, &k)
+	if err != nil {
 		return none, err
 	}
 
@@ -562,7 +565,8 @@ type serviceAccountSearch struct {
 func (c *Client) getServiceAccountIDFromName(ctx context.Context, nodeName string, authHeaders http.Header) (int, error) {
 	var res serviceAccountSearch
 	serviceAccountName := grafana.SanitizeSAName(fmt.Sprintf("%s-%s", pmmServiceAccountName, nodeName))
-	if err := c.do(ctx, http.MethodGet, "/api/serviceaccounts/search", fmt.Sprintf("query=%s", serviceAccountName), authHeaders, nil, &res); err != nil {
+	err := c.do(ctx, http.MethodGet, "/api/serviceaccounts/search", "query="+serviceAccountName, authHeaders, nil, &res)
+	if err != nil {
 		return 0, err
 	}
 	for _, serviceAccount := range res.ServiceAccounts {
@@ -613,7 +617,7 @@ func (c *Client) testCreateUser(ctx context.Context, login string, role role, au
 	if err != nil {
 		return 0, errors.WithStack(err)
 	}
-	var m map[string]interface{}
+	var m map[string]any
 	if err = c.do(ctx, "POST", "/api/admin/users", "", authHeaders, b, &m); err != nil {
 		return 0, err
 	}
@@ -873,7 +877,7 @@ func (c *Client) createServiceAccount(ctx context.Context, role role, nodeName s
 		return 0, errors.WithStack(err)
 	}
 
-	var m map[string]interface{}
+	var m map[string]any
 	if err = c.do(ctx, "POST", "/api/serviceaccounts", "", authHeaders, b, &m); err != nil {
 		return 0, err
 	}
@@ -907,7 +911,7 @@ func (c *Client) createServiceToken(ctx context.Context, serviceAccountID int, n
 		return 0, "", errors.WithStack(err)
 	}
 
-	var m map[string]interface{}
+	var m map[string]any
 	if err = c.do(ctx, "POST", fmt.Sprintf("/api/serviceaccounts/%d/tokens", serviceAccountID), "", authHeaders, b, &m); err != nil {
 		return 0, "", err
 	}
@@ -919,7 +923,8 @@ func (c *Client) createServiceToken(ctx context.Context, serviceAccountID int, n
 
 func (c *Client) serviceTokenExists(ctx context.Context, serviceAccountID int, nodeName string, authHeaders http.Header) (bool, error) {
 	var tokens []serviceToken
-	if err := c.do(ctx, "GET", fmt.Sprintf("/api/serviceaccounts/%d/tokens", serviceAccountID), "", authHeaders, nil, &tokens); err != nil {
+	err := c.do(ctx, "GET", fmt.Sprintf("/api/serviceaccounts/%d/tokens", serviceAccountID), "", authHeaders, nil, &tokens)
+	if err != nil {
 		return false, err
 	}
 
@@ -937,14 +942,16 @@ func (c *Client) serviceTokenExists(ctx context.Context, serviceAccountID int, n
 
 func (c *Client) deletePMMAgentServiceToken(ctx context.Context, serviceAccountID int, nodeName string, authHeaders http.Header) error {
 	var tokens []serviceToken
-	if err := c.do(ctx, "GET", fmt.Sprintf("/api/serviceaccounts/%d/tokens", serviceAccountID), "", authHeaders, nil, &tokens); err != nil {
+	err := c.do(ctx, "GET", fmt.Sprintf("/api/serviceaccounts/%d/tokens", serviceAccountID), "", authHeaders, nil, &tokens)
+	if err != nil {
 		return err
 	}
 
 	serviceTokenName := fmt.Sprintf("%s-%s", pmmServiceTokenName, nodeName)
 	for _, token := range tokens {
 		if strings.HasPrefix(token.Name, grafana.SanitizeSAName(serviceTokenName)) {
-			if err := c.do(ctx, "DELETE", fmt.Sprintf("/api/serviceaccounts/%d/tokens/%d", serviceAccountID, token.ID), "", authHeaders, nil, nil); err != nil {
+			err := c.do(ctx, "DELETE", fmt.Sprintf("/api/serviceaccounts/%d/tokens/%d", serviceAccountID, token.ID), "", authHeaders, nil, nil)
+			if err != nil {
 				return err
 			}
 
@@ -1028,7 +1035,8 @@ func (c *Client) findAnnotations(ctx context.Context, from, to time.Time, author
 	}.Encode()
 
 	var response []annotation
-	if err := c.do(ctx, http.MethodGet, "/api/annotations", params, headers, nil, &response); err != nil {
+	err := c.do(ctx, http.MethodGet, "/api/annotations", params, headers, nil, &response)
+	if err != nil {
 		return nil, err
 	}
 
@@ -1048,7 +1056,8 @@ type grafanaHealthResponse struct {
 // IsReady calls Grafana API to check its status.
 func (c *Client) IsReady(ctx context.Context) error {
 	var status grafanaHealthResponse
-	if err := c.do(ctx, http.MethodGet, "/api/health", "", nil, nil, &status); err != nil {
+	err := c.do(ctx, http.MethodGet, "/api/health", "", nil, nil, &status)
+	if err != nil {
 		return fmt.Errorf("grafana health check failed: %w", err)
 	}
 
@@ -1082,7 +1091,8 @@ func (c *Client) GetCurrentUserAccessToken(ctx context.Context) (string, error) 
 	headers.Set("Cookie", strings.Join(cookies, "; "))
 
 	var user currentUser
-	if err := c.do(ctx, http.MethodGet, "/graph/percona-api/user/oauth-token", "", headers, nil, &user); err != nil {
+	err := c.do(ctx, http.MethodGet, "/graph/percona-api/user/oauth-token", "", headers, nil, &user)
+	if err != nil {
 		var e *clientError
 		if errors.As(err, &e) && e.ErrorMessage == "Failed to get token" && e.Code == http.StatusInternalServerError {
 			return "", ErrFailedToGetToken
