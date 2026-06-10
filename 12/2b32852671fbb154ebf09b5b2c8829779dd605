@@ -1,0 +1,21 @@
+agent/serviceinfobroker/service_info_broker.go
+  s_766c358d84b6e2::t_e9db94d5843ff6 90-91
+agent/serviceinfobroker/clickhouse.go
+  s_766c358d84b6e2::t_e9db94d5843ff6 1-25,28-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "122b32852671fbb154ebf09b5b2c8829779dd605",
+  "prompts": {},
+  "sessions": {
+    "s_766c358d84b6e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f70874aa-b264-42d3-b8bb-d7dde6bfa0a2",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
