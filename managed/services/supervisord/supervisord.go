@@ -48,6 +48,8 @@ const (
 	defaultClickhouseAddr               = "127.0.0.1:9000"
 	defaultClickhouseUser               = "default"
 	defaultClickhousePassword           = "clickhouse"
+	defaultClickhouseIsCluster          = "false"
+	defaultClickhouseClusterName        = ""
 	defaultVMSearchMaxQueryLen          = "1MB"
 	defaultVMSearchLatencyOffset        = "5s"
 	defaultVMSearchMaxUniqueTimeseries  = "100000000"
@@ -329,6 +331,8 @@ environment =
 	PMM_CLICKHOUSE_DATABASE="{{ .ClickhouseDatabase }}",
 	PMM_CLICKHOUSE_USER="{{ .ClickhouseUser }}",
 	PMM_CLICKHOUSE_PASSWORD="{{ .ClickhousePassword }}",
+	PMM_CLICKHOUSE_IS_CLUSTER="{{ .ClickhouseIsCluster }}",
+	PMM_CLICKHOUSE_CLUSTER_NAME="{{ .ClickhouseClusterName }}",
 
 
 autorestart = true
@@ -457,6 +461,8 @@ func (s *Service) marshalConfig(tmpl *template.Template, settings *models.Settin
 	clickhouseAddrPair := strings.SplitN(clickhouseAddr, ":", 2) //nolint:mnd
 	clickhouseUser := envvars.GetEnv("PMM_CLICKHOUSE_USER", defaultClickhouseUser)
 	clickhousePassword := envvars.GetEnv("PMM_CLICKHOUSE_PASSWORD", defaultClickhousePassword)
+	clickhouseIsCluster := envvars.GetEnv("PMM_CLICKHOUSE_IS_CLUSTER", defaultClickhouseIsCluster)
+	clickhouseClusterName := envvars.GetEnv("PMM_CLICKHOUSE_CLUSTER_NAME", defaultClickhouseClusterName)
 	vmSearchDisableCache := envvars.GetEnv("VM_search_disableCache", strconv.FormatBool(!settings.IsVictoriaMetricsCacheEnabled()))
 	vmSearchMaxQueryLen := envvars.GetEnv("VM_search_maxQueryLen", defaultVMSearchMaxQueryLen)
 	vmSearchLatencyOffset := envvars.GetEnv("VM_search_latencyOffset", defaultVMSearchLatencyOffset)
@@ -490,6 +496,8 @@ func (s *Service) marshalConfig(tmpl *template.Template, settings *models.Settin
 		"ClickhousePort":               clickhouseAddrPair[1],
 		"ClickhouseUser":               clickhouseUser,
 		"ClickhousePassword":           clickhousePassword,
+		"ClickhouseIsCluster":          clickhouseIsCluster,
+		"ClickhouseClusterName":        clickhouseClusterName,
 		"PMMServerHost":                "",
 	}
 

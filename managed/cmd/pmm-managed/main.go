@@ -993,7 +993,21 @@ func main() { //nolint:gocognit,maintidx,cyclop
 
 	actionsService := agents.NewActionsService(qanClient, agentsRegistry)
 
-	vmClient, err := metrics.NewClient(metrics.Config{Address: *victoriaMetricsURLF})
+	vmURL, err := url.Parse(*victoriaMetricsURLF)
+	if err != nil {
+		l.Fatalf("Could not parse Victoria Metrics URL: %s", err)
+	}
+	vmClientCfg := metrics.Config{Address: *victoriaMetricsURLF}
+	if vmURL.User != nil {
+		username := vmURL.User.Username()
+		password, _ := vmURL.User.Password()
+		vmClientCfg.RoundTripper = &basicAuthRoundTripper{
+			username: username,
+			password: password,
+			base:     http.DefaultTransport,
+		}
+	}
+	vmClient, err := metrics.NewClient(vmClientCfg)
 	if err != nil {
 		l.Fatalf("Could not create Victoria Metrics client: %s", err)
 	}
@@ -1246,4 +1260,16 @@ func parseLoggerConfig(level string, debug, trace bool) logrus.Level {
 	}
 
 	return logrus.InfoLevel
+}
+
+// basicAuthRoundTripper adds HTTP Basic Authentication to requests.
+type basicAuthRoundTripper struct {
+	username string
+	password string
+	base     http.RoundTripper
+}
+
+func (rt *basicAuthRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.SetBasicAuth(rt.username, rt.password)
+	return rt.base.RoundTrip(req)
 }
