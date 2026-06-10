@@ -46,10 +46,13 @@ import (
 const (
 	defaultClickhouseDatabase           = "pmm"
 	defaultClickhouseAddr               = "127.0.0.1:9000"
+	defaultClickhouseProtocol           = "native"
 	defaultClickhouseUser               = "default"
 	defaultClickhousePassword           = "clickhouse"
 	defaultClickhouseIsCluster          = "false"
 	defaultClickhouseClusterName        = ""
+	defaultClickhouseTLS                = "false"
+	defaultClickhouseTLSSkipVerify      = "false"
 	defaultVMSearchMaxQueryLen          = "1MB"
 	defaultVMSearchLatencyOffset        = "5s"
 	defaultVMSearchMaxUniqueTimeseries  = "100000000"
@@ -329,11 +332,16 @@ command =
 environment =
 	PMM_CLICKHOUSE_ADDR="{{ .ClickhouseAddr }}",
 	PMM_CLICKHOUSE_DATABASE="{{ .ClickhouseDatabase }}",
+	PMM_CLICKHOUSE_PROTOCOL="{{ .ClickhouseProtocol }}",
 	PMM_CLICKHOUSE_USER="{{ .ClickhouseUser }}",
 	PMM_CLICKHOUSE_PASSWORD="{{ .ClickhousePassword }}",
 	PMM_CLICKHOUSE_IS_CLUSTER="{{ .ClickhouseIsCluster }}",
 	PMM_CLICKHOUSE_CLUSTER_NAME="{{ .ClickhouseClusterName }}",
-
+	PMM_CLICKHOUSE_TLS="{{ .ClickhouseTLS }}",
+	PMM_CLICKHOUSE_TLS_SKIP_VERIFY="{{ .ClickhouseTLSSkipVerify }}",
+	PMM_CLICKHOUSE_TLS_CA="{{ .ClickhouseTLSCa }}",
+	PMM_CLICKHOUSE_TLS_CERT="{{ .ClickhouseTLSCert }}",
+	PMM_CLICKHOUSE_TLS_KEY="{{ .ClickhouseTLSKey }}",
 
 autorestart = true
 autostart = true
@@ -458,11 +466,17 @@ func (s *Service) reload(name string) error {
 func (s *Service) marshalConfig(tmpl *template.Template, settings *models.Settings) ([]byte, error) {
 	clickhouseDatabase := envvars.GetEnv("PMM_CLICKHOUSE_DATABASE", defaultClickhouseDatabase)
 	clickhouseAddr := envvars.GetEnv("PMM_CLICKHOUSE_ADDR", defaultClickhouseAddr)
+	clickhouseProtocol := envvars.GetEnv("PMM_CLICKHOUSE_PROTOCOL", defaultClickhouseProtocol)
 	clickhouseAddrPair := strings.SplitN(clickhouseAddr, ":", 2) //nolint:mnd
 	clickhouseUser := envvars.GetEnv("PMM_CLICKHOUSE_USER", defaultClickhouseUser)
 	clickhousePassword := envvars.GetEnv("PMM_CLICKHOUSE_PASSWORD", defaultClickhousePassword)
 	clickhouseIsCluster := envvars.GetEnv("PMM_CLICKHOUSE_IS_CLUSTER", defaultClickhouseIsCluster)
 	clickhouseClusterName := envvars.GetEnv("PMM_CLICKHOUSE_CLUSTER_NAME", defaultClickhouseClusterName)
+	clickhouseTLS := envvars.GetEnv("PMM_CLICKHOUSE_TLS", defaultClickhouseTLS)
+	clickhouseTLSSkipVerify := envvars.GetEnv("PMM_CLICKHOUSE_TLS_SKIP_VERIFY", defaultClickhouseTLSSkipVerify)
+	clickhouseTLSCa := envvars.GetEnv("PMM_CLICKHOUSE_TLS_CA", "")
+	clickhouseTLSCert := envvars.GetEnv("PMM_CLICKHOUSE_TLS_CERT", "")
+	clickhouseTLSKey := envvars.GetEnv("PMM_CLICKHOUSE_TLS_KEY", "")
 	vmSearchDisableCache := envvars.GetEnv("VM_search_disableCache", strconv.FormatBool(!settings.IsVictoriaMetricsCacheEnabled()))
 	vmSearchMaxQueryLen := envvars.GetEnv("VM_search_maxQueryLen", defaultVMSearchMaxQueryLen)
 	vmSearchLatencyOffset := envvars.GetEnv("VM_search_latencyOffset", defaultVMSearchLatencyOffset)
@@ -492,12 +506,18 @@ func (s *Service) marshalConfig(tmpl *template.Template, settings *models.Settin
 		"InterfaceToBind":              envvars.GetInterfaceToBind(),
 		"ClickhouseAddr":               clickhouseAddr,
 		"ClickhouseDatabase":           clickhouseDatabase,
+		"ClickhouseProtocol":           clickhouseProtocol,
 		"ClickhouseHost":               clickhouseAddrPair[0],
 		"ClickhousePort":               clickhouseAddrPair[1],
 		"ClickhouseUser":               clickhouseUser,
 		"ClickhousePassword":           clickhousePassword,
 		"ClickhouseIsCluster":          clickhouseIsCluster,
 		"ClickhouseClusterName":        clickhouseClusterName,
+		"ClickhouseTLS":                clickhouseTLS,
+		"ClickhouseTLSSkipVerify":      clickhouseTLSSkipVerify,
+		"ClickhouseTLSCa":              clickhouseTLSCa,
+		"ClickhouseTLSCert":            clickhouseTLSCert,
+		"ClickhouseTLSKey":             clickhouseTLSKey,
 		"PMMServerHost":                "",
 	}
 
