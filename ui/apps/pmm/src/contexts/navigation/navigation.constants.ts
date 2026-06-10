@@ -766,12 +766,55 @@ export const NAV_SIGN_IN: NavItem = {
  *
  * Folders are created based on the folder name in grafana-dashboards.
  */
+//
+// ClickHouse
+//
+export const NAV_CLICKHOUSE: NavItem = {
+  id: 'clickhouse',
+  text: 'ClickHouse',
+  icon: 'percona-ch',
+  url: `${PMM_NEW_NAV_GRAFANA_PATH}/d/clickhouse-instances-overview/clickhouse-instances-overview`,
+  children: [
+    {
+      id: 'clickhouse-overview',
+      text: 'Overview',
+      icon: 'overview',
+      url: `${PMM_NEW_NAV_GRAFANA_PATH}/d/clickhouse-instances-overview/clickhouse-instances-overview`,
+    },
+    {
+      id: 'clickhouse-summary',
+      text: 'Summary',
+      icon: 'summary',
+      url: `${PMM_NEW_NAV_GRAFANA_PATH}/d/clickhouse-instance-summary/clickhouse-instance-summary`,
+    },
+    {
+      id: 'clickhouse-compare',
+      text: 'Compare',
+      icon: 'compare',
+      url: `${PMM_NEW_NAV_GRAFANA_PATH}/d/clickhouse-instances-compare/clickhouse-instances-compare`,
+    },
+    {
+      id: 'clickhouse-query-performance',
+      text: 'Query Performance',
+      icon: 'query',
+      url: `${PMM_NEW_NAV_GRAFANA_PATH}/d/clickhouse-query-performance/clickhouse-query-performance`,
+    },
+    {
+      id: 'clickhouse-replication',
+      text: 'Replication',
+      icon: 'high-availability',
+      url: `${PMM_NEW_NAV_GRAFANA_PATH}/d/clickhouse-replication/clickhouse-replication`,
+    },
+  ],
+};
+
 export const NAV_FOLDER_MAP: Record<string, string> = {
   system: 'OS',
   mysql: 'MySQL',
   mongo: 'MongoDB',
   postgre: 'PostgreSQL',
   valkey: 'Valkey',
+  clickhouse: 'ClickHouse',
 };
 
 export const NAV_OTHER_DASHBOARDS_TEMPLATE: Partial<NavItem> = {
