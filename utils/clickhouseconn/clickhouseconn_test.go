@@ -150,6 +150,7 @@ func TestConfig_IsSecure(t *testing.T) {
 	}{
 		{name: "https protocol", cfg: Config{Protocol: "https"}, want: true},
 		{name: "TLS enabled", cfg: Config{Protocol: "native", TLS: true}, want: true},
+		{name: "http with TLS", cfg: Config{Protocol: "http", TLS: true}, want: true},
 		{name: "native without TLS", cfg: Config{Protocol: "native", TLS: false}, want: false},
 		{name: "http without TLS", cfg: Config{Protocol: "http", TLS: false}, want: false},
 	}
@@ -168,6 +169,7 @@ func TestConfig_effectivePort(t *testing.T) {
 		want uint16
 	}{
 		{name: "explicit port", cfg: Config{Protocol: "native", Port: 1234}, want: 1234},
+		{name: "empty protocol explicit port", cfg: Config{Protocol: "", Port: 1234}, want: 1234},
 		{name: "native default", cfg: Config{Protocol: "native"}, want: 9000},
 		{name: "empty protocol default", cfg: Config{Protocol: ""}, want: 9000},
 		{name: "http default", cfg: Config{Protocol: "http"}, want: 8123},
@@ -177,6 +179,152 @@ func TestConfig_effectivePort(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.want, tt.cfg.effectivePort())
+		})
+	}
+}
+
+func TestConfig_DSN(t *testing.T) {
+	tests := []struct {
+		name        string
+		cfg         Config
+		want        string
+		wantErr     bool
+		errContains string
+	}{
+		{
+			name: "native default",
+			cfg: Config{
+				Protocol: "native",
+				Host:     "127.0.0.1",
+				Port:     9000,
+				Database: "pmm",
+				User:     "default",
+				Password: "clickhouse",
+			},
+			want: "clickhouse://default:clickhouse@127.0.0.1:9000/pmm",
+		},
+		{
+			name: "native with TLS",
+			cfg: Config{
+				Protocol:      "native",
+				Host:          "127.0.0.1",
+				Port:          9440,
+				Database:      "pmm",
+				User:          "default",
+				Password:      "clickhouse",
+				TLS:           true,
+				TLSSkipVerify: true,
+			},
+			want: "clickhouse://default:clickhouse@127.0.0.1:9440/pmm?secure=true&skip_verify=true",
+		},
+		{
+			name: "http no tls",
+			cfg: Config{
+				Protocol: "http",
+				Host:     "127.0.0.1",
+				Port:     8123,
+				Database: "pmm",
+				User:     "default",
+			},
+			want: "http://default@127.0.0.1:8123/pmm",
+		},
+		{
+			name: "https with ca",
+			cfg: Config{
+				Protocol: "https",
+				Host:     "ch.example.com",
+				Port:     8443,
+				Database: "metrics",
+				User:     "admin",
+				Password: "secret",
+				TLSCa:    "/etc/ssl/ca.crt",
+			},
+			want: "https://admin:secret@ch.example.com:8443/metrics?secure=true&sslrootcert=%2Fetc%2Fssl%2Fca.crt",
+		},
+		{
+			name: "empty protocol defaults to native",
+			cfg: Config{
+				Protocol: "",
+				Host:     "127.0.0.1",
+				Port:     0,
+				Database: "pmm",
+			},
+			want: "clickhouse://127.0.0.1:9000/pmm",
+		},
+		{
+			name: "zero port uses default for https",
+			cfg: Config{
+				Protocol: "https",
+				Host:     "127.0.0.1",
+				Port:     0,
+				Database: "pmm",
+			},
+			want: "https://127.0.0.1:8443/pmm?secure=true",
+		},
+		{
+			name: "empty host errors",
+			cfg: Config{
+				Protocol: "",
+				Host:     "",
+				Port:     0,
+				Database: "",
+			},
+			wantErr:     true,
+			errContains: "clickhouse host is required",
+		},
+		{
+			name: "native tls with ca",
+			cfg: Config{
+				Protocol: "native",
+				Host:     "127.0.0.1",
+				Port:     9000,
+				Database: "pmm",
+				User:     "u",
+				Password: "p",
+				TLS:      true,
+				TLSCa:    "/ca",
+			},
+			want: "clickhouse://u:p@127.0.0.1:9000/pmm?secure=true&sslrootcert=%2Fca",
+		},
+		{
+			name: "empty user with password",
+			cfg: Config{
+				Protocol: "native",
+				Host:     "127.0.0.1",
+				Port:     9000,
+				User:     "",
+				Password: "secret",
+			},
+			want: "clickhouse://:secret@127.0.0.1:9000/",
+		},
+		{
+			name: "native tls with cert and key",
+			cfg: Config{
+				Protocol: "native",
+				Host:     "127.0.0.1",
+				Port:     9000,
+				Database: "pmm",
+				User:     "u",
+				Password: "p",
+				TLS:      true,
+				TLSCa:    "/ca",
+				TLSCert:  "/cert",
+				TLSKey:   "/key",
+			},
+			want: "clickhouse://u:p@127.0.0.1:9000/pmm?secure=true&sslcert=%2Fcert&sslkey=%2Fkey&sslrootcert=%2Fca",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.cfg.DSN()
+			if tt.wantErr {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tt.errContains)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

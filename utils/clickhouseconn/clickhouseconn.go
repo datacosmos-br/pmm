@@ -17,6 +17,9 @@ package clickhouseconn
 
 import (
 	"fmt"
+	"net"
+	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -30,10 +33,12 @@ type Config struct {
 	Password      string
 	TLS           bool
 	TLSSkipVerify bool
-	// TLSCa, TLSCert and TLSKey are used by DSN() in the next iteration (Task 2).
-	TLSCa         string
-	TLSCert       string
-	TLSKey        string
+	// TLSCa is the path to the TLS CA certificate file.
+	TLSCa string
+	// TLSCert is the path to the TLS client certificate file.
+	TLSCert string
+	// TLSKey is the path to the TLS client key file.
+	TLSKey string
 }
 
 // ParseProtocol normalizes a raw protocol string.
@@ -92,4 +97,47 @@ func (c *Config) effectivePort() uint16 {
 	default:
 		return 9000
 	}
+}
+
+// DSN builds a ClickHouse DSN string from the configuration.
+func (c *Config) DSN() (string, error) {
+	if c.Host == "" {
+		return "", fmt.Errorf("clickhouse host is required")
+	}
+
+	u := &url.URL{
+		Scheme: c.Scheme(),
+		Host:   net.JoinHostPort(c.Host, strconv.Itoa(int(c.effectivePort()))),
+		Path:   "/" + c.Database,
+	}
+
+	if c.User != "" || c.Password != "" {
+		if c.Password != "" {
+			u.User = url.UserPassword(c.User, c.Password)
+		} else {
+			u.User = url.User(c.User)
+		}
+	}
+
+	q := url.Values{}
+	if c.IsSecure() {
+		q.Set("secure", "true")
+	}
+	if c.TLSSkipVerify {
+		q.Set("skip_verify", "true")
+	}
+	if c.TLSCa != "" {
+		q.Set("sslrootcert", c.TLSCa)
+	}
+	if c.TLSCert != "" {
+		q.Set("sslcert", c.TLSCert)
+	}
+	if c.TLSKey != "" {
+		q.Set("sslkey", c.TLSKey)
+	}
+	if len(q) > 0 {
+		u.RawQuery = q.Encode()
+	}
+
+	return u.String(), nil
 }
