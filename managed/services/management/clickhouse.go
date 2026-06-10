@@ -17,6 +17,7 @@ package management
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -42,22 +43,33 @@ const defaultClickHouseNativeMetricsPort = 9363
 const clickHouseNativeProbeTimeout = 3 * time.Second
 
 // probeClickHouseNativeEndpoint reports whether the ClickHouse native
-// Prometheus endpoint answers an HTTP GET on {address}:{port}/metrics.
-func probeClickHouseNativeEndpoint(ctx context.Context, address string, port uint16) bool {
+// Prometheus endpoint answers an HTTP GET on {scheme}://{address}:{port}/metrics.
+func probeClickHouseNativeEndpoint(ctx context.Context, scheme, address string, port uint16, tlsSkipVerify bool) bool {
 	if address == "" {
 		return false
+	}
+	if scheme == "" {
+		scheme = "http"
 	}
 
 	probeCtx, cancel := context.WithTimeout(ctx, clickHouseNativeProbeTimeout)
 	defer cancel()
 
-	url := fmt.Sprintf("http://%s/metrics", net.JoinHostPort(address, strconv.Itoa(int(port))))
-	req, err := http.NewRequestWithContext(probeCtx, http.MethodGet, url, nil)
+	urlStr := fmt.Sprintf("%s://%s/metrics", scheme, net.JoinHostPort(address, strconv.Itoa(int(port))))
+	client := http.DefaultClient
+	if scheme == "https" && tlsSkipVerify {
+		client = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+			},
+		}
+	}
+	req, err := http.NewRequestWithContext(probeCtx, http.MethodGet, urlStr, nil)
 	if err != nil {
 		return false
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return false
 	}
@@ -107,16 +119,20 @@ func (s *ManagementService) addClickHouse(ctx context.Context, req *managementv1
 
 		// Resolve the metrics source: auto-probe when unspecified; a forced
 		// native source that fails the probe is a precondition failure.
+		probeScheme := "http"
+		if req.Protocol == "https" {
+			probeScheme = "https"
+		}
 		source := req.MetricsSource
 		switch source {
 		case managementv1.MetricsSource_METRICS_SOURCE_UNSPECIFIED:
-			if probeClickHouseNativeEndpoint(ctx, req.Address, nativePort) {
+			if probeClickHouseNativeEndpoint(ctx, probeScheme, req.Address, nativePort, req.TlsSkipVerify) {
 				source = managementv1.MetricsSource_METRICS_SOURCE_NATIVE
 			} else {
 				source = managementv1.MetricsSource_METRICS_SOURCE_EXPORTER
 			}
 		case managementv1.MetricsSource_METRICS_SOURCE_NATIVE:
-			if !probeClickHouseNativeEndpoint(ctx, req.Address, nativePort) {
+			if !probeClickHouseNativeEndpoint(ctx, probeScheme, req.Address, nativePort, req.TlsSkipVerify) {
 				return status.Errorf(codes.FailedPrecondition,
 					"ClickHouse native Prometheus endpoint is not reachable at %s:%d; "+
 						"enable the <prometheus> server config section or use --metrics-source=exporter",
@@ -132,7 +148,7 @@ func (s *ManagementService) addClickHouse(ctx context.Context, req *managementv1
 				ServiceID:     service.ServiceID,
 				Username:      req.Username,
 				Password:      req.Password,
-				Scheme:        "http",
+				Scheme:        clickhouseExporterScheme(req.Protocol, req.Tls),
 				MetricsPath:   "/metrics",
 				ListenPort:    uint32(nativePort),
 				CustomLabels:  req.CustomLabels,
@@ -211,4 +227,12 @@ func (s *ManagementService) addClickHouse(ctx context.Context, req *managementv1
 		},
 	}
 	return res, nil
+}
+// clickhouseExporterScheme returns the scheme for the ClickHouse native metrics endpoint.
+// It mirrors the logic in clickhouseconn.Config.ExporterScheme.
+func clickhouseExporterScheme(protocol string, tls bool) string {
+	if protocol == "https" || (protocol == "" && tls) {
+		return "https"
+	}
+	return "http"
 }
