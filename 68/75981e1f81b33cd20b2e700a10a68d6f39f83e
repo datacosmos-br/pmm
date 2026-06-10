@@ -1,0 +1,21 @@
+managed/services/inventory/services.go
+  s_68ab3b967b2582::t_f7aa6a7d548705 105-106,234-253
+managed/models/service_helpers.go
+  s_68ab3b967b2582::t_f7aa6a7d548705 277
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "6875981e1f81b33cd20b2e700a10a68d6f39f83e",
+  "prompts": {},
+  "sessions": {
+    "s_68ab3b967b2582": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7627480e-5c4e-4864-8518-e3cbf3982b1a",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
