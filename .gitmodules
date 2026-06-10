@@ -1,4 +1,4 @@
 [submodule "pmm-submodules"]
 	path = pmm-submodules
-	url = https://github.com/Percona-Lab/pmm-submodules.git
+	url = https://github.com/datacosmos-br/pmm-submodules.git
 	branch = pmm-3.7.1
