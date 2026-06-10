@@ -1,0 +1,19 @@
+utils/clickhouseconn/clickhouseconn.go
+  s_766c358d84b6e2::t_1f88c10bd8750a 36-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "824f61e44e75e109f1bf91ffa99df702d68add32",
+  "prompts": {},
+  "sessions": {
+    "s_766c358d84b6e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f70874aa-b264-42d3-b8bb-d7dde6bfa0a2",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
