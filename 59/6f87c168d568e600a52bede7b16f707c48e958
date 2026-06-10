@@ -1,0 +1,19 @@
+build/scripts/build-server-rpm
+  s_68ab3b967b2582::t_ed409d26831161 109-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "596f87c168d568e600a52bede7b16f707c48e958",
+  "prompts": {},
+  "sessions": {
+    "s_68ab3b967b2582": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7627480e-5c4e-4864-8518-e3cbf3982b1a",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
