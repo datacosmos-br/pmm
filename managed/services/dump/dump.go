@@ -142,9 +142,11 @@ func (s *Service) StartDump(params *Params) (string, error) {
 		pmmDumpBin,
 		"export",
 		"--pmm-url=http://127.0.0.1:8080",
-		"--click-house-url="+s.urls.ClickhouseURL,
-		"--victoria-metrics-url="+s.urls.VMURL,
 		"--dump-path="+getDumpFilePath(dump.ID, false))
+	pmmDumpCmd.Env = append(os.Environ(),
+		"PMM_CLICKHOUSE_URL="+s.urls.ClickhouseURL,
+		"PMM_VM_URL="+s.urls.VMURL,
+	)
 
 	if params.Token != "" {
 		pmmDumpCmd.Args = append(pmmDumpCmd.Args, fmt.Sprintf(`--pmm-token=%s`, params.Token))
