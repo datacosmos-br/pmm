@@ -1,0 +1,20 @@
+api/actions/v1/actions.proto
+  s_766c358d84b6e2::t_1beb4ca2ece878 23,212-229,313
+  s_766c358d84b6e2::t_af456899a9ea89 359-370
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "09863aba46d93bece4738a9cf61f9aa631012d45",
+  "prompts": {},
+  "sessions": {
+    "s_766c358d84b6e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f70874aa-b264-42d3-b8bb-d7dde6bfa0a2",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
