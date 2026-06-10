@@ -1,0 +1,51 @@
+api/swagger/swagger.json
+  s_68ab3b967b2582::t_4a0a00e648c05d 8527-8531
+  s_d8591572ad7768::t_79b8012047e237 19677-19681,20692-20696,21278-21282,21906-21910,26109-26113,29280-29284
+managed/models/agent_helpers.go
+  s_d8591572ad7768::t_f27b326ed9e86b 1133-1136
+api/inventory/v1/services.proto
+  s_d8591572ad7768::t_209097ea83708b 172-173
+api/swagger/swagger-dev.json
+  s_766c358d84b6e2::t_15e33a1d6d2218 20650-20654,21665-21669,22251-22255,22879-22883,27082-27086,30253-30257
+api/inventory/v1/json/v1.json
+  s_766c358d84b6e2::t_c296b276ed2fce 4212-4216
+managed/models/agent_model.go
+  s_d8591572ad7768::t_ba34ca75d73931 322-326
+  s_766c358d84b6e2::t_ab28a8e554c453 856
+api/inventory/v1/json/client/agents_service/add_agent_responses.go
+  s_766c358d84b6e2::t_c296b276ed2fce 8938-8940
+api/management/v1/json/client/management_service/add_service_responses.go
+  s_68ab3b967b2582::t_f4c35cd73153ff 2363-2365,10483-10484
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "72971d12ecdc7a90b82c6832dfe85eebd6c7e891",
+  "prompts": {},
+  "sessions": {
+    "s_68ab3b967b2582": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7627480e-5c4e-4864-8518-e3cbf3982b1a",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_766c358d84b6e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f70874aa-b264-42d3-b8bb-d7dde6bfa0a2",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_d8591572ad7768": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5e0ab63d-3dbc-4167-9bdb-453ed05bdb52",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
