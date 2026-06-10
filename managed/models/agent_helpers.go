@@ -124,6 +124,7 @@ type ClickHouseOptionsParams interface {
 	GetTlsCa() string
 	GetTlsCert() string
 	GetTlsKey() string
+	GetProtocol() string
 }
 
 // ClickHouseOptionsFromRequest creates ClickHouseOptions object from request.
@@ -133,6 +134,7 @@ func ClickHouseOptionsFromRequest(params ClickHouseOptionsParams) ClickHouseOpti
 	res.SSLCa = params.GetTlsCa()
 	res.SSLCert = params.GetTlsCert()
 	res.SSLKey = params.GetTlsKey()
+	res.Protocol = params.GetProtocol()
 
 	return res
 }
@@ -1128,9 +1130,10 @@ type ChangeValkeyOptions struct {
 
 // ChangeClickHouseOptions contains ClickHouseOptions fields that can be changed.
 type ChangeClickHouseOptions struct {
-	SSLCa   *string
-	SSLCert *string
-	SSLKey  *string
+	SSLCa    *string
+	SSLCert  *string
+	SSLKey   *string
+	Protocol *string
 }
 
 // ChangeAgentParams contains parameters that can be changed for all Agent types.
@@ -1277,6 +1280,9 @@ func ChangeAgent(q *reform.Querier, agentID string, params *ChangeAgentParams) (
 		}
 		if params.ClickHouseOptions.SSLKey != nil {
 			row.ClickHouseOptions.SSLKey = *params.ClickHouseOptions.SSLKey
+		}
+		if params.ClickHouseOptions.Protocol != nil {
+			row.ClickHouseOptions.Protocol = *params.ClickHouseOptions.Protocol
 		}
 	}
 

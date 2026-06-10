@@ -108,7 +108,9 @@ func (c *Config) DSN() (string, error) {
 	u := &url.URL{
 		Scheme: c.Scheme(),
 		Host:   net.JoinHostPort(c.Host, strconv.Itoa(int(c.effectivePort()))),
-		Path:   "/" + c.Database,
+	}
+	if c.Database != "" {
+		u.Path = "/" + c.Database
 	}
 
 	if c.User != "" || c.Password != "" {

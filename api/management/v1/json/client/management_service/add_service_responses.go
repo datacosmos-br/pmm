@@ -2360,6 +2360,9 @@ type AddServiceOKBodyClickhouseService struct {
 
 	// ClickHouse version.
 	Version string `json:"version,omitempty"`
+
+	// Connection protocol: native (tcp), http, or https.
+	Protocol string `json:"protocol,omitempty"`
 }
 
 // Validate validates this add service OK body clickhouse service
@@ -10476,6 +10479,9 @@ type AddServiceParamsBodyClickhouse struct {
 	// ClickHouse native Prometheus endpoint port (default 9363).
 	// Used for the native source and the auto-probe.
 	NativeMetricsPort int64 `json:"native_metrics_port,omitempty"`
+
+	// Connection protocol: native (tcp), http, or https.
+	Protocol string `json:"protocol,omitempty"`
 
 	// add node
 	AddNode *AddServiceParamsBodyClickhouseAddNode `json:"add_node,omitempty"`

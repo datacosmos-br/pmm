@@ -35,6 +35,7 @@ import (
 	"gopkg.in/reform.v1"
 
 	"github.com/percona/pmm/managed/utils/crypto/bcrypt"
+	"github.com/percona/pmm/utils/clickhouseconn"
 	"github.com/percona/pmm/version"
 )
 
@@ -318,10 +319,11 @@ func (c ValkeyOptions) IsEmpty() bool {
 
 // ClickHouseOptions represents a structure for special ClickHouse options.
 type ClickHouseOptions struct {
-	TLS     bool   `json:"tls"`
-	SSLCa   string `json:"ssl_ca"`
-	SSLCert string `json:"ssl_cert"`
-	SSLKey  string `json:"ssl_key"`
+	TLS      bool   `json:"tls"`
+	SSLCa    string `json:"ssl_ca"`
+	SSLCert  string `json:"ssl_cert"`
+	SSLKey   string `json:"ssl_key"`
+	Protocol string `json:"protocol"`
 	// NativeEndpoint is true when metrics are scraped from the ClickHouse
 	// native Prometheus endpoint instead of a managed clickhouse_exporter.
 	NativeEndpoint bool `json:"native_endpoint"`
@@ -340,6 +342,7 @@ func (c ClickHouseOptions) IsEmpty() bool {
 	return c.SSLCa == "" &&
 		c.SSLCert == "" &&
 		c.SSLKey == "" &&
+		c.Protocol == "" &&
 		!c.NativeEndpoint &&
 		c.NativeMetricsPort == 0
 }
@@ -847,38 +850,36 @@ func (a *Agent) DSN(service *Service, dsnParams DSNParams, tdp *DelimiterPair, p
 		return dsn
 
 	case ClickHouseExporterType, QANClickHouseQueryLogAgentType:
-		urlScheme := "clickhouse"
-		address := ""
-		if socket == "" {
-			address = net.JoinHostPort(host, strconv.Itoa(int(port)))
-		} else {
-			address = socket
-		}
-
-		q := make(url.Values)
-		if a.TLS {
-			q.Set("secure", "true")
-			if a.ClickHouseOptions.TLS && a.TLSSkipVerify {
-				q.Set("skip_verify", "true")
+		proto := a.ClickHouseOptions.Protocol
+		if proto == "" {
+			// Backward compatibility: infer from TLS flag.
+			if a.TLS {
+				proto = "https"
+			} else {
+				proto = "native"
 			}
 		}
 
-		u := &url.URL{
-			Scheme:   urlScheme,
-			Host:     address,
-			RawQuery: q.Encode(),
-		}
-		switch {
-		case password != "":
-			u.User = url.UserPassword(username, password)
-		case username != "":
-			u.User = url.User(username)
+		cfg := clickhouseconn.Config{
+			Protocol:      proto,
+			Host:          host,
+			Port:          port,
+			User:          username,
+			Password:      password,
+			TLS:           a.TLS,
+			TLSSkipVerify: a.TLSSkipVerify,
 		}
 
-		dsn := u.String()
-		dsn = strings.ReplaceAll(dsn, url.QueryEscape(tdp.Left), tdp.Left)
-		dsn = strings.ReplaceAll(dsn, url.QueryEscape(tdp.Right), tdp.Right)
+		if socket != "" {
+			cfg.Host = socket
+			cfg.Port = 0
+		}
 
+		dsn, err := cfg.DSN()
+		if err != nil {
+			// Should not happen with a valid host, but fallback to empty.
+			return ""
+		}
 		return dsn
 	default:
 		panic(fmt.Errorf("unhandled AgentType %q", a.AgentType))

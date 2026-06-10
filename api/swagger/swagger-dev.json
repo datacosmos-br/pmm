@@ -9497,6 +9497,11 @@
                         "LOG_LEVEL_DEBUG"
                       ],
                       "x-order": 13
+                    },
+                    "protocol": {
+                      "description": "Connection protocol: native (tcp), http, or https.",
+                      "type": "string",
+                      "x-order": 14
                     }
                   },
                   "x-order": 18
@@ -20642,6 +20647,11 @@
                         "description": "ClickHouse version.",
                         "type": "string",
                         "x-order": 10
+                      },
+                      "protocol": {
+                        "description": "Connection protocol: native (tcp), http, or https.",
+                        "type": "string",
+                        "x-order": 11
                       }
                     }
                   },
@@ -21652,6 +21662,11 @@
                       "description": "ClickHouse version.",
                       "type": "string",
                       "x-order": 10
+                    },
+                    "protocol": {
+                      "description": "Connection protocol: native (tcp), http, or https.",
+                      "type": "string",
+                      "x-order": 11
                     }
                   },
                   "x-order": 7
@@ -22233,6 +22248,11 @@
                       "description": "ClickHouse version.",
                       "type": "string",
                       "x-order": 10
+                    },
+                    "protocol": {
+                      "description": "Connection protocol: native (tcp), http, or https.",
+                      "type": "string",
+                      "x-order": 11
                     }
                   },
                   "x-order": 7
@@ -22856,6 +22876,11 @@
                       "description": "ClickHouse version.",
                       "type": "string",
                       "x-order": 10
+                    },
+                    "protocol": {
+                      "description": "Connection protocol: native (tcp), http, or https.",
+                      "type": "string",
+                      "x-order": 11
                     }
                   },
                   "x-order": 7
@@ -27054,6 +27079,11 @@
                       "type": "integer",
                       "format": "int64",
                       "x-order": 25
+                    },
+                    "protocol": {
+                      "description": "Connection protocol: native (tcp), http, or https.",
+                      "type": "string",
+                      "x-order": 26
                     }
                   },
                   "x-order": 8
@@ -30220,6 +30250,11 @@
                           "description": "ClickHouse version.",
                           "type": "string",
                           "x-order": 10
+                        },
+                        "protocol": {
+                          "description": "Connection protocol: native (tcp), http, or https.",
+                          "type": "string",
+                          "x-order": 11
                         }
                       },
                       "x-order": 0

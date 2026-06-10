@@ -2206,6 +2206,8 @@ message AddQANClickHouseQueryLogAgentParams {
   string tls_key = 13;
   // Log level for exporter.
   LogLevel log_level = 14;
+  // Connection protocol: native (tcp), http, or https.
+  string protocol = 15;
 }
 
 message ChangeQANClickHouseQueryLogAgentParams {

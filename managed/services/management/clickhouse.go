@@ -84,6 +84,7 @@ func probeClickHouseNativeEndpoint(ctx context.Context, scheme, address string, 
 // req.MetricsSource (auto-probe when unspecified).
 func (s *ManagementService) addClickHouse(ctx context.Context, req *managementv1.AddClickHouseServiceParams) (*managementv1.AddServiceResponse, error) {
 	clickhouse := &managementv1.ClickHouseServiceResult{}
+	var pmmAgentID *string
 
 	nativePort := uint16(req.NativeMetricsPort) //nolint:gosec
 	if nativePort == 0 {
@@ -173,6 +174,7 @@ func (s *ManagementService) addClickHouse(ctx context.Context, req *managementv1
 				return err
 			}
 			clickhouse.ExternalExporter = agent.(*inventoryv1.ExternalExporter) //nolint:forcetypeassert
+			pmmAgentID = row.PMMAgentID
 			return nil
 		}
 
@@ -214,13 +216,18 @@ func (s *ManagementService) addClickHouse(ctx context.Context, req *managementv1
 			return err
 		}
 		clickhouse.ClickhouseExporter = agent.(*inventoryv1.ClickHouseExporter) //nolint:forcetypeassert
+		pmmAgentID = row.PMMAgentID
 		return nil
 	})
 	if errTx != nil {
 		return nil, errTx
 	}
 
-	s.state.RequestStateUpdate(ctx, req.PmmAgentId)
+	if pmmAgentID != nil {
+		s.state.RequestStateUpdate(ctx, *pmmAgentID)
+	} else {
+		s.vmdb.RequestConfigurationUpdate()
+	}
 	res := &managementv1.AddServiceResponse{
 		Service: &managementv1.AddServiceResponse_Clickhouse{
 			Clickhouse: clickhouse,

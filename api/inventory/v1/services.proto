@@ -169,6 +169,8 @@ message ClickHouseService {
   map<string, string> custom_labels = 10;
   // ClickHouse version.
   string version = 11;
+  // Connection protocol: native (tcp), http, or https.
+  string protocol = 12;
 }
 
 // ProxySQLService represents a generic ProxySQL instance.

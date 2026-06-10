@@ -292,10 +292,11 @@ func TestConfig_DSN(t *testing.T) {
 				Protocol: "native",
 				Host:     "127.0.0.1",
 				Port:     9000,
+				Database: "pmm",
 				User:     "",
 				Password: "secret",
 			},
-			want: "clickhouse://:secret@127.0.0.1:9000/",
+			want: "clickhouse://:secret@127.0.0.1:9000/pmm",
 		},
 		{
 			name: "native tls with cert and key",

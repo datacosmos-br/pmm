@@ -15695,6 +15695,8 @@ func (m *AddQANClickHouseQueryLogAgentParams) validate(all bool) error {
 
 	// no validation rules for LogLevel
 
+	// no validation rules for Protocol
+
 	if len(errors) > 0 {
 		return AddQANClickHouseQueryLogAgentParamsMultiError(errors)
 	}

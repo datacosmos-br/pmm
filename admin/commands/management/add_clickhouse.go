@@ -72,6 +72,7 @@ type AddClickHouseCommand struct {
 	CustomLabels        map[string]string `mapsep:"," help:"Custom user-assigned labels"`
 	MetricsSource       string            `enum:"auto,native,exporter" default:"auto" help:"Metrics source: auto (probe the native endpoint), native, or exporter"`
 	NativeMetricsPort   uint16            `default:"9363" help:"ClickHouse native Prometheus endpoint port (used for native source and auto-probe)"`
+	Protocol            string            `enum:"native,http,https" default:"native" help:"Connection protocol: native (tcp/9000), http (8123), or https (8443)"`
 	SkipConnectionCheck bool              `help:"Skip connection check"`
 	TLS                 bool              `help:"Use TLS to connect to the database"`
 	TLSSkipVerify       bool              `help:"Skip TLS certificates validation"`
@@ -181,6 +182,7 @@ func (cmd *AddClickHouseCommand) RunCmd() (commands.Result, error) {
 				LogLevel:          cmd.LogLevel.EnumValue(),
 				MetricsSource:     pointer.ToString(metricsSource),
 				NativeMetricsPort: int64(cmd.NativeMetricsPort),
+				Protocol:          cmd.Protocol,
 			},
 		},
 		Context: commands.Ctx,

@@ -88,6 +88,8 @@ message AddClickHouseServiceParams {
   // ClickHouse native Prometheus endpoint port (default 9363).
   // Used for the native source and the auto-probe.
   uint32 native_metrics_port = 26;
+  // Connection protocol: native (tcp), http, or https.
+  string protocol = 27;
 }
 
 message ClickHouseServiceResult {

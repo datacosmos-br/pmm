@@ -258,6 +258,10 @@
         "created_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "encrypted": {
+          "type": "boolean",
+          "description": "This field is set to true if the dump was created with encryption enabled, and false otherwise."
         }
       }
     },
@@ -350,6 +354,14 @@
         },
         "ignore_load": {
           "type": "boolean"
+        },
+        "enable_encryption": {
+          "type": "boolean",
+          "description": "If true, the dump will be encrypted. Note that enabling encryption may increase the time required to create the dump."
+        },
+        "encryption_password": {
+          "type": "string",
+          "description": "The password used for encryption. It must be at least 8 characters long. This field is required if enable_encryption is true."
         }
       }
     },
