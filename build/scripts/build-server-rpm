@@ -75,8 +75,11 @@ prepare_specs() {
 
         # If the component is a fork (remote is not percona), update the spec
         # provider so spectool downloads from the correct repository.
+        # Only update if the remote URL looks like a real remote (http/https/git),
+        # never a local filesystem path — local paths break %prep symlinks.
         local remote_url=$(git -C "${git_dir}" remote get-url origin 2>/dev/null || echo "")
-        if [[ -n "${remote_url}" && "${remote_url}" != *"percona"* ]]; then
+        if [[ -n "${remote_url}" && "${remote_url}" != *"percona"* && \
+              "${remote_url}" =~ ^(https?://|git@) ]]; then
             local provider=$(echo "${remote_url}" | sed -e 's/\.git$//' -e 's|^https://||' -e 's|^git@github.com:|github.com/|')
             sed -i -e "s|%global provider.*|%global provider ${provider}|" ${rpmbuild_dir}/SOURCES/${spec_name}.spec
         fi
