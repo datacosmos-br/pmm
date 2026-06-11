@@ -1,0 +1,25 @@
+docs/datacosmos/BUILD.md
+  s_9611f97f970de7::t_06e74d08876038 39-43,46-47,50-52
+Makefile.datacosmos
+  s_9611f97f970de7::t_a46670cbf1f459 103-109
+.github/workflows/datacosmos-release.yml
+  s_9611f97f970de7::t_ae87fc2acb31be 122-127,129
+  s_9611f97f970de7::t_d0b93dee11cba6 10-11,15
+  s_9611f97f970de7::t_8a0369f2436f6d 57-59,61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "89a2545be0c3ec74ed69f4d48abbdfa0ce2bbd87",
+  "prompts": {},
+  "sessions": {
+    "s_9611f97f970de7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48c99c3e-e108-433e-9f9d-20adb133fd93",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
