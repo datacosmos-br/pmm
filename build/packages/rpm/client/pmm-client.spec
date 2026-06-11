@@ -216,7 +216,7 @@ fi
 %attr(-,pmm-agent,pmm-agent) /usr/local/percona/pmm
 
 %changelog
-* Sat May 17 2026 Percona LLC <feedback@percona.com>
+* Sun May 17 2026 Percona LLC <feedback@percona.com>
 - PMM-CLICKHOUSE include clickhouse_exporter into pmm client
 
 * Wed May 21 2025 Talha Bin Rizwan <talha.rizwan@percona.com>

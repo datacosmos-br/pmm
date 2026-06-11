@@ -166,6 +166,7 @@ build() {
 
             rm -rf /home/builder/rpm/RPMS/${spec_name}-*
             mkdir -p /home/builder/rpm/local-repo
+            rm -f /home/builder/rpm/local-repo/*.rpm
             find /home/builder/rpm/RPMS -maxdepth 1 -name '*.rpm' -type f \
                 -exec cp -f {} /home/builder/rpm/local-repo/ \;
 
