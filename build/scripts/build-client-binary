@@ -246,13 +246,19 @@ main() {
     gobuild_component "percona-toolkit" "" "github.com/percona/percona-toolkit" "src/go/pt-pg-summary"
 
     if [[ "${BUILD_TYPE}" = "dynamic" ]]; then
-        rm -f ${dynamic_binary_tarball}
-        mkdir -p $(dirname ${dynamic_binary_tarball})
-        tar -C $(dirname ${binary_dir}) -zcpf ${dynamic_binary_tarball} $(basename ${binary_dir})
+        binary_parent_dir="$(dirname "${binary_dir}")"
+        binary_base_dir="$(basename "${binary_dir}")"
+        tarball_parent_dir="$(dirname "${dynamic_binary_tarball}")"
+        rm -f "${dynamic_binary_tarball}"
+        mkdir -p "${tarball_parent_dir}"
+        tar -C "${binary_parent_dir}" -zcpf "${dynamic_binary_tarball}" "${binary_base_dir}"
     else
-        rm -rf ${binary_tarball}
-        mkdir -p $(dirname ${binary_tarball})
-        tar -C $(dirname ${binary_dir}) -zcpf ${binary_tarball} $(basename ${binary_dir})
+        binary_parent_dir="$(dirname "${binary_dir}")"
+        binary_base_dir="$(basename "${binary_dir}")"
+        tarball_parent_dir="$(dirname "${binary_tarball}")"
+        rm -f "${binary_tarball}"
+        mkdir -p "${tarball_parent_dir}"
+        tar -C "${binary_parent_dir}" -zcpf "${binary_tarball}" "${binary_base_dir}"
     fi
 }
 
