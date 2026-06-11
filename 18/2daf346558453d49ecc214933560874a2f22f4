@@ -1,0 +1,31 @@
+Makefile.datacosmos
+  s_1200417b8a3aa1::t_b78a544598f3a8 28
+build/scripts/dc-git-status
+  s_c9fa609c773d54::t_9baee2a05f272f 37-42
+docs/datacosmos/BUILD.md
+  s_1200417b8a3aa1::t_c1d7ba36dbdd72 88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "182daf346558453d49ecc214933560874a2f22f4",
+  "prompts": {},
+  "sessions": {
+    "s_1200417b8a3aa1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb6f8-4554-7550-834c-a88da5cf49ff",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_c9fa609c773d54": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb6f9-f06d-7ab1-b43f-09b2257d1558",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
