@@ -1,0 +1,260 @@
+api/qan/v1/qan.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-15,1066-1074
+api/management/v1/metrics.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-15,100-105
+api/qan/v1/service_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,240,244,248,252,256,260,264,268,272,276,280
+api/management/v1/rds.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-20,834-856
+api/management/v1/service.pb.validate.go
+  s_7216b814c83710::t_58b21b2fd033eb 505-506,982-983,1089-1090,1192-1193,1417-1418,1526-1527,1663-1664
+api/agent/v1/agent_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11
+api/advisors/v1/advisors.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,19-20,1361-1389
+api/management/v1/node.pb.validate.go
+  s_1200417b8a3aa1::t_265772ea57ec3f 158-159,302-303,496-497,612-613,717-718,974-975,1077-1078,1214-1215,1326-1327,1456-1457,1565-1566,1676-1677
+api/actions/v1/actions.pb.gw.go
+  s_7216b814c83710::t_c3fb214163e7e1 79,94
+api/management/v1/mongodb.pb.validate.go
+  s_1200417b8a3aa1::t_265772ea57ec3f 270-271,518-519
+api/management/v1/postgresql.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-20,522-537
+api/management/v1/proxysql.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-20,384-397
+api/user/v1/user_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,99,103
+api/management/v1/node.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-20,1230-1257
+api/qan/v1/filters.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-16,284-295
+api/inventory/v1/agents.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,20-22,13756-13884
+api/management/v1/agent.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-20,1220-1243
+api/management/v1/clickhouse.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-19,494-509
+api/server/v1/server_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,212,216,220,224,228,232,236,240,244
+agent/runner/actions/clickhouse_explain_action.go
+  s_7216b814c83710::t_77815d79c4a66f 125-127,136-138,157
+api/agentlocal/v1/agentlocal.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-19,247,474-487
+api/actions/v1/actions.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,1386,1400-1401,1407,1411,1413,1425-1426,1430,1437,1444,1451,1458,1468-1469,1475,1479,1481,1493-1494,1498,1505,2198,2260,2456,2518,2668-2669,2675-2676,2717,2732-2734,2749-2750,2767,2770-2771,2791-2831,2845,2858,2860,2865
+api/inventory/v1/agents_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,150,154,158,162,166
+api/server/v1/server.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,20-22,1919-1954
+api/management/v1/postgresql.pb.validate.go
+  s_7216b814c83710::t_58b21b2fd033eb 279-280,500-501
+api/management/v1/mysql.pb.validate.go
+  s_1200417b8a3aa1::t_265772ea57ec3f 279-280,500-501
+go.sum
+  s_c9fa609c773d54::t_846b8e4103da57 313-316,321-324,329-330,361-362
+.codex/config.toml
+  s_1200417b8a3aa1::t_baba5891e6e94a 1-2
+api/server/v1/httperror.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-16,123-129
+api/management/v1/proxysql.pb.validate.go
+  s_7216b814c83710::t_58b21b2fd033eb 257-258,418-419
+utils/clickhouseconn/clickhouseconn_test.go
+  s_7216b814c83710::t_77815d79c4a66f 91-94
+api/management/v1/service.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,19-20,992-1047
+agent/runner/actions/clickhouse_explain_action_integration_test.go
+  s_7216b814c83710::t_77815d79c4a66f 60
+api/agent/v1/collector.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-18,3199-3215
+api/qan/v1/collector_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11
+api/alerting/v1/params.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-15,159-165
+build/scripts/build-client-binary
+  s_7216b814c83710::t_6f2ae203b8022c 145
+api/actions/v1/actions.pb.validate.go
+  s_7216b814c83710::t_c3fb214163e7e1 2406,2410,2414,2417-2418,2422,2432,2443,2456,2462,2464,2466,2469,2478,2480-2481,2483,2491,2494,2497,2500,2503-2504,2508,2520,2528,2536,2538-2542,2546,2549-2550,2554,2566,2572,2574,2576,2579,2588,2590-2591,2593,2601,2604,2607,2610,2613-2614,2618,2630,2638,2646
+  s_1200417b8a3aa1::t_26ab5df80dd47e 136-137,249-250,370-371,478-479,601-602,711-712,836-837,948-949,1080-1081,1190-1191,1322-1323,1432-1433,1562-1563,1670-1671,1803-1804,1914-1915,2046-2047,2156-2157,2284-2285,2392-2393,2524-2525,2634-2635,2742-2743,2850-2851,2960-2961,3070-3071,3178-3179,3286-3287,3394-3395,3502-3503,3616-3617,3719-3720,4360-4361,5001-5002
+api/realtimeanalytics/v1/collector.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-16,135-142
+api/backup/v1/restores.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,611-627
+api/agentlocal/v1/agentlocal_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,90
+api/dump/v1beta1/dump_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,131,135,139,143
+api/backup/v1/common.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,413-425
+api/accesscontrol/v1beta1/accesscontrol.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,827-846
+api/backup/v1/backup_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,210,214,218,222,226,230,234,238,242
+api/ha/v1beta1/ha_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,90
+api/inventory/v1/agent_status.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-15,125-130
+api/accesscontrol/v1beta1/accesscontrol_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,165,169,173,177,181,185
+api/qan/v1/object_details.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-18,1613-1647
+api/backup/v1/artifacts.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,640-658
+admin/commands/management/add_clickhouse.go
+  s_7216b814c83710::t_77815d79c4a66f 183
+api/management/v1/external.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-19,346-357
+agent/serviceinfobroker/clickhouse.go
+  s_7216b814c83710::t_77815d79c4a66f 23
+api/alerting/v1/alerting.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,20-21,1429-1461
+api/backup/v1/restores_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,105,109
+api/management/v1/severity.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-15,122-127
+api/backup/v1/locations_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,135,139,143,147
+api/inventory/v1/log_level.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-15,111-116
+api/inventory/v1/nodes.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,2011-2045
+api/realtimeanalytics/v1/query.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-19,325-333
+api/inventory/v1/services_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,150,154,158,162,166
+api/realtimeanalytics/v1/realtimeanalytics_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,135,139,143,147,151
+api/advisors/v1/advisors_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,150,154,158,162,166
+api/qan/v1/collector.pb.validate.go
+  s_7216b814c83710::t_58b21b2fd033eb 163-164,872-873,973-974
+Makefile.datacosmos
+  s_db446802125691::t_d9e9daab1c961d 18-32,57,60,65-71
+  s_aab4a0cd64efa1::t_a5220a3fafd1f3 44
+  s_7216b814c83710::t_6f2ae203b8022c 61-62
+api/inventory/v1/nodes_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,120,124,128
+api/qan/v1/filters.pb.validate.go
+  s_7216b814c83710::t_58b21b2fd033eb 222-223,372-373,506-507,611-612
+api/backup/v1/locations.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,19-20,818-835
+api/management/v1/valkey.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-20,406-419
+api/extensions/v1/redact.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-16,131-137
+api/realtimeanalytics/v1/collector_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11
+api/dump/v1beta1/dump.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,20-21,879-899
+api/inventory/v1/services.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,19-20,3677-3730
+api/alerting/v1/alerting_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,135,139,143,147
+.gitignore
+  s_1200417b8a3aa1::t_baba5891e6e94a 71-76
+api/management/v1/service_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,255,259,263,267,271,275,279,283,287,291,295,299
+api/backup/v1/backup.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,21-22,1246-1278
+api/management/v1/mysql.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-20,531-547
+api/advisors/v1/advisors.pb.validate.go
+  s_7216b814c83710::t_58b21b2fd033eb 143-144,266-267,384-385,496-497,639-640,750-751,853-854,956-957,1059-1060,1196-1197,1299-1300,1436-1437,1573-1574,1677-1678,1780-1781,1917-1918,2048-2049,2189-2190
+api/qan/v1/service.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,231-260
+api/management/v1/annotation.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-16,160-166
+api/agent/pb/agent.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 12-16,40
+api/agent/pb/agent_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,15-16
+api/actions/v1/actions.swagger.json
+  s_7216b814c83710::t_c3fb214163e7e1 95,111,255,276,762,806
+api/ha/v1beta1/ha.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,342-353
+api/management/v1/azure.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-19,715-728
+api/common/metrics_resolutions.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-16,114-120
+api/backup/v1/errors.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-15,164-171
+.codex/hooks.json
+  s_1200417b8a3aa1::t_baba5891e6e94a 1-51
+.serena/project.yml
+  s_c9fa609c773d54::t_846b8e4103da57 1-133
+api/realtimeanalytics/v1/realtimeanalytics.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,21-22,698-720
+.serena/.gitignore
+  s_c9fa609c773d54::t_846b8e4103da57 1-2
+api/common/common.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-15,142-149
+api/management/v1/valkey.pb.validate.go
+  s_7216b814c83710::t_58b21b2fd033eb 276-277,437-438
+api/actions/v1/actions_grpc.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 11,39,66,68,115,135-136,139,143,147,191,203
+api/qan/v1/collector.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-19,3080-3092
+api/qan/v1/profile.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-16,587-600
+api/agent/v1/agent.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,19-22,7198-7309
+utils/clickhouseconn/clickhouseconn.go
+  s_7216b814c83710::t_77815d79c4a66f 19,27-38,62-67,76-79,81,88-89,91,96,106-109,111,118
+api/management/v1/rds.pb.validate.go
+  s_7216b814c83710::t_58b21b2fd033eb 143-144,250-251,387-388,633-634,966-967
+api/management/v1/mongodb.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,18-20,545-561
+managed/services/management/clickhouse.go
+  s_7216b814c83710::t_77815d79c4a66f 298
+api/management/v1/haproxy.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 13-19,324-335
+api/user/v1/user.pb.go
+  s_c9fa609c773d54::t_846b8e4103da57 10-13,497-509
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "b9d14ff987eeb58b6d600782b8da3aab17e3b46f",
+  "prompts": {},
+  "sessions": {
+    "s_1200417b8a3aa1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb6f8-4554-7550-834c-a88da5cf49ff",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_7216b814c83710": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb6f6-460f-7570-9bd9-dd6189397820",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_aab4a0cd64efa1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb702-2aca-74d1-b728-f0e419a88ab8",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_c9fa609c773d54": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb6f9-f06d-7ab1-b43f-09b2257d1558",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_db446802125691": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb70c-173f-7491-801b-da2ec2d01867",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
