@@ -114,7 +114,6 @@
     delay: 5
     register: pmm_ready
     until: pmm_ready.status == 200
-    ignore_errors: true
 
   - name: Initialize admin password for AMI if needed
     include_role:
