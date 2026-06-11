@@ -102,7 +102,7 @@ pmm-client → new, ClickHouse appears, nothing else disturbed).
 
 - **Blocked on Phase 1/3 deliverables** — needs the `clickhouse_exporter` `main`
   package (Phase 1) and the QAN agent (Phase 3). Steps 1, 9 are explicit
-  hand-off points; if absent, those steps stub and must be flagged.
+  hand-off points; if absent, those steps remain blocked with a tracked reason.
 - **`build/Makefile.clickhouse` does not exist** — it must be created (Step 2);
   `qan-api2/Makefile.clickhouse` is unrelated.
 - **Binary-name consistency** — `clickhouse_exporter` must be identical across

@@ -512,8 +512,11 @@ func TestPGStatStatementsQPS(t *testing.T) {
 	}
 
 	t.Run("uses pgss.max value", func(t *testing.T) {
+		var cacheSize uint
+		err = db.Querier.QueryRow(pgssMaxQuery).Scan(&cacheSize)
+		require.NoError(t, err)
 		p := setup(t, db)
-		assert.Equal(t, uint(10000), p.statementsCache.cache.Capacity())
+		assert.Equal(t, cacheSize, p.statementsCache.cache.Capacity())
 	})
 
 	t.Run("check query count when cache size equals pgss.max", func(t *testing.T) {

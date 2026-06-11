@@ -6,8 +6,11 @@
 
 Build and packaging changes must fix the failing source step, not mask it. Do
 not use `|| true`, ignored exit codes, suppressed validation output, skipped
-artifact collection, fake green paths, or permissive fallbacks in build,
-package, release, or diagnostic scripts. Optional inputs must be checked with
+artifact collection, fake green paths, synthetic substitutes, or permissive
+fallbacks in build, package, release, or diagnostic scripts. If the real
+dependency is a daemon, container, generated file, package repository, image, or
+SSOT config, make that dependency work and validate against it instead of
+replacing it with a narrower surrogate. Optional inputs must be checked with
 explicit branches; missing required artifacts, refs, images, packages, or
 credentials must fail the command.
 

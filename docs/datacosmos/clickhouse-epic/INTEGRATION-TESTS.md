@@ -15,6 +15,10 @@ This is the end-to-end test plan that proves each phase works and feeds the
 - **Fixtures**: a `<prometheus>`-enabled ClickHouse config and a disabled one
   (Phase 1 native/exporter probe); seed queries for QAN (Phase 3).
 - Each combination is brought up, tested, torn down (`down -v`) in turn.
+- The matrix must use real ClickHouse containers and real PMM test commands.
+  Do not replace failures with narrower unit tests, skipped topologies, ignored
+  exit codes, or synthetic endpoints. Port conflicts are fixed in the compose
+  contract and runner endpoints, not by avoiding the conflicting service.
 
 ## Phase 1 — metrics, inventory, API, pmm-admin
 

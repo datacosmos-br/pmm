@@ -17,8 +17,11 @@ the real failure source and can publish an incomplete or unverifiable release.
 The strongest rule for datacosmos build governance is: fix the root cause at
 the source and fail visibly. Custom build, sync, status, artifact, package, and
 release paths must not use `|| true`, ignored exit codes, suppressed validation
-output, fake success paths, permissive fallbacks, stubs, or compatibility
-wrappers to turn a failed operation into a green result.
+output, fake success paths, permissive fallbacks, stubs, synthetic substitutes,
+or compatibility wrappers to turn a failed operation into a green result. If
+the real dependency is a daemon, container, generated file, package repository,
+image, or SSOT config, that dependency must be made functional and validated
+directly instead of being replaced by a narrower surrogate.
 
 Expected optional states must be represented with explicit branches. Required
 single sources of truth, refs, artifacts, credentials, package outputs, release

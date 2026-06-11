@@ -5,9 +5,9 @@
 # Each combination is started, validated and torn down in turn, so the matrix
 # fits within modest memory. Override the matrix with env vars:
 #
-#   CLICKHOUSE_VERSIONS="25.3 24.8"  CLICKHOUSE_TOPOLOGIES="single" ./run-matrix.sh
+#   CLICKHOUSE_VERSIONS="25.3 24.8"  CLICKHOUSE_TOPOLOGIES="single" bash run-matrix.sh
 #   CLICKHOUSE_SINGLE_TCP_PORT=39000 CLICKHOUSE_CLUSTER_NODE1_TCP_PORT=39010 \
-#     CLICKHOUSE_CLUSTER_NODE2_TCP_PORT=39011 ./run-matrix.sh
+#     CLICKHOUSE_CLUSTER_NODE2_TCP_PORT=39011 bash run-matrix.sh
 #
 # Usage:  bash run-matrix.sh
 set -uo pipefail
@@ -16,12 +16,42 @@ cd "$(dirname "$0")"
 repo_root=$(cd ../../../.. && pwd)
 compose=(docker compose -f docker-compose.matrix.yml)
 
-cleanup() {
-    "${compose[@]}" --profile single down -v >/dev/null 2>&1 || true
-    "${compose[@]}" --profile cluster down -v >/dev/null 2>&1 || true
+cleanup_profile() {
+    local profile="$1"
+    if "${compose[@]}" --profile "$profile" down -v >/dev/null 2>&1; then
+        return 0
+    fi
+
+    echo "!!! failed to clean up ClickHouse ${profile} profile" >&2
+    return 1
 }
-trap cleanup EXIT
-trap 'cleanup; exit 130' INT TERM
+
+cleanup() {
+    local cleanup_rc=0
+    if ! cleanup_profile single; then
+        cleanup_rc=1
+    fi
+    if ! cleanup_profile cluster; then
+        cleanup_rc=1
+    fi
+    return "$cleanup_rc"
+}
+
+on_exit() {
+    local rc=$?
+    if ! cleanup && [ "$rc" -eq 0 ]; then
+        rc=1
+    fi
+    exit "$rc"
+}
+
+on_signal() {
+    cleanup
+    exit 130
+}
+
+trap on_exit EXIT
+trap on_signal INT TERM
 
 # Build the clickhouse_exporter binary once, up front, so the exporter matrix
 # test (TestClickHouseExporterMatrix) can launch the packaged-equivalent binary
@@ -33,6 +63,30 @@ if ! CGO_ENABLED=0 go -C "$repo_root" build -o bin/clickhouse_exporter ./agent/c
     exit 1
 fi
 export CLICKHOUSE_EXPORTER_BIN="$exporter_bin"
+
+require_test() {
+    local pkg="$1"
+    local test_name="$2"
+    local listed
+    if ! listed=$(go -C "$repo_root" test -tags clickhouse_integration -run '^$' -list "^${test_name}$" "$pkg"); then
+        echo "!!! failed to list ${test_name} in ${pkg}" >&2
+        return 1
+    fi
+    if [[ "$listed" != *"$test_name"* ]]; then
+        echo "!!! required integration test ${test_name} is missing from ${pkg}" >&2
+        return 1
+    fi
+}
+
+if ! require_test ./agent/agents/clickhouse TestClickHouseMatrix; then
+    exit 1
+fi
+if ! require_test ./agent/agents/clickhouse TestClickHouseExporterMatrix; then
+    exit 1
+fi
+if ! require_test ./agent/agents/clickhouse/querylog TestClickHouseQANMatrix; then
+    exit 1
+fi
 
 # Supported ClickHouse versions and topologies (override via env).
 read -r -a versions <<<"${CLICKHOUSE_VERSIONS:-26.3 25.8 25.3 24.8 24.3}"
@@ -49,8 +103,12 @@ for v in "${versions[@]}"; do
 
         if ! "${compose[@]}" --profile "$topo" up -d --wait --wait-timeout 240; then
             echo "!!! ${v}/${topo}: containers did not become healthy"
-            "${compose[@]}" --profile "$topo" logs --tail 30 || true
-            "${compose[@]}" --profile "$topo" down -v >/dev/null 2>&1 || true
+            if ! "${compose[@]}" --profile "$topo" logs --tail 30; then
+                echo "!!! ${v}/${topo}: failed to collect compose logs" >&2
+            fi
+            if ! cleanup_profile "$topo"; then
+                echo "!!! ${v}/${topo}: failed to clean up unhealthy containers" >&2
+            fi
             rc=1
             continue
         fi
@@ -62,20 +120,23 @@ for v in "${versions[@]}"; do
             endpoints+=",cluster-${v}-node2=clickhouse://default:clickhouse@127.0.0.1:${CLICKHOUSE_CLUSTER_NODE2_TCP_PORT}/default"
         fi
 
-        # The filter intentionally also matches TestClickHouseExporterMatrix and
-        # TestClickHouseQANMatrix. Those integration tests are not committed yet;
-        # `go test -run` simply skips names it cannot find, so the matrix stays
-        # runnable today and picks them up automatically once they land.
-        # TODO(clickhouse-epic): add exporter_integration_test.go and
-        # querylog/qan_integration_test.go (build tag clickhouse_integration).
         if ! CLICKHOUSE_TEST_ENDPOINTS="$endpoints" \
             go -C "$repo_root" test -tags clickhouse_integration -count=1 -v \
-            -run 'TestClickHouse(Matrix|ExporterMatrix|QANMatrix)' ./agent/agents/clickhouse/...; then
-            echo "!!! ${v}/${topo}: integration tests failed"
+            -run '^(TestClickHouseMatrix|TestClickHouseExporterMatrix)$' ./agent/agents/clickhouse; then
+            echo "!!! ${v}/${topo}: collector/exporter integration tests failed"
             rc=1
         fi
 
-        "${compose[@]}" --profile "$topo" down -v >/dev/null 2>&1 || true
+        if ! CLICKHOUSE_TEST_ENDPOINTS="$endpoints" \
+            go -C "$repo_root" test -tags clickhouse_integration -count=1 -v \
+            -run '^TestClickHouseQANMatrix$' ./agent/agents/clickhouse/querylog; then
+            echo "!!! ${v}/${topo}: QAN integration tests failed"
+            rc=1
+        fi
+
+        if ! cleanup_profile "$topo"; then
+            rc=1
+        fi
     done
 done
 

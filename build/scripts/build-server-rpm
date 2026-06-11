@@ -5,6 +5,11 @@ set -o xtrace
 
 . $(dirname $0)/vars
 
+fail() {
+    echo "build-server-rpm: $*" >&2
+    exit 1
+}
+
 get_rpm_version() {
     local spec_name=$1
 
@@ -59,12 +64,17 @@ prepare_specs() {
     local spec_name=$1
     local repo_name=$2
 
-    # Best-effort: passwordless sudo is not available in every environment
-    # (e.g. a standalone build). The files are usually already owned by the
-    # current user, so a plain chown — or nothing — suffices.
-    sudo -n chown -R $(id -u):$(id -g) ${rpmbuild_dir}/SPECS ${rpmbuild_dir}/SOURCES 2>/dev/null \
-        || chown -R $(id -u):$(id -g) ${rpmbuild_dir}/SPECS ${rpmbuild_dir}/SOURCES 2>/dev/null \
-        || true
+    if [ ! -w "${rpmbuild_dir}/SPECS" ] || [ ! -w "${rpmbuild_dir}/SOURCES" ]; then
+        if command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+            sudo chown -R $(id -u):$(id -g) ${rpmbuild_dir}/SPECS ${rpmbuild_dir}/SOURCES
+        else
+            chown -R $(id -u):$(id -g) ${rpmbuild_dir}/SPECS ${rpmbuild_dir}/SOURCES
+        fi
+    fi
+    if [ ! -w "${rpmbuild_dir}/SPECS" ] || [ ! -w "${rpmbuild_dir}/SOURCES" ]; then
+        fail "SPECS and SOURCES must be writable: ${rpmbuild_dir}"
+    fi
+
     cp ${rpmbuild_dir}/SPECS/${spec_name}.spec ${rpmbuild_dir}/SOURCES/${spec_name}.spec
     if [ -d "${root_dir}/sources/${repo_name}" ]; then
         # -L + realpath: component sources may be symlinked into a standalone
@@ -155,11 +165,14 @@ build() {
             fi
 
             rm -rf /home/builder/rpm/RPMS/${spec_name}-*
+            mkdir -p /home/builder/rpm/local-repo
+            find /home/builder/rpm/RPMS -maxdepth 1 -name '*.rpm' -type f \
+                -exec cp -f {} /home/builder/rpm/local-repo/ \;
 
-            printf '[local]\nname=local\nbaseurl=file:///home/builder/rpm/RPMS\ngpgcheck=0\nenabled=1\n' \
+            printf '[local]\nname=local\nbaseurl=file:///home/builder/rpm/local-repo\ngpgcheck=0\nenabled=1\n' \
                 | sudo tee /etc/yum.repos.d/local.repo
 
-            until /usr/bin/createrepo_c --update /home/builder/rpm/RPMS; do
+            until /usr/bin/createrepo_c --update /home/builder/rpm/local-repo; do
               echo waiting
               sleep 1
             done
@@ -185,21 +198,19 @@ build() {
         # it: the upload is opt-in via S3_CACHE_UPLOAD and stays off unless
         # explicitly enabled. SKIP_S3_CACHE (standalone) also disables it.
         if [ -z "${S3_CACHE_UPLOAD:-}" ] || [ -n "${SKIP_S3_CACHE:-}" ]; then
-            :
+            echo "Skipping S3 RPM cache upload for ${spec_name}; S3_CACHE_UPLOAD is disabled or SKIP_S3_CACHE is set."
         elif [ -n "$RPM_EPOCH" ]; then
             aws s3 sync \
                 --region us-east-2 \
                 --no-progress \
                 ${rpms_dir}/${spec_name}-${rpm_version} \
-                s3://pmm-build-cache/PR-BUILDS/${rpmbuild_dist}/${spec_name}-${rpm_version} \
-                || :
+                s3://pmm-build-cache/PR-BUILDS/${rpmbuild_dist}/${spec_name}-${rpm_version}
         else
             aws s3 sync \
                 --region us-east-2 \
                 --no-progress \
                 ${rpms_dir}/${spec_name}-${rpm_version} \
-                s3://pmm-build-cache/RELEASE/${rpmbuild_dist}/${spec_name}-${rpm_version} \
-                || :
+                s3://pmm-build-cache/RELEASE/${rpmbuild_dist}/${spec_name}-${rpm_version}
         fi
 
         cp ${rpms_dir}/${spec_name}-${rpm_version}/*/*.rpm ${rpms_dir}

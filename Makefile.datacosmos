@@ -24,7 +24,28 @@ IMAGE_ARCH ?= amd64
 DC_PMM_SUBMODULES_REPO ?= https://github.com/datacosmos-br/pmm-submodules.git
 DC_PMM_DUMP_REPO ?= https://github.com/datacosmos-br/pmm-dump.git
 PMM_SUBMODULES_BRANCH ?= $(or $(shell git config -f .gitmodules submodule.pmm-submodules.branch),$(error .gitmodules missing submodule.pmm-submodules.branch))
-DC_RELEASE_COMMIT_PATHS := .gitmodules Makefile.datacosmos .github/workflows/datacosmos-release.yml build/scripts/dc-bump-forks build/scripts/dc-git-status build/scripts/build-client-packages build/scripts/build-client-rpm build/scripts/create-tags docs/datacosmos/BUILD.md docs/datacosmos/adrs/0001-no-bypass-build-governance.md AGENTS.md CLAUDE.md build/AGENTS.md .agents/skills/agent-coordination/SKILL.md .agents/skills/beads/SKILL.md
+DC_RELEASE_COMMIT_PATHS := \
+	.gitmodules \
+	Makefile.datacosmos \
+	.github/workflows/datacosmos-release.yml \
+	build/scripts/dc-bump-forks \
+	build/scripts/dc-git-status \
+	build/scripts/build-client-binary \
+	build/scripts/build-client-packages \
+	build/scripts/build-client-rpm \
+	build/scripts/build-client-source \
+	build/scripts/build-server-rpm \
+	build/scripts/create-tags \
+	build/scripts/install_tarball \
+	docs/datacosmos/BUILD.md \
+	docs/datacosmos/adrs/0001-no-bypass-build-governance.md \
+	docs/datacosmos/clickhouse-epic/PHASE-4-distribution.md \
+	AGENTS.md \
+	CLAUDE.md \
+	agent/AGENTS.md \
+	build/AGENTS.md \
+	.agents/skills/agent-coordination/SKILL.md \
+	.agents/skills/beads/SKILL.md
 
 FULL_VERSION := $(PMM_VERSION)-$(or $(shell git rev-list --count HEAD),$(error git rev-list --count HEAD failed))
 CLIENT_IMAGE ?= pmm-local/pmm-client:$(FULL_VERSION)
@@ -202,8 +223,11 @@ dc-clean: ## Remove datacosmos external build and artifact dirs
 		echo "Merge in progress; commit the upstream sync before dc-release"; \
 		exit 1; \
 	fi
-	@git diff --quiet -- $(DC_RELEASE_COMMIT_PATHS) || { echo "Release files have unstaged changes; commit before dc-release"; exit 1; }
-	@git diff --cached --quiet -- $(DC_RELEASE_COMMIT_PATHS) || { echo "Release files have staged changes; commit before dc-release"; exit 1; }
+	@if [ -n "$$(git status --porcelain -- $(DC_RELEASE_COMMIT_PATHS))" ]; then \
+		echo "Release files have uncommitted changes; commit before dc-release"; \
+		git status --short -- $(DC_RELEASE_COMMIT_PATHS); \
+		exit 1; \
+	fi
 
 .PHONY: .dc-fetch-tags
 .dc-fetch-tags:

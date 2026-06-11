@@ -5,6 +5,38 @@ set -o xtrace
 
 . $(dirname $0)/vars
 
+fail() {
+    echo "build-client-binary: $*" >&2
+    exit 1
+}
+
+component_archive() {
+    local component=$1
+    local archives=()
+
+    shopt -s nullglob
+    case "${component}" in
+        pmm)
+            archives=("${source_dir}"/pmm-[0-9a-f]*.tar.gz)
+            ;;
+        *)
+            archives=("${source_dir}"/${component}-*.tar.gz)
+            ;;
+    esac
+    shopt -u nullglob
+
+    if [ ${#archives[@]} -eq 0 ]; then
+        fail "missing source archive for ${component} in ${source_dir}"
+    fi
+    if [ ${#archives[@]} -gt 1 ]; then
+        printf 'build-client-binary: ambiguous source archives for %s:\n' "${component}" >&2
+        printf '  %s\n' "${archives[@]}" >&2
+        fail "expected exactly one archive for ${component}"
+    fi
+
+    printf '%s\n' "${archives[0]}"
+}
+
 extract_source_tarball() {
     if [ ! -d "${source_dir}" ]; then
         mkdir -p $(dirname ${source_dir})
@@ -19,7 +51,7 @@ gobuild_component() {
     local component_path=$4
     local result_file=${5:-bin/$(basename ${component_path:-$extract_path})}
 
-    local volume_mounts="-v ${tmp_dir}:/home/builder/tmp -v ${tmp_dir}/go:/tmp/go"
+    local volume_mounts="-v ${tmp_dir}:/home/builder/tmp"
     volume_mounts+=" -v pmm-gobuild:/home/builder/.cache/go-build"
     volume_mounts+=" -v pmm-gomod:/home/builder/go/pkg/mod"
     volume_mounts+=" -v pmm-dnf:/var/cache/dnf"
@@ -51,42 +83,6 @@ gobuild_component() {
         return
     fi
 
-    if [ ${component} = 'pmm-admin' ]; then
-        build_command="cd /tmp/go/src/${extract_path}/${component_path} && make release"
-    elif [ ${component} = 'pmm-agent' ]; then
-        if [ "${BUILD_TYPE}" = "dynamic" ]; then
-            build_command="cd /tmp/go/src/${extract_path}/${component_path} && make release-gssapi"
-        else
-            build_command="cd /tmp/go/src/${extract_path}/${component_path} && make release"
-        fi
-    elif [ ${component} = 'mongodb_exporter' ]; then
-        if [ "${BUILD_TYPE}" = "dynamic" ]; then
-            build_command="cd /tmp/go/src/${extract_path} && make build-gssapi"
-        else
-            build_command="cd /tmp/go/src/${extract_path} && make build"
-        fi
-    elif [ ${component} = 'node_exporter' ] || [ ${component} = 'mysqld_exporter' ] || \
-         [ ${component} = 'proxysql_exporter' ] || [ ${component} = 'rds_exporter' ] || \
-         [ ${component} = 'postgres_exporter' ] || [ ${component} = 'azure_metrics_exporter' ]; then
-        if [ ${component} = 'mysqld_exporter' ]; then
-            build_command="cd /tmp/go/src/${extract_path} && make GO_BUILD_LDFLAGS=\"-ldflags \\\"\${PROMETHEUS_GO_BUILD_LDFLAGS}\\\"\" release"
-        else
-            build_command="cd /tmp/go/src/${extract_path} && make GO_BUILD_LDFLAGS=\"\${PROMETHEUS_GO_BUILD_LDFLAGS}\" release"
-        fi
-    elif [ ${component} = 'percona-toolkit' ]; then
-        build_command="cd /tmp/go/src/${extract_path}/${component_path} && go build -o \${binary_dir}/${result_file} ."
-    elif [ ${component} = 'nomad' ]; then
-        build_command="cd /tmp/go/src/${extract_path} && TARGETS=${target} make deps release"
-    elif [ ${component} = 'redis_exporter' ]; then
-        build_command="cd /tmp/go/src/${extract_path} && go build ."
-    elif [ ${component} = 'clickhouse_exporter' ]; then
-        # Built from the pmm module: cd into the repo so module mode resolves
-        # deps (cwd /tmp/go is outside any module -> GO111MODULE=auto picks GOPATH).
-        build_command="cd /tmp/go/src/${extract_path} && go build -o \${binary_dir}/${result_file} ./${component_path}"
-    else
-        build_command="go build -o \${binary_dir}/${result_file} ./src/${extract_path}/${component_path}"
-    fi
-
     local release_fullcommit
     local component_version
     local component_branch
@@ -106,6 +102,51 @@ gobuild_component() {
         release_fullcommit=$(cd sources/${parent_component}/src/${extract_path} && git rev-parse HEAD)
         component_version=$(cd sources/${parent_component}/src/${extract_path} && git describe --abbrev=0 --always)
         component_branch=$(cd sources/${parent_component}/src/${extract_path} && git describe --always --contains --all)
+    fi
+
+    local build_stamp
+    build_stamp=$(date '+%s')
+    local build_date
+    build_date=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+    local component_gopath=/home/builder/tmp/go-build/${component}-${release_fullcommit}-${build_stamp}
+    local component_source_dir=${component_gopath}/src/${extract_path}
+    local archive
+    archive=$(basename "$(component_archive "${parent_component}")")
+
+    if [ ${component} = 'pmm-admin' ]; then
+        build_command="cd ${component_source_dir}/${component_path} && make release"
+    elif [ ${component} = 'pmm-agent' ]; then
+        if [ "${BUILD_TYPE}" = "dynamic" ]; then
+            build_command="cd ${component_source_dir}/${component_path} && make release-gssapi"
+        else
+            build_command="cd ${component_source_dir}/${component_path} && make release"
+        fi
+    elif [ ${component} = 'mongodb_exporter' ]; then
+        if [ "${BUILD_TYPE}" = "dynamic" ]; then
+            build_command="cd ${component_source_dir} && make build-gssapi"
+        else
+            build_command="cd ${component_source_dir} && make build"
+        fi
+    elif [ ${component} = 'node_exporter' ] || [ ${component} = 'mysqld_exporter' ] || \
+         [ ${component} = 'proxysql_exporter' ] || [ ${component} = 'rds_exporter' ] || \
+         [ ${component} = 'postgres_exporter' ] || [ ${component} = 'azure_metrics_exporter' ]; then
+        if [ ${component} = 'mysqld_exporter' ]; then
+            build_command="cd ${component_source_dir} && make GO_BUILD_LDFLAGS=\"-ldflags \\\"\${PROMETHEUS_GO_BUILD_LDFLAGS}\\\"\" release"
+        else
+            build_command="cd ${component_source_dir} && make GO_BUILD_LDFLAGS=\"\${PROMETHEUS_GO_BUILD_LDFLAGS}\" release"
+        fi
+    elif [ ${component} = 'percona-toolkit' ]; then
+        build_command="cd ${component_source_dir}/${component_path} && go build -o \${binary_dir}/${result_file} ."
+    elif [ ${component} = 'nomad' ]; then
+        build_command="cd ${component_source_dir} && TARGETS=${target} make GIT_COMMIT=${release_fullcommit} GIT_DIRTY= BUILD_DATE=${build_date} deps release && cp pkg/${target}/nomad \${binary_dir}/${result_file}"
+    elif [ ${component} = 'redis_exporter' ]; then
+        build_command="cd ${component_source_dir} && go build -o \${binary_dir}/${result_file} ."
+    elif [ ${component} = 'clickhouse_exporter' ]; then
+        # Built from the pmm module: cd into the repo so module mode resolves
+        # deps (cwd outside any module -> GO111MODULE=auto picks GOPATH).
+        build_command="cd ${component_source_dir} && go build -o \${binary_dir}/${result_file} ./${component_path}"
+    else
+        build_command="cd ${component_gopath} && go build -o \${binary_dir}/${result_file} ./src/${extract_path}/${component_path}"
     fi
 
     docker run --rm ${volume_mounts} ${rpmbuild_docker_image} sh -c "
@@ -131,19 +172,13 @@ gobuild_component() {
 
         mkdir -p \$binary_dir/bin
 
-        rm -rf /tmp/go/src/${extract_path}
-        mkdir -p /tmp/go/src/${extract_path}
-        archive=$(ls ${source_dir} | grep -e "${parent_component}-\w*\.tar\.gz")
-        tar -C /tmp/go/src/${extract_path} --strip-components=1 -zxpf \${source_dir}/\$archive
-        if [ "${component}" = "nomad" ] || [ "${component}" = "node_exporter" ] || [ "${component}" = "mysqld_exporter" ] || [ "${component}" = "proxysql_exporter" ] || [ "${component}" = "rds_exporter" ] || [ "${component}" = "postgres_exporter" ] || [ "${component}" = "azure_metrics_exporter" ]; then
-            git -C /tmp/go/src/${extract_path} init --quiet
-            git -C /tmp/go/src/${extract_path} config user.email "build@datacosmos.com.br"
-            git -C /tmp/go/src/${extract_path} config user.name build
-            git -C /tmp/go/src/${extract_path} add -A
-            git -C /tmp/go/src/${extract_path} commit --quiet -m source-${release_fullcommit}
-        fi
+        component_gopath=${component_gopath}
+        component_source_dir=${component_source_dir}
+        mkdir -p \${component_source_dir}
+        archive=${archive}
+        tar -C \${component_source_dir} --strip-components=1 -zxpf \${source_dir}/\$archive
         export PROMETHEUS_GO_BUILD_LDFLAGS=\"-X github.com/prometheus/common/version.Version=\${COMPONENT_VERSION} -X github.com/prometheus/common/version.Revision=\${PMM_RELEASE_FULLCOMMIT} -X github.com/prometheus/common/version.Branch=\${COMPONENT_BRANCH} -X github.com/prometheus/common/version.BuildUser= -X github.com/prometheus/common/version.BuildDate=\$(date +%FT%T%z) -s -w\"
-        pushd /tmp/go
+        pushd \${component_gopath}
             export GOPATH=\$(pwd -P)
             export PATH=$PATH:\$(go env GOPATH)/bin
             ${build_command}
@@ -157,7 +192,8 @@ copy_component() {
     local component_path=$2
     local component_dest=${3:-$component_path}
     local component_dir=${tmp_dir}/source/${component}
-    local archive=$(ls ${source_dir}/${component}-*.tar.gz | head -n1) # temporary hack for pmm repo
+    local archive
+    archive=$(component_archive "${component}")
 
     if [ ! -d "${component_dir}" ]; then
         mkdir -p ${component_dir}
@@ -176,7 +212,7 @@ main() {
 
     gobuild_component "vmagent" "" "github.com/VictoriaMetrics/VictoriaMetrics" "app/vmagent"
     gobuild_component "nomad" "" "github.com/hashicorp/nomad"
-    gobuild_component "redis_exporter" "" "github.com/oliver006/redis_exporter"
+    gobuild_component "redis_exporter" "" "github.com/oliver006/redis_exporter" "" "bin/valkey_exporter"
     gobuild_component "node_exporter" "" "github.com/prometheus/node_exporter"
     gobuild_component "mysqld_exporter"
     gobuild_component "postgres_exporter" "" "" "cmd/postgres_exporter"
@@ -209,16 +245,13 @@ main() {
     gobuild_component "percona-toolkit" "" "github.com/percona/percona-toolkit" "src/go/pt-mongodb-summary"
     gobuild_component "percona-toolkit" "" "github.com/percona/percona-toolkit" "src/go/pt-pg-summary"
 
-    cp -r ${tmp_dir}/go/src/github.com/hashicorp/nomad/pkg/linux_*/nomad ${binary_dir}/bin/nomad
-    cp -r ${tmp_dir}/go/src/github.com/oliver006/redis_exporter/redis_exporter ${binary_dir}/bin/valkey_exporter
-
     if [[ "${BUILD_TYPE}" = "dynamic" ]]; then
         rm -f ${dynamic_binary_tarball}
-        mkdir -p $(dirname ${dynamic_binary_tarball}) || :
+        mkdir -p $(dirname ${dynamic_binary_tarball})
         tar -C $(dirname ${binary_dir}) -zcpf ${dynamic_binary_tarball} $(basename ${binary_dir})
     else
         rm -rf ${binary_tarball}
-        mkdir -p $(dirname ${binary_tarball}) || :
+        mkdir -p $(dirname ${binary_tarball})
         tar -C $(dirname ${binary_dir}) -zcpf ${binary_tarball} $(basename ${binary_dir})
     fi
 }

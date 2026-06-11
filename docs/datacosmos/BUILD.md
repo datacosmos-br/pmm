@@ -8,10 +8,13 @@ tracking the upstream **`v3`** branch.
 The datacosmos build must stay minimal over upstream and must never hide a
 failure to keep moving. Do not add or keep `|| true`, ignored exit codes,
 suppressed validation output, skipped gates, fake success paths, permissive
-fallbacks, stubs, or compatibility wrappers in the custom build, sync, release,
-or artifact flow. Expected optional states must be handled explicitly; missing
-required refs, artifacts, images, packages, or credentials must stop the target
-with a clear error.
+fallbacks, stubs, synthetic substitutes, or compatibility wrappers in the custom
+build, sync, release, or artifact flow. If the real dependency is a daemon,
+container, generated file, package repository, image, or SSOT config, make that
+dependency work and validate against it instead of replacing it with a narrower
+surrogate. Expected optional states must be handled explicitly; missing required
+refs, artifacts, images, packages, or credentials must stop the target with a
+clear error.
 
 ## Branch model
 
@@ -92,6 +95,16 @@ make dc-build    # prepare + upstream client/server build + artifacts
 make dc-publish  # push the built amd64 images to ghcr.io/datacosmos-br
 make dc-clean    # remove only datacosmos external build/artifact dirs
 ```
+
+## Validation Integrity
+
+The release and local-test gates are root-cause only. Do not mark a datacosmos
+build, test, release, or diagnostic path green by using ignored exit codes,
+skipped gates, fake success paths, synthetic substitutes, broad fallbacks,
+stubs, or compatibility wrappers. If a gate depends on PMM daemons, Docker
+Compose services, ClickHouse matrix nodes, generated files, or fork metadata,
+make those real dependencies work and validate against them. Evidence must cite
+the command, exit code, and decisive output.
 
 For local publishing, set `GHCR_USER` to the GitHub login that owns the token
 used for `ghcr.io`; CI uses `GITHUB_ACTOR`.

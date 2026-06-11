@@ -21,8 +21,8 @@
 //
 // The binary path is provided via CLICKHOUSE_EXPORTER_BIN (set by
 // testdata/run-matrix.sh after building the binary once). When that variable is
-// unset the test is skipped, so a plain `go test -tags clickhouse_integration`
-// without the driver script still passes.
+// unset the test fails because the integration tag means the real exporter
+// binary is part of the gate.
 //
 // The endpoint matrix is the same one collector_integration_test.go uses; the
 // matrixEndpoints() helper is defined there and shared because both files are in
@@ -91,25 +91,18 @@ func scrapeMetrics(ctx context.Context, url string) (string, bool) {
 // TestClickHouseExporterMatrix launches the real clickhouse_exporter binary
 // against every configured endpoint and asserts its /metrics output exposes the
 // three native metric families plus a successful scrape. An unreachable
-// endpoint is skipped so the matrix can be run one topology at a time.
+// endpoint fails because the matrix driver must provide every endpoint.
 func TestClickHouseExporterMatrix(t *testing.T) {
 	binPath := strings.TrimSpace(os.Getenv("CLICKHOUSE_EXPORTER_BIN"))
-	if binPath == "" {
-		t.Skip("CLICKHOUSE_EXPORTER_BIN not set; the exporter binary path is required")
-	}
+	require.NotEmpty(t, binPath, "CLICKHOUSE_EXPORTER_BIN must point to a built exporter binary")
 	require.FileExists(t, binPath, "CLICKHOUSE_EXPORTER_BIN must point to a built exporter binary")
 
-	endpoints := matrixEndpoints()
-	require.NotEmpty(t, endpoints)
+	endpoints := matrixEndpoints(t)
 
 	for name, dsn := range endpoints {
 		t.Run(name, func(t *testing.T) {
-			// Fail fast on an unreachable server before launching the binary,
-			// so a missing endpoint is skipped rather than reported as a crash.
 			c, err := NewCollector(dsn)
-			if err != nil {
-				t.Skipf("endpoint %q unreachable, skipping: %v", name, err)
-			}
+			require.NoErrorf(t, err, "endpoint %q must be reachable before launching exporter", name)
 			require.NoError(t, c.Close())
 
 			port := freeLocalPort(t)
@@ -183,9 +176,8 @@ func TestClickHouseExporterMatrix(t *testing.T) {
 // banner must keep that exact shape.
 func TestClickHouseExporterVersion(t *testing.T) {
 	binPath := strings.TrimSpace(os.Getenv("CLICKHOUSE_EXPORTER_BIN"))
-	if binPath == "" {
-		t.Skip("CLICKHOUSE_EXPORTER_BIN not set; the exporter binary path is required")
-	}
+	require.NotEmpty(t, binPath, "CLICKHOUSE_EXPORTER_BIN must point to a built exporter binary")
+	require.FileExists(t, binPath, "CLICKHOUSE_EXPORTER_BIN must point to a built exporter binary")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

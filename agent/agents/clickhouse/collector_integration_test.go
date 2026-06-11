@@ -20,7 +20,7 @@
 // single-node and cluster topologies, and whether the server is local or
 // external. The full matrix is driven by testdata/run-matrix.sh:
 //
-//	cd agent/agents/clickhouse/testdata && ./run-matrix.sh
+//	cd agent/agents/clickhouse/testdata && bash run-matrix.sh
 //
 // To run against an arbitrary set of endpoints directly, set
 // CLICKHOUSE_TEST_ENDPOINTS to a comma-separated list of "name=dsn" pairs:
@@ -43,8 +43,10 @@ import (
 
 // matrixEndpoints returns the ClickHouse endpoints to validate, parsed from
 // CLICKHOUSE_TEST_ENDPOINTS ("name=dsn" pairs, comma-separated). When unset, a
-// single local default is used so the test is runnable without the driver.
-func matrixEndpoints() map[string]string {
+// single local default is used and must be reachable.
+func matrixEndpoints(t *testing.T) map[string]string {
+	t.Helper()
+
 	raw := os.Getenv("CLICKHOUSE_TEST_ENDPOINTS")
 	if strings.TrimSpace(raw) == "" {
 		return map[string]string{
@@ -58,28 +60,26 @@ func matrixEndpoints() map[string]string {
 			continue
 		}
 		name, dsn, ok := strings.Cut(pair, "=")
-		if !ok {
-			continue
-		}
+		require.Truef(t, ok, "invalid CLICKHOUSE_TEST_ENDPOINTS entry %q, expected name=dsn", pair)
+		require.NotEmptyf(t, strings.TrimSpace(name), "invalid CLICKHOUSE_TEST_ENDPOINTS entry %q: empty name", pair)
+		require.NotEmptyf(t, strings.TrimSpace(dsn), "invalid CLICKHOUSE_TEST_ENDPOINTS entry %q: empty dsn", pair)
 		endpoints[strings.TrimSpace(name)] = strings.TrimSpace(dsn)
 	}
+	require.NotEmpty(t, endpoints, "CLICKHOUSE_TEST_ENDPOINTS must contain at least one endpoint")
 	return endpoints
 }
 
 // TestClickHouseMatrix validates the collector against every configured
 // endpoint (version × {single, cluster} × {local, external}). Each endpoint is
-// a subtest; an unreachable endpoint is skipped so the matrix can be run
-// incrementally, one topology at a time, by the driver script.
+// a subtest; an unreachable endpoint fails because the matrix driver is
+// responsible for creating every configured server.
 func TestClickHouseMatrix(t *testing.T) {
-	endpoints := matrixEndpoints()
-	require.NotEmpty(t, endpoints)
+	endpoints := matrixEndpoints(t)
 
 	for name, dsn := range endpoints {
 		t.Run(name, func(t *testing.T) {
 			c, err := NewCollector(dsn)
-			if err != nil {
-				t.Skipf("endpoint %q unreachable, skipping: %v", name, err)
-			}
+			require.NoErrorf(t, err, "endpoint %q must be reachable", name)
 			defer c.client.Close()
 
 			ctx := context.Background()
