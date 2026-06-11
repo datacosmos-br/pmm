@@ -1,0 +1,125 @@
+agent/agents/mongodb/profiler/internal/collector/collector_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 34,61,82-83,123
+qan-api2/services/analytics/profile_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 35,40-43,45,79,172,302,538,653,738,839
+dashboards/pmm-app/AGENTS.md
+  s_db446802125691::t_8906eee1803cfd 3-9
+admin/AGENTS.md
+  s_db446802125691::t_0a33758f82a0ba 3-9
+qan-api2/Makefile
+  s_db446802125691::t_1e56ed5aaea7af 42-45,57-58,63,80
+qan-api2/AGENTS.md
+  s_db446802125691::t_8906eee1803cfd 3-9
+managed/AGENTS.md
+  s_db446802125691::t_0a33758f82a0ba 3-9
+qan-api2/services/analytics/filters_test.go
+  s_aab4a0cd64efa1::t_66db010a32c631 28,33,57,59
+agent/docker-compose.yml
+  s_aab4a0cd64efa1::t_952f8fc24e7cd1 8,38,57,78,89,101-102,112-113,131,144,153-154
+Makefile.datacosmos
+  s_aab4a0cd64efa1::t_952f8fc24e7cd1 114-118
+agent/agents/mongodb/mongolog/mongodb_test.go
+  s_9611f97f970de7::t_bcbd784413a6cd 41
+agent/agents/clickhouse/testdata/run-matrix.sh
+  s_1200417b8a3aa1::t_c6af055ccd76d7 98-116,136,138-139
+agent/serviceinfobroker/service_info_broker_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 19,34-65,78,86,95,105,113,122,135,144,153,162,172,182,190,199,203,240,274,282,292,300,310,319,361
+docs/datacosmos/clickhouse-epic/INTEGRATION-TESTS.md
+  s_8660b6eaed4d78::t_d1acb951092044 22-26
+agent/connectionchecker/connection_checker_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 19,34-65,78,86,95,105,113,123,131,143,153,162,172,180,189,198,206,215,219,227,235,244,253,263,305
+api-tests/AGENTS.md
+  s_db446802125691::t_0a33758f82a0ba 3-9
+Makefile
+  s_1200417b8a3aa1::t_c6af055ccd76d7 42,46,50
+qan-api2/db_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 32,43,68,123
+ui/AGENTS.md
+  s_db446802125691::t_8906eee1803cfd 3-9
+agent/agents/clickhouse/collector_integration_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 28,42-43,55
+agent/agents/clickhouse/testdata/docker-compose.matrix.yml
+  s_1200417b8a3aa1::t_c6af055ccd76d7 14,32,51
+agent/agents/mongodb/profiler/mongodb_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 38
+agent/utils/tests/postgresql.go
+  s_9611f97f970de7::t_eaa7f329d27c4b 45
+qan-api2/models/metrics_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 28,34
+qan-api2/services/analytics/object_details_test.go
+  s_aab4a0cd64efa1::t_66db010a32c631 35,152,274,353
+vmproxy/AGENTS.md
+  s_db446802125691::t_0a33758f82a0ba 3-9
+api/AGENTS.md
+  s_db446802125691::t_0a33758f82a0ba 3-9
+agent/agents/mongodb/shared/fingerprinter/fingerprinter_test.go
+  s_1200417b8a3aa1::t_c2508965f16533 35,90,115,126,129,131-132
+  s_9611f97f970de7::t_b9ecfafd13243d 98-99,104,109,114,119
+qan-api2/internal/testutils/services.go
+  s_db446802125691::t_dc244b6b18b12c 1
+agent/agents/clickhouse/querylog/qan_integration_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 27,68,89
+dashboards/dashboards/AGENTS.md
+  s_db446802125691::t_0a33758f82a0ba 3-9
+agent/utils/tests/mongodb.go
+  s_aab4a0cd64efa1::t_a82d12448c52e6 60
+docs/datacosmos/BUILD.md
+  s_8660b6eaed4d78::t_d1acb951092044 109-116
+agent/runner/actions/mysql_explain_action_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 197
+agent/utils/tests/services.go
+  s_db446802125691::t_dc244b6b18b12c 1
+  s_9611f97f970de7::t_eaa7f329d27c4b 2-77
+agent/runner/actions/clickhouse_explain_action_integration_test.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 30,36-39,42,46,49,58,61-64,69,79-80
+agent/utils/tests/mysql.go
+  s_1200417b8a3aa1::t_c6af055ccd76d7 42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "9b14f07f3e1c2672c1da1c998841670266971524",
+  "prompts": {},
+  "sessions": {
+    "s_1200417b8a3aa1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb6f8-4554-7550-834c-a88da5cf49ff",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_8660b6eaed4d78": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9bdcab4-8446-4cbc-9d01-51f1eb30707c",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_9611f97f970de7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48c99c3e-e108-433e-9f9d-20adb133fd93",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_aab4a0cd64efa1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb702-2aca-74d1-b728-f0e419a88ab8",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_db446802125691": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb70c-173f-7491-801b-da2ec2d01867",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
