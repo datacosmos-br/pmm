@@ -4,7 +4,7 @@ export const clickhouseMethods = {
   getShowCreateTables: async () => null,
   getIndexes: async () => null,
   getExplainJSON: async () => null,
-  getExplain: async ({ example, queryId }, disableNotifications = false) => {
+  getExplain: async ({ example }, disableNotifications = false) => {
     const payload = {
       service_id: example.service_id,
       query: example.example,

@@ -109,7 +109,7 @@ export const fetchExplains = async (
 
     if (databaseType === Databases.clickhouse && hasExample) {
       const jsonResult = await clickhouseMethods
-        .getExplain({ example, queryId }, true)
+        .getExplain({ example }, true)
         .then(getActionResult)
         .catch(catchActionError);
 
