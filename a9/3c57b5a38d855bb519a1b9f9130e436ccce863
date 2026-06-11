@@ -1,0 +1,19 @@
+qan-api2/migrations/migrations_test.go
+  s_766c358d84b6e2::t_0810e86a775ea6 1-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "a93c57b5a38d855bb519a1b9f9130e436ccce863",
+  "prompts": {},
+  "sessions": {
+    "s_766c358d84b6e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f70874aa-b264-42d3-b8bb-d7dde6bfa0a2",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
