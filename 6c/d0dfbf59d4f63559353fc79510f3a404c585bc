@@ -1,0 +1,31 @@
+dashboards/pmm-app/src/shared/components/Form/FieldAdapters/Field.tsx
+  s_aa0bbd287021d9::t_2824209a695ca7 16-18,27,31,36,41,44,47-50
+dashboards/pmm-app/src/shared/components/Elements/Charts/Latency/Latency.styles.ts
+  s_809751dda0fc9f::t_acbedab1c6cc4a 22
+dashboards/pmm-app/src/shared/components/helpers/getPmmTheme.ts
+  s_809751dda0fc9f::t_acbedab1c6cc4a 33,113-121,123-124,127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "6cd0dfbf59d4f63559353fc79510f3a404c585bc",
+  "prompts": {},
+  "sessions": {
+    "s_809751dda0fc9f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb89e-1b7d-7613-a5bc-f0a0e24755fd",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_aa0bbd287021d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb862-755f-7f23-82e0-c16c29890f21",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
