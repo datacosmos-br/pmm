@@ -72,6 +72,8 @@ export interface ExternalService extends BaseService {
 
 export interface ValkeyService extends VersionedService {}
 
+export interface ClickHouseService extends VersionedService {}
+
 // Service from /v1/management/services API
 export interface ManagedService {
   serviceId: string;
@@ -106,6 +108,7 @@ export interface ListServicesResponse {
   haproxy?: HaProxyService[];
   external?: ExternalService[];
   valkey?: ValkeyService[];
+  clickhouse?: ClickHouseService[];
 }
 
 export interface ListServicesParams {

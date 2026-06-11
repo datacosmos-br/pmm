@@ -376,30 +376,6 @@ export const NAV_VALKEY: NavItem = {
 };
 
 //
-// ClickHouse
-//
-export const NAV_CLICKHOUSE: NavItem = {
-  id: 'clickhouse',
-  text: 'ClickHouse',
-  icon: 'percona-ch',
-  url: `${PMM_NEW_NAV_GRAFANA_PATH}/d/clickhouse-instances-overview/clickhouse-instances-overview`,
-  children: [
-    {
-      id: 'clickhouse-overview',
-      text: 'Overview',
-      icon: 'overview',
-      url: `${PMM_NEW_NAV_GRAFANA_PATH}/d/clickhouse-instances-overview/clickhouse-instances-overview`,
-    },
-    {
-      id: 'clickhouse-queries-overview',
-      text: 'Queries',
-      icon: 'qan',
-      url: `${PMM_NEW_NAV_GRAFANA_PATH}/d/clickhouse-queries-overview/clickhouse-queries-overview`,
-    },
-  ],
-};
-
-//
 // QAN
 //
 export const NAV_QAN: NavItem = {

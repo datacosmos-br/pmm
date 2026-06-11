@@ -55,6 +55,11 @@ export const DYNAMIC_ICON_IMPORT_MAP = {
   'play-arrow': () => import('icons/play-arrow.svg?react'),
   pause: () => import('icons/pause.svg?react'),
   refresh: () => import('icons/refresh.svg?react'),
+  // ClickHouse nav: reuse existing art until bespoke icons land — percona-ch
+  // mirrors the percona-<db> family, compare/query map to graph/qan glyphs.
+  'percona-ch': () => import('icons/percona.svg?react'),
+  compare: () => import('icons/graph-6.svg?react'),
+  query: () => import('icons/qan.svg?react'),
 };
 
 export const VIEWBOX_MAP: Partial<
