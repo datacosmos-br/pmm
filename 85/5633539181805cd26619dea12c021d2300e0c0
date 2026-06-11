@@ -1,0 +1,32 @@
+agent/utils/tests/testdata/mongodb/client.pem
+  s_db446802125691::t_c3c5a183442f9f 30-50
+  s_7216b814c83710::t_394f94431c676c 2-27
+agent/utils/tests/testdata/mongodb/ca.crt
+  s_7216b814c83710::t_9070aaf69d4f7c 2-20
+agent/utils/tests/testdata/mongodb/server.pem
+  s_7216b814c83710::t_44abb8afc95ab9 2-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "855633539181805cd26619dea12c021d2300e0c0",
+  "prompts": {},
+  "sessions": {
+    "s_7216b814c83710": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb6f6-460f-7570-9bd9-dd6189397820",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_db446802125691": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb70c-173f-7491-801b-da2ec2d01867",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
