@@ -1,0 +1,19 @@
+agent/runner/actions/clickhouse_explain_action_integration_test.go
+  s_766c358d84b6e2::t_900416c9df5576 1-118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "06f51568be4cec91de9604aea586d506538cd98c",
+  "prompts": {},
+  "sessions": {
+    "s_766c358d84b6e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f70874aa-b264-42d3-b8bb-d7dde6bfa0a2",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
