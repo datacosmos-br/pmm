@@ -1,9 +1,12 @@
-const ClickHouseDatabaseService = {
-  // Placeholder for future EXPLAIN and table info endpoints
-  getExplain: async () => null,
-  getExplainJSON: async () => null,
+import { apiRequest } from 'shared/components/helpers/api';
+
+export default {
+  getExplain(body, disableNotifications = false) {
+    const requestBody = { clickhouse_explain: body };
+
+    return apiRequest.post<any, any>('/v1/actions:startServiceAction', requestBody, disableNotifications);
+  },
+
   getShowCreateTables: async () => null,
   getIndexes: async () => null,
 };
-
-export default ClickHouseDatabaseService;
