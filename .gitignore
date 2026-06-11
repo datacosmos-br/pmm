@@ -61,12 +61,13 @@ encryption.key
 
 # agent governance — local to the workspace, never committed
 /.agents/
-/AGENTS.md
 
 # Exclude AI skills to support fast local experimentation
 .claude/
+.codex/
 .cursor/
 .cursorrules/
+.serena/
 CLAUDE.md
 
 # Beads / Dolt files (added by bd init)

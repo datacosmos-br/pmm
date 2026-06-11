@@ -43,10 +43,13 @@ the git tag keeps it (`v3.8.0-dc2`).
 For each upstream version, the datacosmos counter starts at `dc1` and increments
 from the highest existing `v<upstream version>-dc<N>` tag. The release helper
 fetches tags first, so it accounts for releases already pushed to `origin`.
+When the upstream commit used by the branch is exactly a stable `vX.Y.Z` tag,
+the release helper uses `vX.Y.Z-dc<N>`. Otherwise it uses
+`v3-<upstream commit ISO date>-dc<N>`, with `N` incrementing for that date.
 
 ```bash
-make dc-next    # prints the next v<version>-dc<N> tag
-make dc-release # creates and pushes that annotated tag
+make dc-next                  # next tag, e.g. v3.8.0-dc1 or v3-2026-06-11-dc1
+make dc-release               # creates and pushes that tag
 ```
 
 The earlier date scheme `v3-<ISO date>-<upstream commit count>` still works if
@@ -54,7 +57,7 @@ such a tag is pushed manually — the workflow triggers on both `v*-dc*` and
 `v3-*` tags — but `dcN` is the current scheme.
 
 Pushing the tag runs `.github/workflows/datacosmos-release.yml`, which builds
-multi-arch images and a GitHub Release. The build's internal `PMM_VERSION`
+linux/amd64 images and a GitHub Release. The build's internal `PMM_VERSION`
 (written to `VERSION`, used for the upstream S3 RPM cache) is derived
 separately from the nearest upstream semver tag — it stays a clean `X.Y.Z`.
 
@@ -65,8 +68,7 @@ datacosmos-specific `dc-*` targets. Common targets such as `release`, `check`,
 `clean`, and `gen` stay owned by upstream Makefiles.
 
 ```bash
-make dc-build   # prepare + upstream client/server build + per-arch GHCR push + artifacts
-make dc-publish # publish multi-arch manifests after the per-arch builds
+make dc-build   # prepare + upstream client/server build + publish amd64 images + artifacts
 make dc-clean   # remove only datacosmos external build/artifact dirs
 ```
 
@@ -80,10 +82,9 @@ fork can safely reuse public Percona infrastructure:
 - `SKIP_S3_CACHE` is unset by default, so amd64 server RPMs can reuse
   `s3://pmm-build-cache` anonymously and avoid rebuilding Grafana and other
   heavy components.
-- GitHub Actions sets `SKIP_S3_CACHE=1` on arm64 because the upstream cache is
-  x86_64-only.
-- Images are built locally first and published to `ghcr.io/datacosmos-br` only
-  through the explicit publish targets used by the release workflow.
+- The current datacosmos release workflow publishes linux/amd64 only.
+- Images are built locally first and published to `ghcr.io/datacosmos-br` as
+  part of `dc-build`.
 
 ### Local-only mode
 

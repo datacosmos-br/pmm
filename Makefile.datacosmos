@@ -15,15 +15,13 @@ PMM_VERSION := $(if $(PMM_VERSION),$(PMM_VERSION),3.0.0)
 
 UPSTREAM_BRANCH ?= upstream/v3
 UPSTREAM_TARGET ?= head
-DC_SOURCE ?= stable
 DIST ?= el9
 ROOT_DIR ?= $(abspath $(CURDIR)/../pmm-build-root)
 ARTIFACT_DIR ?= $(abspath $(CURDIR)/../pmm-artifacts)
 GHCR_NAMESPACE ?= ghcr.io/datacosmos-br
-DC_DATE ?= $(shell date -u +%Y-%m-%d)
-DC_TAG_BASE := $(if $(filter head,$(DC_SOURCE)),v3-$(DC_DATE)-dc,v$(PMM_VERSION)-dc)
-DC_VERSION ?= $(if $(filter head,$(DC_SOURCE)),v3-$(DC_DATE)-dev,$(PMM_VERSION)-dev)
+DC_VERSION ?= $(PMM_VERSION)-dev
 IMAGE_ARCH ?= amd64
+DC_RELEASE_COMMIT_PATHS := Makefile.datacosmos .github/workflows/datacosmos-release.yml
 
 FULL_VERSION := $(PMM_VERSION)-$(shell git rev-list --count HEAD 2>/dev/null || echo 1)
 CLIENT_IMAGE ?= pmm-local/pmm-client:$(FULL_VERSION)
@@ -34,6 +32,14 @@ SERVER_PUBLISH_IMAGE ?= $(GHCR_NAMESPACE)/pmm-server:$(DC_VERSION)-$(IMAGE_ARCH)
 export ROOT_DIR
 export RPMBUILD_DIST := $(DIST)
 unexport PUSH_DOCKER
+
+define DC_RESOLVE_TAG_SCRIPT
+upstream_ref=$$(git rev-parse -q --verify MERGE_HEAD 2>/dev/null || git merge-base HEAD $(UPSTREAM_BRANCH) 2>/dev/null || git rev-parse HEAD); \
+stable=$$(git tag --points-at "$$upstream_ref" --list 'v[0-9]*.[0-9]*.[0-9]*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | sort -V | tail -1 || true); \
+if [ -n "$$stable" ]; then base="$${stable}-dc"; else base="v3-$$(git show -s --format=%cs "$$upstream_ref")-dc"; fi; \
+last=$$(git tag -l "$${base}*" | sed -n "s/^$${base}\([0-9][0-9]*\)$$/\1/p" | sort -n | tail -1); \
+tag="$$base$$(( $${last:-0} + 1 ))"
+endef
 
 .PHONY: dc-upstream
 dc-upstream: ## Merge upstream/v3 head, or latest stable tag with UPSTREAM_TARGET=stable
@@ -54,20 +60,13 @@ dc-upstream: ## Merge upstream/v3 head, or latest stable tag with UPSTREAM_TARGE
 dc-sync: dc-upstream
 
 .PHONY: dc-next
-dc-next: ## Print next release tag; use DC_SOURCE=head for v3-YYYY-MM-DD-dc<N>
-	@git fetch origin --tags
-	@git fetch upstream --tags
-	@base="$(DC_TAG_BASE)"; \
-	last=$$(git tag -l "$${base}*" | sed -n "s/^$${base}\([0-9][0-9]*\)$$/\1/p" | sort -n | tail -1); \
-	printf "%s%s\n" "$$base" "$$(( $${last:-0} + 1 ))"
+dc-next: .dc-fetch-tags ## Print next release tag inferred from upstream sync position
+	@$(DC_RESOLVE_TAG_SCRIPT); \
+	printf "%s\n" "$$tag"
 
 .PHONY: dc-release
-dc-release: ## Create and push next release tag; use DC_SOURCE=head for v3-YYYY-MM-DD-dc<N>
-	@git fetch origin --tags
-	@git fetch upstream --tags
-	@base="$(DC_TAG_BASE)"; \
-	last=$$(git tag -l "$${base}*" | sed -n "s/^$${base}\([0-9][0-9]*\)$$/\1/p" | sort -n | tail -1); \
-	tag="$$base$$(( $${last:-0} + 1 ))"; \
+dc-release: .dc-clean-worktree .dc-fetch-tags ## Create and push next release tag inferred from upstream sync position
+	@$(DC_RESOLVE_TAG_SCRIPT); \
 	git tag -a "$$tag" -m "datacosmos PMM $$tag (@ $$(git rev-parse --short HEAD))"; \
 	git push origin "$$tag"
 
@@ -75,20 +74,20 @@ dc-release: ## Create and push next release tag; use DC_SOURCE=head for v3-YYYY-
 dc-tag: dc-release
 
 .PHONY: dc-build
-dc-build: .dc-prepare .dc-login ## Build, push per-arch images, and collect artifacts
+dc-build: .dc-prepare .dc-login ## Build/publish linux/amd64 images and collect artifacts
 	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) \
 		$(CURDIR)/build/scripts/build-client
 	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) RPMBUILD_DIST=$(DIST) DOCKER_TAG=$(SERVER_IMAGE) \
 		$(CURDIR)/build/scripts/build-server
+	$(MAKE) .dc-push-images
+	$(MAKE) dc-artifacts
+
+.PHONY: .dc-push-images
+.dc-push-images:
 	docker tag $(CLIENT_IMAGE) $(CLIENT_PUBLISH_IMAGE)
 	docker tag $(SERVER_IMAGE) $(SERVER_PUBLISH_IMAGE)
 	docker push $(CLIENT_PUBLISH_IMAGE)
 	docker push $(SERVER_PUBLISH_IMAGE)
-	mkdir -p $(ARTIFACT_DIR)/server-rpms
-	cp -a $(ROOT_DIR)/results/. $(ARTIFACT_DIR)/ 2>/dev/null || true
-	find $(ROOT_DIR)/tmp/pmm-server/RPMS -name '*.rpm' -type f \
-		-exec cp -f {} $(ARTIFACT_DIR)/server-rpms/ \; 2>/dev/null || true
-	echo "Artifacts in $(ARTIFACT_DIR)"
 
 .PHONY: dc-artifacts
 dc-artifacts:
@@ -117,6 +116,20 @@ dc-clean: ## Remove datacosmos external build and artifact dirs
 	mkdir -p $(ROOT_DIR)/sources/pmm/src/github.com/percona
 	git clone --local --no-checkout $(CURDIR) $(ROOT_DIR)/sources/pmm/src/github.com/percona/pmm
 	git -C $(ROOT_DIR)/sources/pmm/src/github.com/percona/pmm checkout --detach $$(git rev-parse HEAD)
+
+.PHONY: .dc-clean-worktree
+.dc-clean-worktree:
+	@if git rev-parse -q --verify MERGE_HEAD >/dev/null; then \
+		echo "Merge in progress; commit the upstream sync before dc-release"; \
+		exit 1; \
+	fi
+	@git diff --quiet -- $(DC_RELEASE_COMMIT_PATHS) || { echo "Release files have unstaged changes; commit before dc-release"; exit 1; }
+	@git diff --cached --quiet -- $(DC_RELEASE_COMMIT_PATHS) || { echo "Release files have staged changes; commit before dc-release"; exit 1; }
+
+.PHONY: .dc-fetch-tags
+.dc-fetch-tags:
+	@git fetch origin --tags
+	@git fetch upstream --tags
 
 .PHONY: .dc-login
 .dc-login:
