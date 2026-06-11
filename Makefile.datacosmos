@@ -100,6 +100,13 @@ release-tag:                                      ## Create the release tag v3-<
 	git tag -a "$$tag" -m "datacosmos PMM $$tag (upstream/v3 @ $$(git rev-parse --short upstream/v3))"; \
 	echo "Created $$tag — push it to trigger the release: git push origin $$tag"
 
+.PHONY: release-tag-dc
+release-tag-dc:                                   ## Create the next semver-dcN tag v$(PMM_VERSION)-dc<N>
+	@base="v$(PMM_VERSION)-dc"; n=1; \
+	while git rev-parse -q --verify "refs/tags/$$base$$n" >/dev/null 2>&1; do n=$$((n + 1)); done; \
+	git tag -a "$$base$$n" -m "datacosmos PMM $$base$$n (upstream $(PMM_VERSION) @ $$(git rev-parse --short HEAD))"; \
+	echo "Created $$base$$n — push it to trigger the release: git push origin $$base$$n"
+
 .PHONY: prepare
 prepare: submodules create-build-dirs             ## Fetch submodules and lay out the build tree
 	@echo "=== PMM $(FULL_VERSION) — branch $(GIT_BRANCH) — ROOT_DIR=$(ROOT_DIR) ==="

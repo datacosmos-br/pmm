@@ -7,11 +7,12 @@ name: datacosmos release
 on:
   push:
     tags:
-      - "v3-*"
+      - "v3-*"      # legacy date scheme: v3-<date>-<count>
+      - "v*-dc*"    # semver-dcN scheme: v3.8.0-dc2
   workflow_dispatch:
     inputs:
       dc_version:
-        description: "datacosmos version tag (e.g. v3-2026-05-17-5580)"
+        description: "datacosmos version tag (e.g. v3.8.0-dc2 or v3-2026-05-17-5580)"
         required: true
 
 permissions:
@@ -53,8 +54,11 @@ jobs:
       - name: Derive datacosmos version
         id: ver
         run: |
-          # The v3-<date>-<count> tag is the version string verbatim.
+          # A v3-<date>-<count> tag is the version string verbatim; a
+          # semver-dcN tag (v3.8.0-dc2) drops its leading 'v' so the image tag
+          # reads 3.8.0-dc2.
           dc="${DC_INPUT:-${GITHUB_REF_NAME}}"
+          case "$dc" in v*.*.*-dc*) dc="${dc#v}" ;; esac
           echo "dc_version=${dc}" >> "$GITHUB_OUTPUT"
 
       - name: Free up runner disk space
@@ -115,11 +119,14 @@ jobs:
       - name: Derive datacosmos version and tag
         id: ver
         run: |
-          # The v3-<date>-<count> tag is both the version string and the
-          # release tag verbatim — no prefixing or stripping.
-          dc="${DC_INPUT:-${GITHUB_REF_NAME}}"
+          # The git tag is used verbatim for the GitHub Release; the image
+          # version drops the leading 'v' for a semver-dcN tag (v3.8.0-dc2 ->
+          # 3.8.0-dc2), while a v3-<date>-<count> tag stays verbatim.
+          tag="${DC_INPUT:-${GITHUB_REF_NAME}}"
+          dc="$tag"
+          case "$dc" in v*.*.*-dc*) dc="${dc#v}" ;; esac
           echo "dc_version=${dc}" >> "$GITHUB_OUTPUT"
-          echo "tag=${dc}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
 
       - name: Merge per-arch images into multi-arch tags
         env:

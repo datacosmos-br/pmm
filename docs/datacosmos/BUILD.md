@@ -36,15 +36,20 @@ done
 
 ## Releases
 
-datacosmos releases are tagged `v3-<ISO date>-<upstream commit count>` — e.g.
-`v3-2026-05-17-5580`: the `v3` line, the date the tag was cut, and
-`git rev-list --count upstream/v3` (the upstream commit the build is based on).
-The old `-dcN` counter is retired.
+datacosmos releases are tagged with the **semver-`dcN`** scheme:
+`v<upstream version>-dc<N>` — e.g. `v3.8.0-dc2`: the upstream PMM release the
+build tracks (`3.8.0`), and `dcN` the datacosmos build counter on top of it
+(`dc1`, `dc2`, …). The image/RPM version drops the leading `v` (`3.8.0-dc2`);
+the git tag keeps it (`v3.8.0-dc2`).
 
 ```bash
-make -f Makefile.datacosmos release-tag               # creates the v3-<date>-<count> tag
-git push origin v3-<date>-<count>                     # triggers the datacosmos release workflow
+make -f Makefile.datacosmos release-tag-dc            # creates the next v<version>-dc<N> tag
+git push origin v3.8.0-dc2                            # triggers the datacosmos release workflow
 ```
+
+The earlier date scheme `v3-<ISO date>-<upstream commit count>` (e.g.
+`v3-2026-05-17-5580`, via `make release-tag`) still works — the workflow
+triggers on both `v*-dc*` and `v3-*` tags — but `dcN` is the current scheme.
 
 Pushing the tag runs `.github/workflows/datacosmos-release.yml`, which builds
 multi-arch images and a GitHub Release. The build's internal `PMM_VERSION`
