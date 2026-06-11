@@ -94,6 +94,9 @@ services:
     container_name: pmm-agent_mongorepl
     environment:
       - MONGO_IMAGE=${MONGO_IMAGE:-percona/percona-server-mongodb:6.0}
+      - MONGO_REPLSET_HOST=${PMM_TEST_SERVICE_HOST:-localhost}
+    extra_hosts:
+      - "${PMM_TEST_SERVICE_EXTRA_HOST:-host.docker.internal:host-gateway}"
     volumes:
       - ./testscripts/:/scripts
     command: /scripts/mongo_repl.sh
@@ -108,6 +111,9 @@ services:
     command: /scripts/mongo_repl_with_tls.sh
     environment:
       - MONGO_IMAGE=${MONGO_IMAGE:-percona/percona-server-mongodb:6.0}
+      - MONGO_REPLSET_HOST=${PMM_TEST_SERVICE_HOST:-localhost}
+    extra_hosts:
+      - "${PMM_TEST_SERVICE_EXTRA_HOST:-host.docker.internal:host-gateway}"
     ports:
       - "${PMM_TEST_BIND_HOST:-127.0.0.1}:27022:27022"
       - "${PMM_TEST_BIND_HOST:-127.0.0.1}:27023:27023"

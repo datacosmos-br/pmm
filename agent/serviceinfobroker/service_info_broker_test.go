@@ -200,7 +200,7 @@ func TestServiceInfoBroker(t *testing.T) {
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_VALKEY_SERVICE,
 				Timeout: durationpb.New(time.Nanosecond),
 			},
-			expectedErr: `dial tcp .+:6379: i/o timeout`,
+			expectedErr: `(?:dial tcp .+:6379: i/o timeout|dial tcp: lookup .+: i/o timeout|context deadline exceeded)`,
 		},
 	}
 

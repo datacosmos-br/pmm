@@ -112,7 +112,13 @@ dc-status: ## Show Git-derived upstream, tag, bump, and worktree status
 .PHONY: dc-test-env-up
 dc-test-env-up: ## Start upstream service containers used by local tests
 	@if [[ "$${DOCKER_HOST:-}" == tcp://* ]]; then \
-		PMM_TEST_BIND_HOST="$${PMM_TEST_BIND_HOST:-0.0.0.0}" $(MAKE) -C agent env-up; \
+		service_host="$${PMM_TEST_SERVICE_HOST:-$${DOCKER_HOST#tcp://}}"; \
+		service_host="$${service_host%%:*}"; \
+		if [[ "$$service_host" == "localhost" || "$$service_host" == 127.* || "$$service_host" == "::1" ]]; then \
+			PMM_TEST_BIND_HOST="$${PMM_TEST_BIND_HOST:-0.0.0.0}" PMM_TEST_SERVICE_HOST="$$service_host" $(MAKE) -C agent env-up; \
+		else \
+			PMM_TEST_BIND_HOST="$${PMM_TEST_BIND_HOST:-0.0.0.0}" PMM_TEST_SERVICE_HOST="$$service_host" PMM_TEST_SERVICE_EXTRA_HOST="$$service_host:host-gateway" $(MAKE) -C agent env-up; \
+		fi; \
 	else \
 		$(MAKE) -C agent env-up; \
 	fi
