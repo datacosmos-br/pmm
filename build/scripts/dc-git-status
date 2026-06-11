@@ -89,7 +89,7 @@ fi
 
 sync_short=$(git rev-parse --short "${sync_ref}")
 sync_date=$(git show -s --format=%cs "${sync_ref}")
-sync_stable=$(git tag --points-at "${sync_ref}" --list 'v[0-9]*.[0-9]*.[0-9]*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)
+sync_stable=$(git tag --points-at "${sync_ref}" --list 'v[0-9]*.[0-9]*.[0-9]*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | sed -n '$p' || true)
 sync_stable=${sync_stable:-none}
 
 if [ -n "${latest_stable}" ]; then
@@ -105,7 +105,7 @@ if [ "${sync_stable}" != none ]; then
 else
     next_base="v3-${sync_date}-dc"
 fi
-last_for_base=$(git tag -l "${next_base}*" | sed -n "s/^${next_base}\([0-9][0-9]*\)$/\1/p" | sort -n | tail -1)
+last_for_base=$(git tag -l "${next_base}*" | sed -n "s/^${next_base}\([0-9][0-9]*\)$/\1/p" | sort -n | sed -n '$p')
 next_dc_tag="${next_base}$(( ${last_for_base:-0} + 1 ))"
 
 submodules_repo=${DC_PMM_SUBMODULES_REPO:-https://github.com/datacosmos-br/pmm-submodules.git}
