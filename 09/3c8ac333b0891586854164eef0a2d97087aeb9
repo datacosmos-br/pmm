@@ -1,0 +1,19 @@
+AGENTS.md
+  s_1200417b8a3aa1::t_e214a5761a8aaa 8-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "093c8ac333b0891586854164eef0a2d97087aeb9",
+  "prompts": {},
+  "sessions": {
+    "s_1200417b8a3aa1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb6f8-4554-7550-834c-a88da5cf49ff",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
