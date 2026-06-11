@@ -1,0 +1,19 @@
+build/scripts/build-server-docker
+  s_8fc773802c87e6::t_4fb1ef22a0f35c 21,23-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "27e56dfb91ccd0b052edf6213a63404549418a96",
+  "prompts": {},
+  "sessions": {
+    "s_8fc773802c87e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb7ab-490c-7693-96e1-753a77e6ba9d",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
