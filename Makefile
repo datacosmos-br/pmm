@@ -39,14 +39,15 @@ TARGET ?= _bash
 DEVCONTAINER_NAME ?= $(or $(shell docker ps --filter 'name=^/devcontainer-cosmos-dev-1$$' --format '{{.Names}}'),pmm-server)
 DEVCONTAINER_WORKDIR ?= $(if $(filter devcontainer-cosmos-dev-1,$(DEVCONTAINER_NAME)),/workspace/cosmos-main/apps/pmm,/root/go/src/github.com/percona/pmm)
 DEVCONTAINER_USER_FLAG ?= $(if $(filter devcontainer-cosmos-dev-1,$(DEVCONTAINER_NAME)),--user codespace,)
+DEVCONTAINER_EXEC_FLAGS ?= $(shell if [ -t 0 ]; then printf -- "-it"; else printf -- "-i"; fi)
 
 env:								## Run `make TARGET` in devcontainer (`make env TARGET=help`); TARGET defaults to bash
 	COMPOSE_PROFILES=$(PROFILES) \
-	docker exec -it $(DEVCONTAINER_USER_FLAG) --workdir=$(DEVCONTAINER_WORKDIR) $(DEVCONTAINER_NAME) make $(TARGET)
+	docker exec $(DEVCONTAINER_EXEC_FLAGS) $(DEVCONTAINER_USER_FLAG) --workdir=$(DEVCONTAINER_WORKDIR) $(DEVCONTAINER_NAME) make $(TARGET)
 
 env-root:								## Run `make TARGET` in devcontainer (`make env-root TARGET=help`); TARGET defaults to bash
 	COMPOSE_PROFILES=$(PROFILES) \
-	docker exec -it --workdir=$(DEVCONTAINER_WORKDIR) --user root $(DEVCONTAINER_NAME) make $(TARGET)
+	docker exec $(DEVCONTAINER_EXEC_FLAGS) --workdir=$(DEVCONTAINER_WORKDIR) --user root $(DEVCONTAINER_NAME) make $(TARGET)
 
 rotate-encryption: 							## Rotate encryption key
 	go run ./encryption-rotation/main.go

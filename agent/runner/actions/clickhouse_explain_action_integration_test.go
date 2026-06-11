@@ -27,22 +27,26 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/percona/pmm/agent/utils/tests"
 	agentv1 "github.com/percona/pmm/api/agent/v1"
 )
 
 // clickHouseExplainDSN returns the DSN to exercise the EXPLAIN action against,
 // from CLICKHOUSE_TEST_ENDPOINTS ("name=dsn" pairs) — the same env the collector
-// matrix uses — falling back to a local default. Unreachable endpoints are
-// skipped, so this self-skips in plain `go test` and runs under run-matrix.sh.
-func clickHouseExplainDSN() string {
+// matrix uses — falling back to the shared integration service host.
+func clickHouseExplainDSN(t *testing.T) string {
+	t.Helper()
+
 	raw := strings.TrimSpace(os.Getenv("CLICKHOUSE_TEST_ENDPOINTS"))
 	if raw == "" {
-		return "clickhouse://default:clickhouse@127.0.0.1:9000/default"
+		return "clickhouse://default:clickhouse@" + tests.ServiceAddr(t, 9000) + "/default"
 	}
 	first := strings.TrimSpace(strings.Split(raw, ",")[0])
 	if _, dsn, ok := strings.Cut(first, "="); ok {
+		require.NotEmpty(t, strings.TrimSpace(dsn), "CLICKHOUSE_TEST_ENDPOINTS contained an empty DSN in %q", raw)
 		return strings.TrimSpace(dsn)
 	}
+	require.NotEmpty(t, first, "CLICKHOUSE_TEST_ENDPOINTS contained an empty endpoint")
 	return strings.TrimSpace(first)
 }
 
@@ -51,20 +55,18 @@ func clickHouseExplainDSN() string {
 // cannot reach — single-column output (PLAN/AST) AND the 5-column ESTIMATE output
 // (database, table, parts, rows, marks) that the QAN "Explain" panel consumes.
 func TestClickHouseExplainActionIntegration(t *testing.T) {
-	dsn := clickHouseExplainDSN()
+	dsn := clickHouseExplainDSN(t)
 
 	db, err := sql.Open("clickhouse", dsn)
-	if err != nil {
-		t.Skipf("clickhouse driver open failed, skipping: %v", err)
-	}
-	defer db.Close()
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, db.Close())
+	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	err = db.PingContext(ctx)
-	if err != nil {
-		t.Skipf("clickhouse %s unreachable, skipping: %v", dsn, err)
-	}
+	require.NoError(t, err, "ClickHouse endpoint %s must be reachable", dsn)
 
 	// A MergeTree table is required for EXPLAIN ESTIMATE (it reports per-part
 	// row/mark estimates). Created+dropped per run so the test is idempotent.
@@ -74,7 +76,8 @@ func TestClickHouseExplainActionIntegration(t *testing.T) {
 	t.Cleanup(func() {
 		cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cleanupCancel()
-		_, _ = db.ExecContext(cleanupCtx, "DROP TABLE IF EXISTS "+tbl)
+		_, cleanupErr := db.ExecContext(cleanupCtx, "DROP TABLE IF EXISTS "+tbl)
+		require.NoError(t, cleanupErr)
 	})
 	_, err = db.ExecContext(ctx, "INSERT INTO "+tbl+" SELECT number FROM numbers(10)")
 	require.NoError(t, err)

@@ -18,7 +18,6 @@ package analytics
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -33,19 +32,17 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	qanpb "github.com/percona/pmm/api/qan/v1"
+	"github.com/percona/pmm/qan-api2/internal/testutils"
 	"github.com/percona/pmm/qan-api2/models"
 	"github.com/percona/pmm/qan-api2/utils/logger"
 )
 
-func setup() *sqlx.DB {
-	dsn, ok := os.LookupEnv("QANAPI_DSN_TEST")
-	if !ok {
-		dsn = "clickhouse://default:clickhouse@127.0.0.1:19000/pmm_test"
-	}
+func setup(tb testing.TB) *sqlx.DB {
+	tb.Helper()
+
+	dsn := testutils.ClickHouseDSN(tb, "pmm_test")
 	db, err := sqlx.Connect("clickhouse", dsn)
-	if err != nil {
-		log.Fatal("Connection: ", err)
-	}
+	require.NoError(tb, err)
 
 	return db
 }
@@ -79,7 +76,7 @@ func getExpectedJSON(t *testing.T, got proto.Message, filename string) []byte {
 }
 
 func TestService_GetReport(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")
@@ -172,7 +169,7 @@ func TestService_GetReport(t *testing.T) {
 }
 
 func TestService_GetReport_Mix(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")
@@ -302,7 +299,7 @@ func TestService_GetReport_Mix(t *testing.T) {
 }
 
 func TestService_GetReport_Groups(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")
@@ -538,7 +535,7 @@ func TestService_GetReport_Groups(t *testing.T) {
 }
 
 func TestService_GetReport_AllLabels(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")
@@ -653,7 +650,7 @@ func TestService_GetReport_AllLabels(t *testing.T) {
 }
 
 func TestService_GetReport_Sparklines(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")
@@ -738,7 +735,7 @@ func TestService_GetReport_Sparklines(t *testing.T) {
 }
 
 func TestService_GetReport_Search(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")
@@ -839,7 +836,7 @@ func TestService_GetReport_Search(t *testing.T) {
 }
 
 func TestServiceGetReportSpecialMetrics(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")

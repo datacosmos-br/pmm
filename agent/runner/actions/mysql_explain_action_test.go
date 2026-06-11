@@ -194,7 +194,7 @@ func TestMySQLExplain(t *testing.T) {
 		t.Parallel()
 
 		params := &agentv1.StartActionRequest_MySQLExplainParams{
-			Dsn:          "pmm-agent:pmm-agent-wrong-password@tcp(127.0.0.1:3306)/world",
+			Dsn:          fmt.Sprintf("pmm-agent:pmm-agent-wrong-password@tcp(%s)/world", tests.ServiceAddr(t, 3306)),
 			OutputFormat: agentv1.MysqlExplainOutputFormat_MYSQL_EXPLAIN_OUTPUT_FORMAT_DEFAULT,
 		}
 		a, err := NewMySQLExplainAction("", time.Second, params)

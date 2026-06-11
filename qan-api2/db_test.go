@@ -19,9 +19,7 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"os"
 	"os/exec"
-	"strings"
 	"testing"
 	"time"
 
@@ -31,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/percona/pmm/qan-api2/internal/testutils"
 	"github.com/percona/pmm/qan-api2/migrations"
 )
 
@@ -41,11 +40,7 @@ func setupDB(t *testing.T) *sqlx.DB {
 	out, err := exec.CommandContext(t.Context(), "/bin/sh", "-c", cmdStr).Output()
 	require.NoError(t, err, "Docker create db: %v", out)
 
-	dsn, ok := os.LookupEnv("QANAPI_DSN_TEST")
-	dsn = strings.Replace(dsn, "/pmm_test", "/pmm_test_parts", 1)
-	if !ok {
-		dsn = "clickhouse://default:clickhouse@127.0.0.1:19000/pmm_test_parts"
-	}
+	dsn := testutils.ClickHouseDSN(t, "pmm_test_parts")
 	db, err := sqlx.Connect("clickhouse", dsn)
 	require.NoError(t, err, "Connection failed")
 	t.Cleanup(func() {
@@ -70,7 +65,7 @@ func cleanupDB(t *testing.T, dbName string) {
 
 	cmdStr := fmt.Sprintf(`docker exec pmm-clickhouse-test clickhouse client --password=clickhouse --query='DROP DATABASE IF EXISTS %s;'`, dbName)
 	out, err := exec.CommandContext(context.Background(), "/bin/sh", "-c", cmdStr).Output() //nolint:gosec
-	assert.NoError(t, err, "Docker drop db: %v", out)
+	require.NoError(t, err, "Docker drop db: %v", out)
 }
 
 func TestDropOldPartition(t *testing.T) {
@@ -125,12 +120,7 @@ func TestCreateDbIfNotExists(t *testing.T) {
 	})
 
 	t.Run("connect to db that is absent", func(t *testing.T) {
-		dsn, ok := os.LookupEnv("QANAPI_DSN_TEST")
-
-		dsn = strings.Replace(dsn, "/pmm_test", "/pmm_created_db", 1)
-		if !ok {
-			dsn = "clickhouse://default:clickhouse@127.0.0.1:19000/pmm_created_db"
-		}
+		dsn := testutils.ClickHouseDSN(t, "pmm_created_db")
 
 		err := createDB(dsn, "")
 

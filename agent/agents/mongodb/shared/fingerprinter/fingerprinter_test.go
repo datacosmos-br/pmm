@@ -32,6 +32,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"github.com/percona/pmm/agent/utils/mongo_fix"
+	"github.com/percona/pmm/agent/utils/tests"
 )
 
 const (
@@ -86,7 +87,7 @@ func createSession(dsn string, agentID string) (*mongo.Client, error) {
 
 func TestProfilerFingerprinter(t *testing.T) {
 	t.Run("CheckWithRealDB", func(t *testing.T) {
-		url := "mongodb://root:root-password@127.0.0.1:27017"
+		url := "mongodb://root:root-password@" + tests.ServiceAddr(t, 27017)
 		dbName := "test_fingerprint"
 
 		client, err := createSession(url, "pmm-agent")
@@ -94,37 +95,41 @@ func TestProfilerFingerprinter(t *testing.T) {
 
 		ctx, cancel := context.WithTimeout(t.Context(), mgoTimeoutSessionSync)
 		defer cancel()
-		err = client.Database(dbName).Drop(ctx)
+		database := client.Database(dbName)
+		err = database.Drop(ctx)
 		require.NoError(t, err)
 		t.Cleanup(func() {
 			dropCtx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancelCtx()
-			err = client.Database(dbName).Drop(dropCtx)
+			err = database.Drop(dropCtx)
 			require.NoError(t, err)
 		})
 
 		ps := ProfilerStatus{}
-		err = client.Database("admin").RunCommand(ctx, primitive.M{"profile": -1}).Decode(&ps)
+		err = database.RunCommand(ctx, primitive.M{"profile": -1}).Decode(&ps)
 		require.NoError(t, err)
 		t.Cleanup(func() {
 			cmdCtx, cancelCtx := context.WithTimeout(context.Background(), 1*time.Second)
 			defer cancelCtx()
-			client.Database("admin").RunCommand(cmdCtx, primitive.D{{Key: "profile", Value: ps.Was}, {Key: "slowms", Value: ps.SlowMs}})
+			res := database.RunCommand(cmdCtx, primitive.D{{Key: "profile", Value: ps.Was}, {Key: "slowms", Value: ps.SlowMs}})
+			require.NoError(t, res.Err())
 		})
 
 		// Enable profilling all queries (2, slowms = 0)
-		res := client.Database("admin").RunCommand(ctx, primitive.D{{Key: "profile", Value: 2}, {Key: "slowms", Value: 0}})
+		res := database.RunCommand(ctx, primitive.D{{Key: "profile", Value: 2}, {Key: "slowms", Value: 0}})
 		require.NoError(t, res.Err())
 
-		database := client.Database(dbName)
 		_, err = database.Collection("test").InsertOne(ctx, bson.M{"id": 0, "name": "test", "value": 1, "time": time.Now()})
+		require.NoError(t, err)
+		findTime := time.Now()
+		_, err = database.Collection("test").InsertOne(ctx, bson.M{"id": 1, "name": "test", "value": 1, "time": findTime})
 		require.NoError(t, err)
 		_, err = database.Collection("secondcollection").InsertOne(ctx, bson.M{"id": 0, "name": "sec", "value": 2})
 		require.NoError(t, err)
-		database.Collection("test").FindOne(ctx, bson.M{"id": 0})
-		database.Collection("test").FindOne(ctx, bson.M{"id": 1, "name": "test", "time": time.Now()})
-		database.Collection("test").FindOneAndUpdate(ctx, bson.M{"id": 0}, bson.M{"$set": bson.M{"name": "new"}})
-		database.Collection("test").FindOneAndDelete(ctx, bson.M{"id": 1})
+		require.NoError(t, database.Collection("test").FindOne(ctx, bson.M{"id": 0}).Err())
+		require.NoError(t, database.Collection("test").FindOne(ctx, bson.M{"id": 1, "name": "test", "time": findTime}).Err())
+		require.NoError(t, database.Collection("test").FindOneAndUpdate(ctx, bson.M{"id": 0}, bson.M{"$set": bson.M{"name": "new"}}).Err())
+		require.NoError(t, database.Collection("test").FindOneAndDelete(ctx, bson.M{"id": 1}).Err())
 		_, err = database.Collection("secondcollection").Find(ctx, bson.M{"name": "sec"}, options.Find().SetLimit(1).SetSort(bson.M{"id": -1}))
 		require.NoError(t, err)
 		_, err = database.Collection("test").Aggregate(

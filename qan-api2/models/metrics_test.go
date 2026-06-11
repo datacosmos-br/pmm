@@ -16,7 +16,6 @@
 package models
 
 import (
-	"os"
 	"testing"
 	"time"
 
@@ -26,15 +25,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	qanv1 "github.com/percona/pmm/api/qan/v1"
+	"github.com/percona/pmm/qan-api2/internal/testutils"
 )
 
 func setupTestClickHouse(t *testing.T) *sqlx.DB {
 	t.Helper()
 
-	dsn, ok := os.LookupEnv("QANAPI_DSN_TEST")
-	if !ok {
-		dsn = "clickhouse://default:clickhouse@127.0.0.1:19000/pmm_test"
-	}
+	dsn := testutils.ClickHouseDSN(t, "pmm_test")
 	db, err := sqlx.Connect("clickhouse", dsn)
 	require.NoError(t, err)
 

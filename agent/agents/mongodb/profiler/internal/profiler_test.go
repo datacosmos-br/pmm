@@ -81,8 +81,11 @@ func testProfiler(t *testing.T, url string) {
 		doc := bson.M{"id": i}
 		dbName := fmt.Sprintf("test_%02d", i)
 		logrus.Traceln("create db", dbName)
-		_, err = sess.Database(dbName).Collection("test").InsertOne(t.Context(), doc)
+		database := sess.Database(dbName)
+		_, err = database.Collection("test").InsertOne(t.Context(), doc)
 		require.NoError(t, err)
+		res := database.RunCommand(t.Context(), bson.D{{Key: "profile", Value: 2}, {Key: "slowms", Value: 0}})
+		require.NoError(t, res.Err())
 		i++
 	}
 	<-time.After(aggregator.DefaultInterval) // give it some time before starting profiler

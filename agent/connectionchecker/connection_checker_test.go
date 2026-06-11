@@ -16,6 +16,7 @@ package connectionchecker
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -30,6 +31,38 @@ import (
 	inventoryv1 "github.com/percona/pmm/api/inventory/v1"
 )
 
+func mysqlConnectionDSN(tb testing.TB, user, password, timeout string) string {
+	tb.Helper()
+
+	return fmt.Sprintf("%s:%s@tcp(%s)/?clientFoundRows=true&parseTime=true&timeout=%s", user, password, tests.ServiceAddr(tb, 3306), timeout)
+}
+
+func mongoConnectionDSN(tb testing.TB, credentials string, port int, database string, timeoutMS int) string {
+	tb.Helper()
+
+	auth := ""
+	if credentials != "" {
+		auth = credentials + "@"
+	}
+	if database == "" {
+		return fmt.Sprintf("mongodb://%s%s?connectTimeoutMS=%d", auth, tests.ServiceAddr(tb, port), timeoutMS)
+	}
+
+	return fmt.Sprintf("mongodb://%s%s/%s?connectTimeoutMS=%d", auth, tests.ServiceAddr(tb, port), database, timeoutMS)
+}
+
+func postgresqlConnectionDSN(tb testing.TB, password, timeout string) string {
+	tb.Helper()
+
+	return fmt.Sprintf("postgres://pmm-agent:%s@%s/postgres?connect_timeout=%s&sslmode=disable", password, tests.ServiceAddr(tb, 5432), timeout)
+}
+
+func valkeyConnectionDSN(tb testing.TB, password string) string {
+	tb.Helper()
+
+	return fmt.Sprintf("redis://default:%s@%s", password, tests.ServiceAddr(tb, 6379))
+}
+
 func TestConnectionChecker(t *testing.T) {
 	t.Parallel()
 
@@ -42,7 +75,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "MySQL",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "root:root-password@tcp(127.0.0.1:3306)/?clientFoundRows=true&parseTime=true&timeout=1s",
+				Dsn:     mysqlConnectionDSN(t, "root", "root-password", "1s"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_MYSQL_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -50,7 +83,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "MySQL wrong params",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "pmm-agent:pmm-agent-wrong-password@tcp(127.0.0.1:3306)/?clientFoundRows=true&parseTime=true&timeout=1s",
+				Dsn:     mysqlConnectionDSN(t, "pmm-agent", "pmm-agent-wrong-password", "1s"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_MYSQL_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -59,7 +92,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "MySQL timeout",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "root:root-password@tcp(127.0.0.1:3306)/?clientFoundRows=true&parseTime=true&timeout=10s",
+				Dsn:     mysqlConnectionDSN(t, "root", "root-password", "10s"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_MYSQL_SERVICE,
 				Timeout: durationpb.New(time.Nanosecond),
 			},
@@ -69,7 +102,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "MongoDB with no auth",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "mongodb://127.0.0.1:27019/admin?connectTimeoutMS=1000",
+				Dsn:     mongoConnectionDSN(t, "", 27019, "admin", 1000),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_MONGODB_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -77,7 +110,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "MongoDB with no auth with params",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "mongodb://root:root-password@127.0.0.1:27019/admin?connectTimeoutMS=1000",
+				Dsn:     mongoConnectionDSN(t, "root:root-password", 27019, "admin", 1000),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_MONGODB_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -87,7 +120,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "MongoDB",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "mongodb://root:root-password@127.0.0.1:27017/admin?connectTimeoutMS=1000",
+				Dsn:     mongoConnectionDSN(t, "root:root-password", 27017, "admin", 1000),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_MONGODB_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -95,7 +128,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "MongoDB no params",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "mongodb://127.0.0.1:27017/admin?connectTimeoutMS=1000",
+				Dsn:     mongoConnectionDSN(t, "", 27017, "admin", 1000),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_MONGODB_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -107,7 +140,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "MongoDB wrong params",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "mongodb://root:root-password-wrong@127.0.0.1:27017/admin?connectTimeoutMS=1000",
+				Dsn:     mongoConnectionDSN(t, "root:root-password-wrong", 27017, "admin", 1000),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_MONGODB_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -117,7 +150,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "MongoDB timeout",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "mongodb://root:root-password@127.0.0.1:27017/admin?connectTimeoutMS=10000",
+				Dsn:     mongoConnectionDSN(t, "root:root-password", 27017, "admin", 10000),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_MONGODB_SERVICE,
 				Timeout: durationpb.New(time.Nanosecond),
 			},
@@ -126,7 +159,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "MongoDB no database",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "mongodb://root:root-password@127.0.0.1:27017?connectTimeoutMS=1000",
+				Dsn:     mongoConnectionDSN(t, "root:root-password", 27017, "", 1000),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_MONGODB_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -136,7 +169,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "PostgreSQL",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "postgres://pmm-agent:pmm-agent-password@127.0.0.1:5432/postgres?connect_timeout=1&sslmode=disable",
+				Dsn:     postgresqlConnectionDSN(t, "pmm-agent-password", "1"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_POSTGRESQL_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -144,7 +177,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "PostgreSQL wrong params",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "postgres://pmm-agent:pmm-agent-wrong-password@127.0.0.1:5432/postgres?connect_timeout=1&sslmode=disable",
+				Dsn:     postgresqlConnectionDSN(t, "pmm-agent-wrong-password", "1"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_POSTGRESQL_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -153,7 +186,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "PostgreSQL timeout",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "postgres://pmm-agent:pmm-agent-password@127.0.0.1:5432/postgres?connect_timeout=10&sslmode=disable",
+				Dsn:     postgresqlConnectionDSN(t, "pmm-agent-password", "10"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_POSTGRESQL_SERVICE,
 				Timeout: durationpb.New(time.Nanosecond),
 			},
@@ -162,7 +195,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "Valkey",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "redis://default:pmm-agent_password@127.0.0.1:6379",
+				Dsn:     valkeyConnectionDSN(t, "pmm-agent_password"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_VALKEY_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -170,7 +203,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "Valkey wrong params",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "redis://default:pmm-agent_wrong_password@127.0.0.1:6379",
+				Dsn:     valkeyConnectionDSN(t, "pmm-agent_wrong_password"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_VALKEY_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -179,11 +212,11 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "Valkey timeout",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "redis://default:pmm-agent_password@127.0.0.1:6379",
+				Dsn:     valkeyConnectionDSN(t, "pmm-agent_password"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_VALKEY_SERVICE,
 				Timeout: durationpb.New(time.Nanosecond),
 			},
-			expectedErr: `dial tcp 127.0.0.1:6379: i/o timeout`,
+			expectedErr: `dial tcp .+:6379: i/o timeout`,
 		},
 
 		// Use MySQL for ProxySQL tests for now.
@@ -191,7 +224,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "ProxySQL/MySQL",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "root:root-password@tcp(127.0.0.1:3306)/?clientFoundRows=true&parseTime=true&timeout=1s",
+				Dsn:     mysqlConnectionDSN(t, "root", "root-password", "1s"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_PROXYSQL_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -199,7 +232,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "ProxySQL/MySQL wrong params",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "pmm-agent:pmm-agent-wrong-password@tcp(127.0.0.1:3306)/?clientFoundRows=true&parseTime=true&timeout=1s",
+				Dsn:     mysqlConnectionDSN(t, "pmm-agent", "pmm-agent-wrong-password", "1s"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_PROXYSQL_SERVICE,
 				Timeout: durationpb.New(3 * time.Second),
 			},
@@ -208,7 +241,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "ProxySQL/MySQL timeout",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "root:root-password@tcp(127.0.0.1:3306)/?clientFoundRows=true&parseTime=true&timeout=10s",
+				Dsn:     mysqlConnectionDSN(t, "root", "root-password", "10s"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_PROXYSQL_SERVICE,
 				Timeout: durationpb.New(time.Nanosecond),
 			},
@@ -217,7 +250,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "Invalid service type",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "root:root-password@tcp(127.0.0.1:3306)/?clientFoundRows=true&parseTime=true&timeout=10s",
+				Dsn:     mysqlConnectionDSN(t, "root", "root-password", "10s"),
 				Type:    inventoryv1.ServiceType_SERVICE_TYPE_UNSPECIFIED,
 				Timeout: durationpb.New(time.Nanosecond),
 			},
@@ -227,7 +260,7 @@ func TestConnectionChecker(t *testing.T) {
 		{
 			name: "Unknown service type",
 			req: &agentv1.CheckConnectionRequest{
-				Dsn:     "root:root-password@tcp(127.0.0.1:3306)/?clientFoundRows=true&parseTime=true&timeout=10s",
+				Dsn:     mysqlConnectionDSN(t, "root", "root-password", "10s"),
 				Type:    inventoryv1.ServiceType(12345),
 				Timeout: durationpb.New(time.Nanosecond),
 			},
@@ -269,7 +302,7 @@ func TestConnectionChecker(t *testing.T) {
 		})
 		c := New(cfgStorage)
 		resp := c.Check(context.Background(), &agentv1.CheckConnectionRequest{
-			Dsn:  "root:root-password@tcp(127.0.0.1:3306)/?clientFoundRows=true&parseTime=true&timeout=1s",
+			Dsn:  mysqlConnectionDSN(t, "root", "root-password", "1s"),
 			Type: inventoryv1.ServiceType_SERVICE_TYPE_MYSQL_SERVICE,
 		}, 0)
 		require.NotNil(t, resp)

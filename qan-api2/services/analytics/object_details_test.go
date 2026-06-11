@@ -32,7 +32,7 @@ import (
 )
 
 func TestService_GetQueryExample(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")
@@ -149,7 +149,7 @@ func TestService_GetQueryExample(t *testing.T) {
 }
 
 func TestService_GetMetricsError(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")
@@ -271,7 +271,7 @@ func TestService_GetMetricsError(t *testing.T) {
 }
 
 func TestService_GetMetrics(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")
@@ -350,7 +350,7 @@ func TestService_GetMetrics(t *testing.T) {
 }
 
 func TestService_GetLabels(t *testing.T) {
-	db := setup()
+	db := setup(t)
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)
 	t1, _ := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")

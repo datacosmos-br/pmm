@@ -24,7 +24,7 @@
 // matrixEndpoints helper is redefined here because this is a different package
 // (querylog) and the collector's helper cannot cross the package boundary.
 //
-//	CLICKHOUSE_TEST_ENDPOINTS="single-25.3=clickhouse://default:clickhouse@127.0.0.1:9000/default" \
+//	CLICKHOUSE_TEST_ENDPOINTS="single-25.3=clickhouse://default:clickhouse@clickhouse-host:9000/default" \
 //	  go test -tags clickhouse_integration ./agent/agents/clickhouse/...
 //
 // Driving approach: the test exercises the agent's own collection path — the
@@ -65,6 +65,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/percona/pmm/agent/utils/tests"
 	agentv1 "github.com/percona/pmm/api/agent/v1"
 )
 
@@ -85,7 +86,7 @@ func matrixEndpoints(t *testing.T) map[string]string {
 	raw := os.Getenv("CLICKHOUSE_TEST_ENDPOINTS")
 	if strings.TrimSpace(raw) == "" {
 		return map[string]string{
-			"single-local": "clickhouse://default:clickhouse@127.0.0.1:9000/default",
+			"single-local": "clickhouse://default:clickhouse@" + tests.ServiceAddr(t, 9000) + "/default",
 		}
 	}
 	endpoints := make(map[string]string)

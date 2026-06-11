@@ -1,5 +1,12 @@
 # PMM UI Development Guidelines
 
+## Strongest Rule: No Bypass, No Hidden Failure
+
+Fix the root cause at the source and make failures visible. Do not use skipped
+gates, ignored errors, synthetic substitutes, permissive fallbacks, stubs, or
+compatibility wrappers to make a broken build, test, render, or runtime path
+appear green. If the dependency is real, make it work and validate it directly.
+
 > **Parent guide**: [AGENTS.md](../AGENTS.md) — product overview, architecture, domain model, global conventions
 > **Related**: [api/AGENTS.md](../api/AGENTS.md) (API definitions consumed by UI) · [managed/AGENTS.md](../managed/AGENTS.md) (server backend)
 

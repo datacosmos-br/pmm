@@ -115,7 +115,6 @@ func TestSlowLogMakeBuckets(t *testing.T) {
 }
 
 func TestSlowLog(t *testing.T) {
-	t.Parallel()
 	sqlDB := tests.OpenTestMySQL(t)
 	t.Cleanup(func() {
 		assert.NoError(t, sqlDB.Close())
@@ -129,8 +128,6 @@ func TestSlowLog(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("Normal", func(t *testing.T) {
-		t.Parallel()
-
 		params := &Params{
 			DSN:               tests.GetTestMySQLDSN(t),
 			SlowLogFilePrefix: testdata,
@@ -179,8 +176,6 @@ func TestSlowLog(t *testing.T) {
 	})
 
 	t.Run("NoFile", func(t *testing.T) {
-		t.Parallel()
-
 		params := &Params{
 			DSN:               tests.GetTestMySQLDSN(t),
 			SlowLogFilePrefix: "nonexistent",

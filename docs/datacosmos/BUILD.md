@@ -106,6 +106,14 @@ Compose services, ClickHouse matrix nodes, generated files, or fork metadata,
 make those real dependencies work and validate against them. Evidence must cite
 the command, exit code, and decisive output.
 
+`make env TARGET=dc-test-local` is the devcontainer validation path. It starts
+the upstream daemon containers through Docker and runs the real checks/tests.
+When Docker is remote (`DOCKER_HOST=tcp://...`), service tests must discover the
+daemon host from `PMM_TEST_SERVICE_HOST` or `DOCKER_HOST`, and compose/run
+targets may bind published ports to `0.0.0.0` via `PMM_TEST_BIND_HOST` so the
+devcontainer can reach them. Local Docker keeps loopback binding by default.
+Do not replace this with skips, synthetic services, or narrower unit tests.
+
 For local publishing, set `GHCR_USER` to the GitHub login that owns the token
 used for `ghcr.io`; CI uses `GITHUB_ACTOR`.
 

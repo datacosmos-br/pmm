@@ -35,7 +35,7 @@ func TestMongoRun(t *testing.T) {
 	require.NoError(t, err)
 	for _, params := range []*Params{
 		{
-			DSN:     "mongodb://root:root-password@127.0.0.1:27017/admin",
+			DSN:     tests.GetTestMongoDBDSN(t),
 			AgentID: "test",
 		},
 		{

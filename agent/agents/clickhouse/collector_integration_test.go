@@ -25,7 +25,7 @@
 // To run against an arbitrary set of endpoints directly, set
 // CLICKHOUSE_TEST_ENDPOINTS to a comma-separated list of "name=dsn" pairs:
 //
-//	CLICKHOUSE_TEST_ENDPOINTS="single-25.3=clickhouse://default:clickhouse@127.0.0.1:9000/default" \
+//	CLICKHOUSE_TEST_ENDPOINTS="single-25.3=clickhouse://default:clickhouse@clickhouse-host:9000/default" \
 //	  go test -tags clickhouse_integration ./agent/agents/clickhouse/...
 
 package clickhouse
@@ -39,6 +39,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/percona/pmm/agent/utils/tests"
 )
 
 // matrixEndpoints returns the ClickHouse endpoints to validate, parsed from
@@ -50,7 +52,7 @@ func matrixEndpoints(t *testing.T) map[string]string {
 	raw := os.Getenv("CLICKHOUSE_TEST_ENDPOINTS")
 	if strings.TrimSpace(raw) == "" {
 		return map[string]string{
-			"single-local": "clickhouse://default:clickhouse@127.0.0.1:9000/default",
+			"single-local": "clickhouse://default:clickhouse@" + tests.ServiceAddr(t, 9000) + "/default",
 		}
 	}
 	endpoints := make(map[string]string)

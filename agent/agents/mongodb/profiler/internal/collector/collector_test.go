@@ -31,6 +31,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"github.com/percona/pmm/agent/utils/mongo_fix"
+	"github.com/percona/pmm/agent/utils/tests"
 )
 
 const (
@@ -57,7 +58,7 @@ func BenchmarkCollector(b *testing.B) {
 	ctx, cancel := context.WithTimeout(b.Context(), timeout)
 	defer cancel()
 
-	url := "mongodb://root:root-password@127.0.0.1:27017"
+	url := "mongodb://root:root-password@" + tests.ServiceAddr(b, 27017)
 	// time.Millisecond*time.Duration(maxDocs*maxLoops): time it takes to write all docs for all iterations
 	// cursorTimeout*time.Duration(maxLoops*2): Wait time between loops to produce iter.TryNext to return a false
 
@@ -78,7 +79,8 @@ func BenchmarkCollector(b *testing.B) {
 	b.Cleanup(func() { // restore profiler status
 		cmdCtx, cancelCtx := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancelCtx()
-		client.Database("admin").RunCommand(cmdCtx, primitive.D{{Key: "profile", Value: ps.Was}, {Key: "slowms", Value: ps.SlowMs}})
+		res := client.Database("admin").RunCommand(cmdCtx, primitive.D{{Key: "profile", Value: ps.Was}, {Key: "slowms", Value: ps.SlowMs}})
+		require.NoError(b, res.Err())
 	})
 
 	// Enable profilling all queries (2, slowms = 0)
@@ -118,7 +120,7 @@ func TestCollector(t *testing.T) {
 	maxLoops := 3
 	maxDocs := 100
 
-	url := "mongodb://root:root-password@127.0.0.1:27017"
+	url := "mongodb://root:root-password@" + tests.ServiceAddr(t, 27017)
 	// time.Millisecond*time.Duration(maxDocs*maxLoops): time it takes to write all docs for all iterations
 	// cursorTimeout*time.Duration(maxLoops*2): Wait time between loops to produce iter.TryNext to return a false
 	timeout := time.Millisecond*time.Duration(maxDocs*maxLoops) + cursorTimeout*time.Duration(maxLoops*2) + 5*time.Second

@@ -95,6 +95,25 @@ export CLICKHOUSE_SINGLE_TCP_PORT="${CLICKHOUSE_SINGLE_TCP_PORT:-39000}"
 export CLICKHOUSE_CLUSTER_NODE1_TCP_PORT="${CLICKHOUSE_CLUSTER_NODE1_TCP_PORT:-39010}"
 export CLICKHOUSE_CLUSTER_NODE2_TCP_PORT="${CLICKHOUSE_CLUSTER_NODE2_TCP_PORT:-39011}"
 
+if [[ "${DOCKER_HOST:-}" == tcp://* ]]; then
+    export PMM_TEST_BIND_HOST="${PMM_TEST_BIND_HOST:-0.0.0.0}"
+fi
+
+if [ -z "${PMM_TEST_SERVICE_HOST:-}" ]; then
+    if [[ "${DOCKER_HOST:-}" == tcp://* ]]; then
+        docker_host="${DOCKER_HOST#tcp://}"
+        docker_host="${docker_host%%/*}"
+        docker_host="${docker_host%%:*}"
+        if [ -z "$docker_host" ]; then
+            echo "!!! DOCKER_HOST did not contain a host: ${DOCKER_HOST}" >&2
+            exit 1
+        fi
+        export PMM_TEST_SERVICE_HOST="$docker_host"
+    else
+        export PMM_TEST_SERVICE_HOST="127.0.0.1"
+    fi
+fi
+
 rc=0
 for v in "${versions[@]}"; do
     for topo in "${topologies[@]}"; do
@@ -114,10 +133,10 @@ for v in "${versions[@]}"; do
         fi
 
         if [ "$topo" = "single" ]; then
-            endpoints="single-${v}=clickhouse://default:clickhouse@127.0.0.1:${CLICKHOUSE_SINGLE_TCP_PORT}/default"
+            endpoints="single-${v}=clickhouse://default:clickhouse@${PMM_TEST_SERVICE_HOST}:${CLICKHOUSE_SINGLE_TCP_PORT}/default"
         else
-            endpoints="cluster-${v}-node1=clickhouse://default:clickhouse@127.0.0.1:${CLICKHOUSE_CLUSTER_NODE1_TCP_PORT}/default"
-            endpoints+=",cluster-${v}-node2=clickhouse://default:clickhouse@127.0.0.1:${CLICKHOUSE_CLUSTER_NODE2_TCP_PORT}/default"
+            endpoints="cluster-${v}-node1=clickhouse://default:clickhouse@${PMM_TEST_SERVICE_HOST}:${CLICKHOUSE_CLUSTER_NODE1_TCP_PORT}/default"
+            endpoints+=",cluster-${v}-node2=clickhouse://default:clickhouse@${PMM_TEST_SERVICE_HOST}:${CLICKHOUSE_CLUSTER_NODE2_TCP_PORT}/default"
         fi
 
         if ! CLICKHOUSE_TEST_ENDPOINTS="$endpoints" \

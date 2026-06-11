@@ -18,7 +18,6 @@ package analytics
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"testing"
 	"time"
 
@@ -26,10 +25,12 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	qanpb "github.com/percona/pmm/api/qan/v1"
+	"github.com/percona/pmm/qan-api2/internal/testutils"
 	"github.com/percona/pmm/qan-api2/models"
 	"github.com/percona/pmm/qan-api2/utils/logger"
 )
@@ -53,14 +54,9 @@ type testValuesUnmarshal struct {
 }
 
 func TestService_GetFilters(t *testing.T) {
-	dsn, ok := os.LookupEnv("QANAPI_DSN_TEST")
-	if !ok {
-		dsn = "clickhouse://default:clickhouse@0.0.0.0:19000/pmm_test"
-	}
+	dsn := testutils.ClickHouseDSN(t, "pmm_test")
 	db, err := sqlx.Connect("clickhouse", dsn)
-	if err != nil {
-		t.Fatal("Connection: ", err)
-	}
+	require.NoError(t, err)
 
 	rm := models.NewReporter(db)
 	mm := models.NewMetrics(db)

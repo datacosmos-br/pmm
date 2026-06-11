@@ -111,7 +111,11 @@ dc-status: ## Show Git-derived upstream, tag, bump, and worktree status
 
 .PHONY: dc-test-env-up
 dc-test-env-up: ## Start upstream service containers used by local tests
-	$(MAKE) -C agent env-up
+	@if [[ "$${DOCKER_HOST:-}" == tcp://* ]]; then \
+		PMM_TEST_BIND_HOST="$${PMM_TEST_BIND_HOST:-0.0.0.0}" $(MAKE) -C agent env-up; \
+	else \
+		$(MAKE) -C agent env-up; \
+	fi
 
 .PHONY: dc-test-agent
 dc-test-agent: dc-test-env-up ## Run agent tests against upstream service containers
@@ -169,9 +173,8 @@ dc-tag: dc-release
 
 .PHONY: dc-build
 dc-build: .dc-prepare ## Build linux/amd64 images and collect artifacts
-	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) \
-		$(CURDIR)/build/scripts/build-client
-	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) RPMBUILD_DIST=$(DIST) DOCKER_TAG=$(SERVER_IMAGE) \
+	# build-server already invokes build-client; pass both tags to avoid a duplicate client build.
+	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) RPMBUILD_DIST=$(DIST) DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) DOCKER_TAG=$(SERVER_IMAGE) \
 		$(CURDIR)/build/scripts/build-server
 	$(MAKE) dc-artifacts
 

@@ -16,9 +16,7 @@ package tests
 
 import (
 	"database/sql"
-	"net"
 	"net/url"
-	"strconv"
 	"testing"
 
 	_ "github.com/lib/pq" // register SQL driver
@@ -44,7 +42,7 @@ func GetTestPostgreSQLDSN(tb testing.TB) string {
 
 	u := &url.URL{
 		Scheme:   "postgres",
-		Host:     net.JoinHostPort("localhost", strconv.Itoa(defaultPostgresPort)),
+		Host:     ServiceAddr(tb, defaultPostgresPort),
 		Path:     "pmm-agent",
 		User:     url.UserPassword("pmm-agent", "pmm-agent-password"),
 		RawQuery: q.Encode(),

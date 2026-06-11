@@ -19,6 +19,11 @@ This is the end-to-end test plan that proves each phase works and feeds the
   Do not replace failures with narrower unit tests, skipped topologies, ignored
   exit codes, or synthetic endpoints. Port conflicts are fixed in the compose
   contract and runner endpoints, not by avoiding the conflicting service.
+- Devcontainer and remote-Docker runs must resolve real service addresses via
+  `PMM_TEST_SERVICE_HOST` / `DOCKER_HOST` and publish test ports with
+  `PMM_TEST_BIND_HOST=0.0.0.0` only when the Docker daemon is remote. Local
+  Docker keeps the default loopback bind. Integration tests must use the shared
+  service-address helpers instead of hardcoding loopback for required daemons.
 
 ## Phase 1 — metrics, inventory, API, pmm-admin
 

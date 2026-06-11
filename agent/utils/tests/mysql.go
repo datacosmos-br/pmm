@@ -39,7 +39,7 @@ func GetTestMySQLDSN(tb testing.TB) string {
 	cfg.User = "root"
 	cfg.Passwd = "root-password"
 	cfg.Net = "tcp"
-	cfg.Addr = "127.0.0.1:3306"
+	cfg.Addr = ServiceAddr(tb, mysqlServicePort)
 	cfg.DBName = "world"
 
 	// MultiStatements must not be used as it enables SQL injections in Actions

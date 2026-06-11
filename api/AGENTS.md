@@ -1,5 +1,12 @@
 # PMM API Development Guidelines
 
+## Strongest Rule: No Bypass, No Hidden Failure
+
+Fix the root cause at the source and make failures visible. Do not use skipped
+gates, ignored errors, synthetic substitutes, permissive fallbacks, stubs, or
+compatibility wrappers to make a broken API, generation, lint, or runtime path
+appear green. If the dependency is real, make it work and validate it directly.
+
 > **Parent guide**: [AGENTS.md](../AGENTS.md) — product overview, architecture, domain model, global conventions
 > **Related**: [managed/AGENTS.md](../managed/AGENTS.md) (server-side implementation) · [admin/AGENTS.md](../admin/AGENTS.md) (CLI client) · [api-tests/AGENTS.md](../api-tests/AGENTS.md) (integration tests)
 

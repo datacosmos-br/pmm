@@ -39,6 +39,10 @@ install-race:                   ## Install qan-api2 binary with race detector
 
 TEST_CONTAINER_NAME := pmm-clickhouse-test
 TEST_IMAGE_NAME := clickhouse/clickhouse-server:25.3.6.56
+QAN_TEST_CLICKHOUSE_HOST ?= $(if $(PMM_TEST_SERVICE_HOST),$(PMM_TEST_SERVICE_HOST),$(if $(filter tcp://%,$(DOCKER_HOST)),$(word 1,$(subst :, ,$(patsubst tcp://%,%,$(DOCKER_HOST)))),127.0.0.1))
+QAN_TEST_BIND_HOST ?= $(if $(PMM_TEST_BIND_HOST),$(PMM_TEST_BIND_HOST),$(if $(filter tcp://%,$(DOCKER_HOST)),0.0.0.0,127.0.0.1))
+QANAPI_DSN_TEST ?= clickhouse://default:clickhouse@$(QAN_TEST_CLICKHOUSE_HOST):19000/pmm_test
+export QANAPI_DSN_TEST
 
 _start-clickhouse:
 	@if [ "$$(uname)" = "Darwin" ]; then \
@@ -50,13 +54,13 @@ _start-clickhouse:
 	@docker run -d \
 		--platform=linux/amd64 \
 		--name  $(TEST_CONTAINER_NAME) \
-		-p 19000:9000 \
-		-p 18123:8123 \
+		-p $(QAN_TEST_BIND_HOST):19000:9000 \
+		-p $(QAN_TEST_BIND_HOST):18123:8123 \
 		-e CLICKHOUSE_USER=default \
 		-e CLICKHOUSE_PASSWORD=clickhouse \
 		$(TEST_IMAGE_NAME)
 	@echo "Waiting for Clickhouse container to become healthy..."
-	@timeout 60 sh -c 'until curl -fsS --max-time 1 http://127.0.0.1:18123/ping > /dev/null 2>&1; do sleep 1; done' || \
+	@timeout 60 sh -c 'until curl -fsS --max-time 1 http://$(QAN_TEST_CLICKHOUSE_HOST):18123/ping > /dev/null 2>&1; do sleep 1; done' || \
 	   (echo "Timed out waiting for ClickHouse to become ready" && exit 1)
 	@echo "✅ Clickhouse container is ready for use"
 
@@ -73,7 +77,7 @@ _import-test-data:				## Create pmm_test DB and load test data
 	@echo "✅ Test data is ready for use"
 
 test-env-up: _start-clickhouse  _import-test-data	## Start docker containers used for testing and import test data
-	@echo "✅ Clickhouse is ready for use on address 127.0.0.1 ports 18123,19000"
+	@echo "✅ Clickhouse is ready for use on address $(QAN_TEST_CLICKHOUSE_HOST) ports 18123,19000"
 
 test-env-down:  _stop-clickhouse	## Stop and remove docker containers used for testing
 	@echo "✅ Clickhouse container has been cleaned up"

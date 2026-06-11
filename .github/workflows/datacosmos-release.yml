@@ -49,12 +49,29 @@ jobs:
 
       - name: Free up runner disk space
         run: |
-          for path in /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache; do
+          echo "Disk before cleanup:"
+          df -h
+          for path in \
+            /usr/share/dotnet \
+            /usr/local/lib/android \
+            /usr/local/share/boost \
+            /usr/share/swift \
+            /usr/local/.ghcup \
+            /opt/az \
+            /opt/ghc \
+            /opt/hostedtoolcache \
+            /opt/microsoft \
+            /opt/pipx; do
             if [ -e "$path" ]; then
+              sudo du -sh "$path"
               sudo rm -rf "$path"
             fi
           done
+          sudo apt-get clean
           docker system prune -af
+          docker builder prune -af
+          echo "Disk after cleanup:"
+          df -h
 
       # Pre-pull the rpmbuild image with retries. public.ecr.aws is
       # anonymous-rate-limited ('toomanyrequests'); an in-build `docker run`
