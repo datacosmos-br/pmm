@@ -63,11 +63,14 @@ func newMockDB(t *testing.T) (*sql.DB, sqlmock.Sqlmock) {
 // expectAllTables queues mocked responses for the three system-table queries.
 func expectAllTables(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(metricsSQL).WillReturnRows(
-		sqlmock.NewRows([]string{"metric", "value"}).AddRow("Query", 3.0).AddRow("Merge", 1.0))
+		sqlmock.NewRows([]string{"metric", "value"}).AddRow("Query", 3.0).AddRow("Merge", 1.0),
+	)
 	mock.ExpectQuery(asyncMetricsSQL).WillReturnRows(
-		sqlmock.NewRows([]string{"metric", "value"}).AddRow("Uptime", 1234.0).AddRow("jemalloc.arenas.all.muzzy", 7.0))
+		sqlmock.NewRows([]string{"metric", "value"}).AddRow("Uptime", 1234.0).AddRow("jemalloc.arenas.all.muzzy", 7.0),
+	)
 	mock.ExpectQuery(eventsSQL).WillReturnRows(
-		sqlmock.NewRows([]string{"event", "value"}).AddRow("SelectQuery", 42.0))
+		sqlmock.NewRows([]string{"event", "value"}).AddRow("SelectQuery", 42.0),
+	)
 }
 
 // gatheredValues registers the collector on a private registry, gathers it, and
@@ -131,9 +134,11 @@ func TestCollectorCollectTableErrorIsNotFatal(t *testing.T) {
 
 	mock.ExpectQuery(metricsSQL).WillReturnError(sql.ErrConnDone)
 	mock.ExpectQuery(asyncMetricsSQL).WillReturnRows(
-		sqlmock.NewRows([]string{"metric", "value"}).AddRow("Uptime", 1.0))
+		sqlmock.NewRows([]string{"metric", "value"}).AddRow("Uptime", 1.0),
+	)
 	mock.ExpectQuery(eventsSQL).WillReturnRows(
-		sqlmock.NewRows([]string{"event", "value"}).AddRow("SelectQuery", 1.0))
+		sqlmock.NewRows([]string{"event", "value"}).AddRow("SelectQuery", 1.0),
+	)
 
 	values := gatheredValues(t, newTestCollector(db))
 

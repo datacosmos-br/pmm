@@ -35,6 +35,8 @@ import (
 
 const loggerComponentNameServiceInfoBroker = "service-info-broker"
 
+const defaultServiceInfoTimeout = 3 * time.Second
+
 // ServiceInfoBroker helps query various information from services.
 type ServiceInfoBroker struct {
 	r *Registry
@@ -58,7 +60,7 @@ func serviceInfoRequest(q *reform.Querier, service *models.Service, agent *model
 		request = &agentv1.ServiceInfoRequest{
 			Type:    inventoryv1.ServiceType_SERVICE_TYPE_MYSQL_SERVICE,
 			Dsn:     agent.DSN(service, models.DSNParams{DialTimeout: time.Second, Database: service.DatabaseName}, nil, pmmAgentVersion),
-			Timeout: durationpb.New(3 * time.Second),
+			Timeout: durationpb.New(defaultServiceInfoTimeout),
 			TextFiles: &agentv1.TextFiles{
 				Files:              agent.Files(),
 				TemplateLeftDelim:  tdp.Left,
@@ -76,7 +78,7 @@ func serviceInfoRequest(q *reform.Querier, service *models.Service, agent *model
 			Type: inventoryv1.ServiceType_SERVICE_TYPE_POSTGRESQL_SERVICE,
 			Dsn: agent.DSN(service, models.DSNParams{DialTimeout: time.Second, Database: service.DatabaseName, PostgreSQLSupportsSSLSNI: sqlSniSupported},
 				nil, pmmAgentVersion),
-			Timeout: durationpb.New(3 * time.Second),
+			Timeout: durationpb.New(defaultServiceInfoTimeout),
 			TextFiles: &agentv1.TextFiles{
 				Files:              agent.Files(),
 				TemplateLeftDelim:  tdp.Left,
@@ -88,7 +90,7 @@ func serviceInfoRequest(q *reform.Querier, service *models.Service, agent *model
 		request = &agentv1.ServiceInfoRequest{
 			Type:    inventoryv1.ServiceType_SERVICE_TYPE_MONGODB_SERVICE,
 			Dsn:     agent.DSN(service, models.DSNParams{DialTimeout: time.Second, Database: service.DatabaseName}, nil, pmmAgentVersion),
-			Timeout: durationpb.New(3 * time.Second),
+			Timeout: durationpb.New(defaultServiceInfoTimeout),
 			TextFiles: &agentv1.TextFiles{
 				Files:              agent.Files(),
 				TemplateLeftDelim:  tdp.Left,
@@ -99,7 +101,7 @@ func serviceInfoRequest(q *reform.Querier, service *models.Service, agent *model
 		request = &agentv1.ServiceInfoRequest{
 			Type:    inventoryv1.ServiceType_SERVICE_TYPE_PROXYSQL_SERVICE,
 			Dsn:     agent.DSN(service, models.DSNParams{DialTimeout: time.Second, Database: service.DatabaseName}, nil, pmmAgentVersion),
-			Timeout: durationpb.New(3 * time.Second),
+			Timeout: durationpb.New(defaultServiceInfoTimeout),
 		}
 	case models.ExternalServiceType:
 		exporterURL, err := agent.ExporterURL(q)
@@ -110,7 +112,7 @@ func serviceInfoRequest(q *reform.Querier, service *models.Service, agent *model
 		request = &agentv1.ServiceInfoRequest{
 			Type:    inventoryv1.ServiceType_SERVICE_TYPE_EXTERNAL_SERVICE,
 			Dsn:     exporterURL,
-			Timeout: durationpb.New(3 * time.Second),
+			Timeout: durationpb.New(defaultServiceInfoTimeout),
 		}
 	case models.HAProxyServiceType:
 		exporterURL, err := agent.ExporterURL(q)
@@ -121,7 +123,7 @@ func serviceInfoRequest(q *reform.Querier, service *models.Service, agent *model
 		request = &agentv1.ServiceInfoRequest{
 			Type:    inventoryv1.ServiceType_SERVICE_TYPE_HAPROXY_SERVICE,
 			Dsn:     exporterURL,
-			Timeout: durationpb.New(3 * time.Second),
+			Timeout: durationpb.New(defaultServiceInfoTimeout),
 		}
 
 	case models.ValkeyServiceType:
@@ -131,7 +133,7 @@ func serviceInfoRequest(q *reform.Querier, service *models.Service, agent *model
 			Type: inventoryv1.ServiceType_SERVICE_TYPE_VALKEY_SERVICE,
 			Dsn: agent.DSN(service, models.DSNParams{DialTimeout: 2 * time.Second},
 				nil, pmmAgentVersion),
-			Timeout: durationpb.New(3 * time.Second),
+			Timeout: durationpb.New(defaultServiceInfoTimeout),
 			TextFiles: &agentv1.TextFiles{
 				Files:              agent.Files(),
 				TemplateLeftDelim:  tdp.Left,
@@ -143,7 +145,7 @@ func serviceInfoRequest(q *reform.Querier, service *models.Service, agent *model
 		request = &agentv1.ServiceInfoRequest{
 			Type:    inventoryv1.ServiceType_SERVICE_TYPE_CLICKHOUSE_SERVICE,
 			Dsn:     agent.DSN(service, models.DSNParams{DialTimeout: time.Second}, nil, pmmAgentVersion),
-			Timeout: durationpb.New(3 * time.Second),
+			Timeout: durationpb.New(defaultServiceInfoTimeout),
 			TextFiles: &agentv1.TextFiles{
 				Files:              agent.Files(),
 				TemplateLeftDelim:  tdp.Left,

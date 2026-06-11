@@ -101,7 +101,6 @@ func (o *StartClickHouseExplainActionOK) GetPayload() *StartClickHouseExplainAct
 }
 
 func (o *StartClickHouseExplainActionOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
 	o.Payload = new(StartClickHouseExplainActionOKBody)
 
 	// response payload
@@ -175,7 +174,6 @@ func (o *StartClickHouseExplainActionDefault) GetPayload() *StartClickHouseExpla
 }
 
 func (o *StartClickHouseExplainActionDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
 	o.Payload = new(StartClickHouseExplainActionDefaultBody)
 
 	// response payload
@@ -191,7 +189,6 @@ StartClickHouseExplainActionBody start click house explain action body
 swagger:model StartClickHouseExplainActionBody
 */
 type StartClickHouseExplainActionBody struct {
-
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -238,7 +235,6 @@ StartClickHouseExplainActionDefaultBody start click house explain action default
 swagger:model StartClickHouseExplainActionDefaultBody
 */
 type StartClickHouseExplainActionDefaultBody struct {
-
 	// code
 	Code int32 `json:"code,omitempty"`
 
@@ -308,9 +304,7 @@ func (o *StartClickHouseExplainActionDefaultBody) ContextValidate(ctx context.Co
 }
 
 func (o *StartClickHouseExplainActionDefaultBody) contextValidateDetails(ctx context.Context, formats strfmt.Registry) error {
-
 	for i := 0; i < len(o.Details); i++ {
-
 		if o.Details[i] != nil {
 
 			if swag.IsZero(o.Details[i]) { // not required
@@ -330,7 +324,6 @@ func (o *StartClickHouseExplainActionDefaultBody) contextValidateDetails(ctx con
 				return err
 			}
 		}
-
 	}
 
 	return nil
@@ -359,7 +352,6 @@ StartClickHouseExplainActionDefaultBodyDetailsItems0 start click house explain a
 swagger:model StartClickHouseExplainActionDefaultBodyDetailsItems0
 */
 type StartClickHouseExplainActionDefaultBodyDetailsItems0 struct {
-
 	// at type
 	AtType string `json:"@type,omitempty"`
 
@@ -371,7 +363,6 @@ type StartClickHouseExplainActionDefaultBodyDetailsItems0 struct {
 func (o *StartClickHouseExplainActionDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 	// stage 1, bind the properties
 	var stage1 struct {
-
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -409,7 +400,6 @@ func (o *StartClickHouseExplainActionDefaultBodyDetailsItems0) UnmarshalJSON(dat
 // MarshalJSON marshals this object with additional properties into a JSON object
 func (o StartClickHouseExplainActionDefaultBodyDetailsItems0) MarshalJSON() ([]byte, error) {
 	var stage1 struct {
-
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -473,7 +463,6 @@ StartClickHouseExplainActionOKBody start click house explain action OK body
 swagger:model StartClickHouseExplainActionOKBody
 */
 type StartClickHouseExplainActionOKBody struct {
-
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 

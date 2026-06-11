@@ -143,7 +143,8 @@ func (s *Service) StartDump(params *Params) (string, error) {
 		"export",
 		"--pmm-url=http://127.0.0.1:8080",
 		"--dump-path="+getDumpFilePath(dump.ID, false))
-	pmmDumpCmd.Env = append(os.Environ(),
+	pmmDumpCmd.Env = append(
+		os.Environ(),
 		"PMM_CLICKHOUSE_URL="+s.urls.ClickhouseURL,
 		"PMM_VM_URL="+s.urls.VMURL,
 	)

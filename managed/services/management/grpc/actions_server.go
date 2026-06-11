@@ -425,8 +425,8 @@ func (s *actionsServer) StartMongoDBExplainAction(ctx context.Context, req *acti
 }
 
 // StartClickHouseExplainAction starts ClickHouse EXPLAIN action.
-func (s *actionsServer) StartClickHouseExplainAction(ctx context.Context, req *actionsv1.StartClickHouseExplainActionParams) (
-	*actionsv1.StartClickHouseExplainActionResult, error,
+func (s *actionsServer) StartClickHouseExplainAction(ctx context.Context, req *actionsv1.StartClickHouseExplainActionRequest) (
+	*actionsv1.StartClickHouseExplainActionResponse, error,
 ) {
 	res, dsn, err := s.prepareServiceAction(req.ServiceId, req.PmmAgentId, "")
 	if err != nil {
@@ -438,7 +438,7 @@ func (s *actionsServer) StartClickHouseExplainAction(ctx context.Context, req *a
 		return nil, err
 	}
 
-	return &actionsv1.StartClickHouseExplainActionResult{
+	return &actionsv1.StartClickHouseExplainActionResponse{
 		PmmAgentId: req.PmmAgentId,
 		ActionId:   res.ID,
 	}, nil

@@ -274,7 +274,8 @@ func main() {
 	clickhouseUserF := kingpin.Flag("clickhouse-user", "ClickHouse database user").Default("default").Envar("PMM_CLICKHOUSE_USER").String()
 	clickhousePasswordF := kingpin.Flag("clickhouse-password", "ClickHouse database user password").Default("clickhouse").Envar("PMM_CLICKHOUSE_PASSWORD").String()
 	clickhouseTLSF := kingpin.Flag("clickhouse-tls", "Enable TLS for ClickHouse connection").Default("false").Envar("PMM_CLICKHOUSE_TLS").Bool()
-	clickhouseTLSSkipVerifyF := kingpin.Flag("clickhouse-tls-skip-verify", "Skip TLS certificate verification").Default("false").Envar("PMM_CLICKHOUSE_TLS_SKIP_VERIFY").Bool()
+	clickhouseTLSSkipVerifyF := kingpin.Flag("clickhouse-tls-skip-verify", "Skip TLS certificate verification").
+		Default("false").Envar("PMM_CLICKHOUSE_TLS_SKIP_VERIFY").Bool()
 	clickhouseTLSCaF := kingpin.Flag("clickhouse-tls-ca", "Path to TLS CA certificate").Default("").Envar("PMM_CLICKHOUSE_TLS_CA").String()
 	clickhouseTLSCertF := kingpin.Flag("clickhouse-tls-cert", "Path to TLS client certificate").Default("").Envar("PMM_CLICKHOUSE_TLS_CERT").String()
 	clickhouseTLSKeyF := kingpin.Flag("clickhouse-tls-key", "Path to TLS client key").Default("").Envar("PMM_CLICKHOUSE_TLS_KEY").String()

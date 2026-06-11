@@ -28,10 +28,8 @@ upstream  https://github.com/percona/pmm.git          # Percona
 ## Syncing with upstream (periodic)
 
 ```bash
-git fetch upstream --tags
-for b in feat/build feat/clickhouse-collector main; do
-  git switch "$b" && git merge upstream/v3            # resolve conflicts in fork files only
-done
+make dc-upstream                         # merge upstream/v3 head
+make dc-upstream UPSTREAM_TARGET=stable  # merge the latest stable vX.Y.Z tag
 ```
 
 ## Releases
@@ -42,14 +40,18 @@ build tracks (`3.8.0`), and `dcN` the datacosmos build counter on top of it
 (`dc1`, `dc2`, …). The image/RPM version drops the leading `v` (`3.8.0-dc2`);
 the git tag keeps it (`v3.8.0-dc2`).
 
+For each upstream version, the datacosmos counter starts at `dc1` and increments
+from the highest existing `v<upstream version>-dc<N>` tag. The release helper
+fetches tags first, so it accounts for releases already pushed to `origin`.
+
 ```bash
-make -f Makefile.datacosmos release-tag-dc            # creates the next v<version>-dc<N> tag
-git push origin v3.8.0-dc2                            # triggers the datacosmos release workflow
+make dc-next    # prints the next v<version>-dc<N> tag
+make dc-release # creates and pushes that annotated tag
 ```
 
-The earlier date scheme `v3-<ISO date>-<upstream commit count>` (e.g.
-`v3-2026-05-17-5580`, via `make release-tag`) still works — the workflow
-triggers on both `v*-dc*` and `v3-*` tags — but `dcN` is the current scheme.
+The earlier date scheme `v3-<ISO date>-<upstream commit count>` still works if
+such a tag is pushed manually — the workflow triggers on both `v*-dc*` and
+`v3-*` tags — but `dcN` is the current scheme.
 
 Pushing the tag runs `.github/workflows/datacosmos-release.yml`, which builds
 multi-arch images and a GitHub Release. The build's internal `PMM_VERSION`
@@ -58,43 +60,47 @@ separately from the nearest upstream semver tag — it stays a clean `X.Y.Z`.
 
 ## Building (datacosmos pipeline)
 
-`Makefile.datacosmos` is **included** by the root `Makefile` and drives an
-RPM/OCI build via `build/scripts/build-client` and `build/scripts/build-server`.
+`Makefile.datacosmos` is included by the root `Makefile`, but only exposes
+datacosmos-specific `dc-*` targets. Common targets such as `release`, `check`,
+`clean`, and `gen` stay owned by upstream Makefiles.
 
 ```bash
-make all          # prepare + rpmbuild image + client + server
-make client       # client RPM/DEB/Docker only
-make server       # server RPM/Docker only
-make publish      # collect artifacts into ./artifacts
-make clean
+make dc-build   # prepare + upstream client/server build + per-arch GHCR push + artifacts
+make dc-publish # publish multi-arch manifests after the per-arch builds
+make dc-clean   # remove only datacosmos external build/artifact dirs
 ```
 
-### Standalone (no Percona infrastructure)
+### Upstream-aligned default
 
-`Makefile.datacosmos` builds with **no Jenkins, no AWS S3 build cache, no
-private/Percona registries, no image push**:
+`Makefile.datacosmos` deliberately follows upstream's build strategy where the
+fork can safely reuse public Percona infrastructure:
 
-- `RPMBUILD_DOCKER_IMAGE` defaults to the locally-built `pmm-rpmbuild:local`
-  (built by `make build-rpmbuild-image` from `oraclelinux:9-slim`).
-- `SKIP_S3_CACHE=1` is exported — `build/scripts/build-server-rpm` then builds
-  every RPM locally instead of syncing `s3://pmm-build-cache`.
-- Images use local tags (`pmm-local/*`) and are never pushed.
-- `make prepare` materialises the build tree under `$(ROOT_DIR)` (default
-  `../pmm-build-root`, **outside** the repo).
+- `RPMBUILD_DOCKER_IMAGE` defaults to upstream's public
+  `public.ecr.aws/e7j3v3n0/rpmbuild:3` image from `build/scripts/vars`.
+- `SKIP_S3_CACHE` is unset by default, so amd64 server RPMs can reuse
+  `s3://pmm-build-cache` anonymously and avoid rebuilding Grafana and other
+  heavy components.
+- GitHub Actions sets `SKIP_S3_CACHE=1` on arm64 because the upstream cache is
+  x86_64-only.
+- Images are built locally first and published to `ghcr.io/datacosmos-br` only
+  through the explicit publish targets used by the release workflow.
+
+### Local-only mode
+
+For a fully local rebuild, set the overrides explicitly:
+
+```bash
+docker build --pull --tag pmm-rpmbuild:local --file build/docker/rpmbuild/Dockerfile.el9 build/docker/rpmbuild
+RPMBUILD_DOCKER_IMAGE=pmm-rpmbuild:local SKIP_S3_CACHE=1 make dc-build
+```
+
+`make dc-build` materialises the build tree under `$(ROOT_DIR)` (default
+`../pmm-build-root`, **outside** the repo).
 
 ### ⚠️ Build status — verified vs. pending
 
-Verified working: `make build-rpmbuild-image` (local 1.5 GB rpmbuild image),
-`make prepare` (submodule checkout + build-tree layout), and the early
-`make client` stages (external tarball downloads, source preparation).
-
-**Pending:** the canonical PMM build (orchestrated upstream by
-[`Percona-Lab/pmm-submodules`](https://github.com/Percona-Lab/pmm-submodules)
-+ Jenkins) assumes `root_dir` is itself a git checkout (the Jenkins workspace)
-and writes the Go module cache under `root_dir/tmp`. Reproducing a full
-`make client` / `make server` standalone needs `build/scripts/vars` to be
-decoupled from that workspace assumption. Until then, run the full RPM/image
-build inside a `Percona-Lab/pmm-submodules` checkout, or in CI.
+The default release path is the GitHub Actions workflow. Local full builds still
+need Docker, submodules, and enough disk for PMM's upstream RPM/image pipeline.
 
 ## ClickHouse collector (draft — `feat/clickhouse-collector`)
 

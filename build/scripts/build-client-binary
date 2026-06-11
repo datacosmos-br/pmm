@@ -68,7 +68,11 @@ gobuild_component() {
     elif [ ${component} = 'node_exporter' ] || [ ${component} = 'mysqld_exporter' ] || \
          [ ${component} = 'proxysql_exporter' ] || [ ${component} = 'rds_exporter' ] || \
          [ ${component} = 'postgres_exporter' ] || [ ${component} = 'azure_metrics_exporter' ]; then
-        build_command="cd /tmp/go/src/${extract_path} && make release"
+        if [ ${component} = 'mysqld_exporter' ]; then
+            build_command="cd /tmp/go/src/${extract_path} && make GO_BUILD_LDFLAGS=\"-ldflags \\\"\${PROMETHEUS_GO_BUILD_LDFLAGS}\\\"\" release"
+        else
+            build_command="cd /tmp/go/src/${extract_path} && make GO_BUILD_LDFLAGS=\"\${PROMETHEUS_GO_BUILD_LDFLAGS}\" release"
+        fi
     elif [ ${component} = 'percona-toolkit' ]; then
         build_command="cd /tmp/go/src/${extract_path}/${component_path} && go build -o \${binary_dir}/${result_file} ."
     elif [ ${component} = 'nomad' ]; then
@@ -82,6 +86,28 @@ gobuild_component() {
     else
         build_command="go build -o \${binary_dir}/${result_file} ./src/${extract_path}/${component_path}"
     fi
+
+    local release_fullcommit
+    local component_version
+    local component_branch
+    if [ ${component} = 'vmagent' ]; then
+        release_fullcommit=${vmagent_commit_hash}
+        component_version=${vmagent_commit_hash:0:6}
+        component_branch=${vmagent_commit_hash:0:6}
+    elif [ ${component} = 'nomad' ]; then
+        release_fullcommit=${nomad_commit_hash}
+        component_version=${nomad_commit_hash:0:6}
+        component_branch=${nomad_commit_hash:0:6}
+    elif [ ${component} = 'redis_exporter' ]; then
+        release_fullcommit=${redis_exporter_commit_hash}
+        component_version=${redis_exporter_commit_hash:0:6}
+        component_branch=${redis_exporter_commit_hash:0:6}
+    else
+        release_fullcommit=$(cd sources/${parent_component}/src/${extract_path} && git rev-parse HEAD)
+        component_version=$(cd sources/${parent_component}/src/${extract_path} && git describe --abbrev=0 --always)
+        component_branch=$(cd sources/${parent_component}/src/${extract_path} && git describe --always --contains --all)
+    fi
+
     docker run --rm ${volume_mounts} ${rpmbuild_docker_image} sh -c "
         set -o errexit
         set -o xtrace
@@ -93,9 +119,9 @@ gobuild_component() {
         # for 'make release'
         export PMM_RELEASE_VERSION=${full_pmm_version}
         export PMM_RELEASE_TIMESTAMP=$(date '+%s')
-        export PMM_RELEASE_FULLCOMMIT=$(cd sources/${parent_component}/src/${extract_path} && git rev-parse HEAD)
-        export COMPONENT_VERSION=$(cd sources/${parent_component}/src/${extract_path} && git describe --abbrev=0 --always)
-        export COMPONENT_BRANCH=$(cd sources/${parent_component}/src/${extract_path} && git describe --always --contains --all)
+        export PMM_RELEASE_FULLCOMMIT=${release_fullcommit}
+        export COMPONENT_VERSION=${component_version}
+        export COMPONENT_BRANCH=${component_branch}
         export PMM_RELEASE_BRANCH=""
         sudo chown -R builder:builder /home/builder/tmp
 
@@ -105,9 +131,18 @@ gobuild_component() {
 
         mkdir -p \$binary_dir/bin
 
+        rm -rf /tmp/go/src/${extract_path}
         mkdir -p /tmp/go/src/${extract_path}
         archive=$(ls ${source_dir} | grep -e "${parent_component}-\w*\.tar\.gz")
         tar -C /tmp/go/src/${extract_path} --strip-components=1 -zxpf \${source_dir}/\$archive
+        if [ "${component}" = "nomad" ] || [ "${component}" = "node_exporter" ] || [ "${component}" = "mysqld_exporter" ] || [ "${component}" = "proxysql_exporter" ] || [ "${component}" = "rds_exporter" ] || [ "${component}" = "postgres_exporter" ] || [ "${component}" = "azure_metrics_exporter" ]; then
+            git -C /tmp/go/src/${extract_path} init --quiet
+            git -C /tmp/go/src/${extract_path} config user.email "build@datacosmos.com.br"
+            git -C /tmp/go/src/${extract_path} config user.name build
+            git -C /tmp/go/src/${extract_path} add -A
+            git -C /tmp/go/src/${extract_path} commit --quiet -m source-${release_fullcommit}
+        fi
+        export PROMETHEUS_GO_BUILD_LDFLAGS=\"-X github.com/prometheus/common/version.Version=\${COMPONENT_VERSION} -X github.com/prometheus/common/version.Revision=\${PMM_RELEASE_FULLCOMMIT} -X github.com/prometheus/common/version.Branch=\${COMPONENT_BRANCH} -X github.com/prometheus/common/version.BuildUser= -X github.com/prometheus/common/version.BuildDate=\$(date +%FT%T%z) -s -w\"
         pushd /tmp/go
             export GOPATH=\$(pwd -P)
             export PATH=$PATH:\$(go env GOPATH)/bin

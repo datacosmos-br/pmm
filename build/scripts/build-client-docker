@@ -25,6 +25,6 @@ if [ -n "${PUSH_DOCKER}" ]; then
     docker push "${DOCKER_CLIENT_TAG}"
 fi
 
-rm "${root_dir}/${DOCKER_FILE_LOCATION}/pmm-client.tar.gz"
+rm -f "${root_dir}/${DOCKER_FILE_LOCATION}/pmm-client.tar.gz"
 
 # vim: expandtab shiftwidth=4 tabstop=4

@@ -92,7 +92,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1StartClickHouseExplainActionResult"
+              "$ref": "#/definitions/v1StartClickHouseExplainActionResponse"
             }
           },
           "default": {
@@ -108,7 +108,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1StartClickHouseExplainActionParams"
+              "$ref": "#/definitions/v1StartClickHouseExplainActionRequest"
             }
           }
         ],
@@ -252,7 +252,7 @@
         }
       }
     },
-    "v1StartClickHouseExplainActionParams": {
+    "v1StartClickHouseExplainActionRequest": {
       "type": "object",
       "properties": {
         "pmm_agent_id": {
@@ -273,7 +273,7 @@
         }
       }
     },
-    "v1StartClickHouseExplainActionResult": {
+    "v1StartClickHouseExplainActionResponse": {
       "type": "object",
       "properties": {
         "action_id": {
@@ -759,7 +759,7 @@
           "$ref": "#/definitions/v1StartPTPgSummaryActionParams"
         },
         "clickhouse_explain": {
-          "$ref": "#/definitions/v1StartClickHouseExplainActionParams"
+          "$ref": "#/definitions/v1StartClickHouseExplainActionRequest"
         }
       }
     },
@@ -803,7 +803,7 @@
           "$ref": "#/definitions/v1StartPTPgSummaryActionResult"
         },
         "clickhouse_explain": {
-          "$ref": "#/definitions/v1StartClickHouseExplainActionResult"
+          "$ref": "#/definitions/v1StartClickHouseExplainActionResponse"
         }
       }
     }

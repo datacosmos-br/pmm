@@ -209,7 +209,7 @@ message StartMongoDBExplainActionResult {
   string pmm_agent_id = 2;
 }
 
-message StartClickHouseExplainActionParams {
+message StartClickHouseExplainActionRequest {
   // pmm-agent ID where to run this Action.
   string pmm_agent_id = 1;
   // Service ID for this Action. Required.
@@ -220,7 +220,7 @@ message StartClickHouseExplainActionParams {
   string explain_type = 4;
 }
 
-message StartClickHouseExplainActionResult {
+message StartClickHouseExplainActionResponse {
   // Unique Action ID.
   string action_id = 1;
   // pmm-agent ID where to this Action was started.
@@ -310,7 +310,7 @@ message StartServiceActionRequest {
     StartPTMongoDBSummaryActionParams pt_mongodb_summary = 10;
     StartPTMySQLSummaryActionParams pt_mysql_summary = 11;
     StartPTPgSummaryActionParams pt_postgres_summary = 12;
-    StartClickHouseExplainActionParams clickhouse_explain = 13;
+    StartClickHouseExplainActionRequest clickhouse_explain = 13;
   }
 }
 
@@ -328,7 +328,7 @@ message StartServiceActionResponse {
     StartPTMongoDBSummaryActionResult pt_mongodb_summary = 10;
     StartPTMySQLSummaryActionResult pt_mysql_summary = 11;
     StartPTPgSummaryActionResult pt_postgres_summary = 12;
-    StartClickHouseExplainActionResult clickhouse_explain = 13;
+    StartClickHouseExplainActionResponse clickhouse_explain = 13;
   }
 }
 
@@ -357,7 +357,7 @@ service ActionsService {
   // StartPTPgSummaryAction starts pt-pg-summary Action.
 
   // StartClickHouseExplainAction starts ClickHouse EXPLAIN Action.
-  rpc StartClickHouseExplainAction(StartClickHouseExplainActionParams) returns (StartClickHouseExplainActionResult) {
+  rpc StartClickHouseExplainAction(StartClickHouseExplainActionRequest) returns (StartClickHouseExplainActionResponse) {
     option (google.api.http) = {
       post: "/v1/actions:clickhouseExplain"
       body: "*"

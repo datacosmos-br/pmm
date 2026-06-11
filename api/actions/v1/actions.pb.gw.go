@@ -76,7 +76,7 @@ func local_request_ActionsService_GetAction_0(ctx context.Context, marshaler run
 
 func request_ActionsService_StartClickHouseExplainAction_0(ctx context.Context, marshaler runtime.Marshaler, client ActionsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq StartClickHouseExplainActionParams
+		protoReq StartClickHouseExplainActionRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -91,7 +91,7 @@ func request_ActionsService_StartClickHouseExplainAction_0(ctx context.Context, 
 
 func local_request_ActionsService_StartClickHouseExplainAction_0(ctx context.Context, marshaler runtime.Marshaler, server ActionsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq StartClickHouseExplainActionParams
+		protoReq StartClickHouseExplainActionRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {

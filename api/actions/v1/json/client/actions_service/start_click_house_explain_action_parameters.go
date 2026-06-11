@@ -57,7 +57,6 @@ StartClickHouseExplainActionParams contains all the parameters to send to the AP
 	Typically these are written to a http.Request.
 */
 type StartClickHouseExplainActionParams struct {
-
 	// Body.
 	Body StartClickHouseExplainActionBody
 
@@ -127,7 +126,6 @@ func (o *StartClickHouseExplainActionParams) SetBody(body StartClickHouseExplain
 
 // WriteToRequest writes these params to a swagger request
 func (o *StartClickHouseExplainActionParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
-
 	if err := r.SetTimeout(o.timeout); err != nil {
 		return err
 	}

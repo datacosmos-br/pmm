@@ -42,6 +42,12 @@ const defaultClickHouseNativeMetricsPort = 9363
 // clickHouseNativeProbeTimeout bounds the auto-probe of the native endpoint.
 const clickHouseNativeProbeTimeout = 3 * time.Second
 
+const (
+	clickHouseProtocolHTTP  = "http"
+	clickHouseProtocolHTTPS = "https"
+	clickHouseMetricsPath   = "/metrics"
+)
+
 // probeClickHouseNativeEndpoint reports whether the ClickHouse native
 // Prometheus endpoint answers an HTTP GET on {scheme}://{address}:{port}/metrics.
 func probeClickHouseNativeEndpoint(ctx context.Context, scheme, address string, port uint16, tlsSkipVerify bool) bool {
@@ -49,15 +55,15 @@ func probeClickHouseNativeEndpoint(ctx context.Context, scheme, address string, 
 		return false
 	}
 	if scheme == "" {
-		scheme = "http"
+		scheme = clickHouseProtocolHTTP
 	}
 
 	probeCtx, cancel := context.WithTimeout(ctx, clickHouseNativeProbeTimeout)
 	defer cancel()
 
-	urlStr := fmt.Sprintf("%s://%s/metrics", scheme, net.JoinHostPort(address, strconv.Itoa(int(port))))
+	urlStr := fmt.Sprintf("%s://%s%s", scheme, net.JoinHostPort(address, strconv.Itoa(int(port))), clickHouseMetricsPath)
 	client := http.DefaultClient
-	if scheme == "https" && tlsSkipVerify {
+	if scheme == clickHouseProtocolHTTPS && tlsSkipVerify {
 		client = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
@@ -92,131 +98,11 @@ func (s *ManagementService) addClickHouse(ctx context.Context, req *managementv1
 	}
 
 	errTx := s.db.InTransactionContext(ctx, nil, func(tx *reform.TX) error {
-		nodeID, err := nodeID(tx, req.NodeId, req.NodeName, req.AddNode, req.Address)
+		var err error
+		pmmAgentID, err = s.addClickHouseInTransaction(ctx, tx, req, clickhouse, nativePort)
 		if err != nil {
 			return err
 		}
-
-		service, err := models.AddNewService(tx.Querier, models.ClickHouseServiceType, &models.AddDBMSServiceParams{
-			ServiceName:    req.ServiceName,
-			NodeID:         nodeID,
-			Environment:    req.Environment,
-			Cluster:        req.Cluster,
-			ReplicationSet: req.ReplicationSet,
-			Address:        pointer.ToStringOrNil(req.Address),
-			Port:           pointer.ToUint16OrNil(uint16(req.Port)), //nolint:gosec
-			Socket:         pointer.ToStringOrNil(req.Socket),
-			CustomLabels:   req.CustomLabels,
-		})
-		if err != nil {
-			return err
-		}
-
-		inventoryService, err := services.ToAPIService(service)
-		if err != nil {
-			return err
-		}
-		clickhouse.Service = inventoryService.(*inventoryv1.ClickHouseService) //nolint:forcetypeassert
-
-		// Resolve the metrics source: auto-probe when unspecified; a forced
-		// native source that fails the probe is a precondition failure.
-		probeScheme := "http"
-		if req.Protocol == "https" {
-			probeScheme = "https"
-		}
-		source := req.MetricsSource
-		switch source {
-		case managementv1.MetricsSource_METRICS_SOURCE_UNSPECIFIED:
-			if probeClickHouseNativeEndpoint(ctx, probeScheme, req.Address, nativePort, req.TlsSkipVerify) {
-				source = managementv1.MetricsSource_METRICS_SOURCE_NATIVE
-			} else {
-				source = managementv1.MetricsSource_METRICS_SOURCE_EXPORTER
-			}
-		case managementv1.MetricsSource_METRICS_SOURCE_NATIVE:
-			if !probeClickHouseNativeEndpoint(ctx, probeScheme, req.Address, nativePort, req.TlsSkipVerify) {
-				return status.Errorf(codes.FailedPrecondition,
-					"ClickHouse native Prometheus endpoint is not reachable at %s:%d; "+
-						"enable the <prometheus> server config section or use --metrics-source=exporter",
-					req.Address, nativePort)
-			}
-		case managementv1.MetricsSource_METRICS_SOURCE_EXPORTER:
-			// Explicit managed-exporter source; no native-endpoint probe needed.
-		}
-
-		if source == managementv1.MetricsSource_METRICS_SOURCE_NATIVE {
-			row, err := models.CreateExternalExporter(tx.Querier, &models.CreateExternalExporterParams{
-				RunsOnNodeID:  nodeID,
-				ServiceID:     service.ServiceID,
-				Username:      req.Username,
-				Password:      req.Password,
-				Scheme:        clickhouseExporterScheme(req.Protocol, req.Tls),
-				MetricsPath:   "/metrics",
-				ListenPort:    uint32(nativePort),
-				CustomLabels:  req.CustomLabels,
-				TLSSkipVerify: req.TlsSkipVerify,
-			})
-			if err != nil {
-				return err
-			}
-
-			// Record that this service is monitored via the native endpoint.
-			row.ClickHouseOptions = models.ClickHouseOptions{
-				NativeEndpoint:    true,
-				NativeMetricsPort: nativePort,
-			}
-			err = tx.Update(row)
-			if err != nil {
-				return err
-			}
-
-			agent, err := services.ToAPIAgent(tx.Querier, row)
-			if err != nil {
-				return err
-			}
-			clickhouse.ExternalExporter = agent.(*inventoryv1.ExternalExporter) //nolint:forcetypeassert
-			pmmAgentID = row.PMMAgentID
-			return nil
-		}
-
-		req.MetricsMode, err = supportedMetricsMode(req.MetricsMode, req.PmmAgentId)
-		if err != nil {
-			return err
-		}
-
-		row, err := models.CreateAgent(tx.Querier, models.ClickHouseExporterType, &models.CreateAgentParams{
-			PMMAgentID:    req.PmmAgentId,
-			ServiceID:     service.ServiceID,
-			Username:      req.Username,
-			Password:      req.Password,
-			TLS:           req.Tls,
-			TLSSkipVerify: req.TlsSkipVerify,
-			ExporterOptions: models.ExporterOptions{
-				ExposeExporter: req.ExposeExporter,
-				PushMetrics:    isPushMode(req.MetricsMode),
-			},
-			ClickHouseOptions: models.ClickHouseOptionsFromRequest(req),
-		})
-		if err != nil {
-			return err
-		}
-		if !req.SkipConnectionCheck {
-			err = s.cc.CheckConnectionToService(ctx, tx.Querier, service, row)
-			if err != nil {
-				return err
-			}
-
-			err = s.sib.GetInfoFromService(ctx, tx.Querier, service, row)
-			if err != nil {
-				return err
-			}
-		}
-
-		agent, err := services.ToAPIAgent(tx.Querier, row)
-		if err != nil {
-			return err
-		}
-		clickhouse.ClickhouseExporter = agent.(*inventoryv1.ClickHouseExporter) //nolint:forcetypeassert
-		pmmAgentID = row.PMMAgentID
 		return nil
 	})
 	if errTx != nil {
@@ -235,11 +121,186 @@ func (s *ManagementService) addClickHouse(ctx context.Context, req *managementv1
 	}
 	return res, nil
 }
+
+func (s *ManagementService) addClickHouseInTransaction(
+	ctx context.Context,
+	tx *reform.TX,
+	req *managementv1.AddClickHouseServiceParams,
+	clickhouse *managementv1.ClickHouseServiceResult,
+	nativePort uint16,
+) (*string, error) {
+	nodeIDValue, service, err := createClickHouseService(tx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	inventoryService, err := services.ToAPIService(service)
+	if err != nil {
+		return nil, err
+	}
+	clickhouse.Service = inventoryService.(*inventoryv1.ClickHouseService) //nolint:forcetypeassert
+
+	source, err := clickHouseMetricsSource(ctx, req, nativePort)
+	if err != nil {
+		return nil, err
+	}
+	if source == managementv1.MetricsSource_METRICS_SOURCE_NATIVE {
+		return addClickHouseNativeMetrics(tx, req, clickhouse, nodeIDValue, service.ServiceID, nativePort)
+	}
+	return s.addClickHouseManagedExporter(ctx, tx, req, clickhouse, service)
+}
+
+func createClickHouseService(
+	tx *reform.TX,
+	req *managementv1.AddClickHouseServiceParams,
+) (string, *models.Service, error) {
+	nodeIDValue, err := nodeID(tx, req.NodeId, req.NodeName, req.AddNode, req.Address)
+	if err != nil {
+		return "", nil, err
+	}
+
+	service, err := models.AddNewService(tx.Querier, models.ClickHouseServiceType, &models.AddDBMSServiceParams{
+		ServiceName:    req.ServiceName,
+		NodeID:         nodeIDValue,
+		Environment:    req.Environment,
+		Cluster:        req.Cluster,
+		ReplicationSet: req.ReplicationSet,
+		Address:        pointer.ToStringOrNil(req.Address),
+		Port:           pointer.ToUint16OrNil(uint16(req.Port)), //nolint:gosec
+		Socket:         pointer.ToStringOrNil(req.Socket),
+		CustomLabels:   req.CustomLabels,
+	})
+	if err != nil {
+		return "", nil, err
+	}
+	return nodeIDValue, service, nil
+}
+
+func clickHouseMetricsSource(
+	ctx context.Context,
+	req *managementv1.AddClickHouseServiceParams,
+	nativePort uint16,
+) (managementv1.MetricsSource, error) {
+	probeScheme := clickHouseProtocolHTTP
+	if req.Protocol == clickHouseProtocolHTTPS {
+		probeScheme = clickHouseProtocolHTTPS
+	}
+
+	source := req.MetricsSource
+	switch source {
+	case managementv1.MetricsSource_METRICS_SOURCE_UNSPECIFIED:
+		if probeClickHouseNativeEndpoint(ctx, probeScheme, req.Address, nativePort, req.TlsSkipVerify) {
+			return managementv1.MetricsSource_METRICS_SOURCE_NATIVE, nil
+		}
+		return managementv1.MetricsSource_METRICS_SOURCE_EXPORTER, nil
+	case managementv1.MetricsSource_METRICS_SOURCE_NATIVE:
+		if !probeClickHouseNativeEndpoint(ctx, probeScheme, req.Address, nativePort, req.TlsSkipVerify) {
+			return source, status.Errorf(codes.FailedPrecondition,
+				"ClickHouse native Prometheus endpoint is not reachable at %s:%d; "+
+					"enable the <prometheus> server config section or use --metrics-source=exporter",
+				req.Address, nativePort)
+		}
+	case managementv1.MetricsSource_METRICS_SOURCE_EXPORTER:
+		return source, nil
+	}
+	return source, nil
+}
+
+func addClickHouseNativeMetrics(
+	tx *reform.TX,
+	req *managementv1.AddClickHouseServiceParams,
+	clickhouse *managementv1.ClickHouseServiceResult,
+	nodeIDValue string,
+	serviceID string,
+	nativePort uint16,
+) (*string, error) {
+	row, err := models.CreateExternalExporter(tx.Querier, &models.CreateExternalExporterParams{
+		RunsOnNodeID:  nodeIDValue,
+		ServiceID:     serviceID,
+		Username:      req.Username,
+		Password:      req.Password,
+		Scheme:        clickhouseExporterScheme(req.Protocol, req.Tls),
+		MetricsPath:   clickHouseMetricsPath,
+		ListenPort:    uint32(nativePort),
+		CustomLabels:  req.CustomLabels,
+		TLSSkipVerify: req.TlsSkipVerify,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	row.ClickHouseOptions = models.ClickHouseOptions{
+		NativeEndpoint:    true,
+		NativeMetricsPort: nativePort,
+	}
+	err = tx.Update(row)
+	if err != nil {
+		return nil, err
+	}
+
+	agent, err := services.ToAPIAgent(tx.Querier, row)
+	if err != nil {
+		return nil, err
+	}
+	clickhouse.ExternalExporter = agent.(*inventoryv1.ExternalExporter) //nolint:forcetypeassert
+	return row.PMMAgentID, nil
+}
+
+func (s *ManagementService) addClickHouseManagedExporter(
+	ctx context.Context,
+	tx *reform.TX,
+	req *managementv1.AddClickHouseServiceParams,
+	clickhouse *managementv1.ClickHouseServiceResult,
+	service *models.Service,
+) (*string, error) {
+	var err error
+	req.MetricsMode, err = supportedMetricsMode(req.MetricsMode, req.PmmAgentId)
+	if err != nil {
+		return nil, err
+	}
+
+	row, err := models.CreateAgent(tx.Querier, models.ClickHouseExporterType, &models.CreateAgentParams{
+		PMMAgentID:    req.PmmAgentId,
+		ServiceID:     service.ServiceID,
+		Username:      req.Username,
+		Password:      req.Password,
+		TLS:           req.Tls,
+		TLSSkipVerify: req.TlsSkipVerify,
+		ExporterOptions: models.ExporterOptions{
+			ExposeExporter: req.ExposeExporter,
+			PushMetrics:    isPushMode(req.MetricsMode),
+		},
+		ClickHouseOptions: models.ClickHouseOptionsFromRequest(req),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if !req.SkipConnectionCheck {
+		err = s.cc.CheckConnectionToService(ctx, tx.Querier, service, row)
+		if err != nil {
+			return nil, err
+		}
+
+		err = s.sib.GetInfoFromService(ctx, tx.Querier, service, row)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	agent, err := services.ToAPIAgent(tx.Querier, row)
+	if err != nil {
+		return nil, err
+	}
+	clickhouse.ClickhouseExporter = agent.(*inventoryv1.ClickHouseExporter) //nolint:forcetypeassert
+	return row.PMMAgentID, nil
+}
+
 // clickhouseExporterScheme returns the scheme for the ClickHouse native metrics endpoint.
 // It mirrors the logic in clickhouseconn.Config.ExporterScheme.
 func clickhouseExporterScheme(protocol string, tls bool) string {
-	if protocol == "https" || (protocol == "" && tls) {
-		return "https"
+	if protocol == clickHouseProtocolHTTPS || (protocol == "" && tls) {
+		return clickHouseProtocolHTTPS
 	}
-	return "http"
+	return clickHouseProtocolHTTP
 }

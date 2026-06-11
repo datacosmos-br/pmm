@@ -18,12 +18,12 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
 	_ "github.com/ClickHouse/clickhouse-go/v2" // register database/sql driver "clickhouse"
-	"github.com/pkg/errors"
 
 	agentv1 "github.com/percona/pmm/api/agent/v1"
 )
@@ -51,16 +51,16 @@ type clickHouseExplainAction struct {
 // NewClickHouseExplainAction creates a ClickHouse EXPLAIN Action.
 func NewClickHouseExplainAction(id string, timeout time.Duration, params *agentv1.StartActionRequest_ClickHouseExplainParams, _ string) (Action, error) {
 	if params.Query == "" {
-		return nil, errors.New("Query to EXPLAIN is empty")
+		return nil, errors.New("query to EXPLAIN is empty")
 	}
 
 	if strings.HasSuffix(params.Query, "...") {
-		return nil, errors.New("EXPLAIN failed because the query exceeded max length and got trimmed. Set max-query-length to a larger value.") //nolint:revive,lll // explain is a keyword
+		return nil, errors.New("EXPLAIN failed because the query exceeded max length and got trimmed. Set max-query-length to a larger value") //nolint:lll // explain is a keyword
 	}
 
 	explainType := strings.ToUpper(strings.TrimSpace(params.ExplainType))
 	if _, ok := allowedClickHouseExplainTypes[explainType]; !ok {
-		return nil, errors.Errorf("invalid EXPLAIN type %q; allowed: PLAN, PIPELINE, AST, ESTIMATE, SYNTAX", params.ExplainType)
+		return nil, fmt.Errorf("invalid EXPLAIN type %q; allowed: PLAN, PIPELINE, AST, ESTIMATE, SYNTAX", params.ExplainType)
 	}
 
 	return &clickHouseExplainAction{
@@ -94,13 +94,13 @@ func (a *clickHouseExplainAction) DSN() string {
 func (a *clickHouseExplainAction) Run(ctx context.Context) ([]byte, error) {
 	db, err := sql.Open("clickhouse", a.params.Dsn)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 	defer db.Close() //nolint:errcheck
 
 	rows, err := db.QueryContext(ctx, a.buildExplainQuery())
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to execute EXPLAIN")
+		return nil, fmt.Errorf("failed to execute EXPLAIN: %w", err)
 	}
 	defer rows.Close() //nolint:errcheck
 
@@ -109,7 +109,7 @@ func (a *clickHouseExplainAction) Run(ctx context.Context) ([]byte, error) {
 	// scan generically and join columns with a tab.
 	cols, err := rows.Columns()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read EXPLAIN columns")
+		return nil, fmt.Errorf("failed to read EXPLAIN columns: %w", err)
 	}
 
 	var lines []string
@@ -122,8 +122,9 @@ func (a *clickHouseExplainAction) Run(ctx context.Context) ([]byte, error) {
 		scanArgs[i] = &values[i]
 	}
 	for rows.Next() {
-		if err := rows.Scan(scanArgs...); err != nil {
-			return nil, errors.Wrap(err, "failed to scan EXPLAIN result")
+		err := rows.Scan(scanArgs...)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan EXPLAIN result: %w", err)
 		}
 		fields := make([]string, len(values))
 		for i, v := range values {
@@ -132,8 +133,9 @@ func (a *clickHouseExplainAction) Run(ctx context.Context) ([]byte, error) {
 		lines = append(lines, strings.Join(fields, "\t"))
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, errors.Wrap(err, "error reading EXPLAIN result")
+	err = rows.Err()
+	if err != nil {
+		return nil, fmt.Errorf("error reading EXPLAIN result: %w", err)
 	}
 
 	result := map[string]any{
@@ -152,7 +154,7 @@ func (a *clickHouseExplainAction) buildExplainQuery() string {
 	if explainType != "" {
 		return fmt.Sprintf("EXPLAIN %s %s", explainType, query)
 	}
-	return fmt.Sprintf("EXPLAIN %s", query)
+	return "EXPLAIN " + query
 }
 
 func (a *clickHouseExplainAction) sealed() {}

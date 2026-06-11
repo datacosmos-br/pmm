@@ -20,6 +20,7 @@ import (
 	"math"
 
 	_ "github.com/ClickHouse/clickhouse-go/v2" // register clickhouse driver
+
 	agentv1 "github.com/percona/pmm/api/agent/v1"
 )
 
@@ -35,7 +36,8 @@ func (sib *ServiceInfoBroker) getClickHouseInfo(ctx context.Context, dsn string)
 	defer db.Close() //nolint:errcheck
 
 	var tableCount uint64
-	if err = db.QueryRowContext(ctx, "SELECT count() FROM system.tables").Scan(&tableCount); err != nil {
+	err = db.QueryRowContext(ctx, "SELECT count() FROM system.tables").Scan(&tableCount)
+	if err != nil {
 		res.Error = err.Error()
 		return &res
 	}
@@ -45,7 +47,8 @@ func (sib *ServiceInfoBroker) getClickHouseInfo(ctx context.Context, dsn string)
 	}
 
 	var version string
-	if err = db.QueryRowContext(ctx, "SELECT version()").Scan(&version); err != nil {
+	err = db.QueryRowContext(ctx, "SELECT version()").Scan(&version)
+	if err != nil {
 		res.Error = err.Error()
 		return &res
 	}

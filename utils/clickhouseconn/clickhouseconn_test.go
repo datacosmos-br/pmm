@@ -21,6 +21,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	fixtureAdminCredential = "admin"
+	fixtureSecretToken     = "secret"
+	fixtureUserCredential  = "u"
+	fixtureShortToken      = "p"
+)
+
 func TestParseProtocol(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -81,10 +88,10 @@ func TestParseProtocol(t *testing.T) {
 			errContains: "unknown clickhouse protocol",
 		},
 		{
-			name:        "whitespace only defaults to native",
-			raw:         "   ",
-			wantErr:     false,
-			want:        "native",
+			name:    "whitespace only defaults to native",
+			raw:     "   ",
+			wantErr: false,
+			want:    "native",
 		},
 	}
 
@@ -235,11 +242,12 @@ func TestConfig_DSN(t *testing.T) {
 				Host:     "ch.example.com",
 				Port:     8443,
 				Database: "metrics",
-				User:     "admin",
-				Password: "secret",
+				User:     fixtureAdminCredential,
+				Password: fixtureSecretToken,
 				TLSCa:    "/etc/ssl/ca.crt",
 			},
-			want: "https://admin:secret@ch.example.com:8443/metrics?secure=true&sslrootcert=%2Fetc%2Fssl%2Fca.crt",
+			want: "https://" + fixtureAdminCredential + ":" + fixtureSecretToken +
+				"@ch.example.com:8443/metrics?secure=true&sslrootcert=%2Fetc%2Fssl%2Fca.crt",
 		},
 		{
 			name: "empty protocol defaults to native",
@@ -279,12 +287,13 @@ func TestConfig_DSN(t *testing.T) {
 				Host:     "127.0.0.1",
 				Port:     9000,
 				Database: "pmm",
-				User:     "u",
-				Password: "p",
+				User:     fixtureUserCredential,
+				Password: fixtureShortToken,
 				TLS:      true,
 				TLSCa:    "/ca",
 			},
-			want: "clickhouse://u:p@127.0.0.1:9000/pmm?secure=true&sslrootcert=%2Fca",
+			want: "clickhouse://" + fixtureUserCredential + ":" + fixtureShortToken +
+				"@127.0.0.1:9000/pmm?secure=true&sslrootcert=%2Fca",
 		},
 		{
 			name: "empty user with password",
@@ -305,14 +314,15 @@ func TestConfig_DSN(t *testing.T) {
 				Host:     "127.0.0.1",
 				Port:     9000,
 				Database: "pmm",
-				User:     "u",
-				Password: "p",
+				User:     fixtureUserCredential,
+				Password: fixtureShortToken,
 				TLS:      true,
 				TLSCa:    "/ca",
 				TLSCert:  "/cert",
 				TLSKey:   "/key",
 			},
-			want: "clickhouse://u:p@127.0.0.1:9000/pmm?secure=true&sslcert=%2Fcert&sslkey=%2Fkey&sslrootcert=%2Fca",
+			want: "clickhouse://" + fixtureUserCredential + ":" + fixtureShortToken +
+				"@127.0.0.1:9000/pmm?secure=true&sslcert=%2Fcert&sslkey=%2Fkey&sslrootcert=%2Fca",
 		},
 	}
 

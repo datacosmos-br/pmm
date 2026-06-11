@@ -1,237 +1,127 @@
 ###############################################################################
-# Makefile.datacosmos — PMM build pipeline, aligned to upstream.
+# Makefile.datacosmos - fork-only PMM build and release helpers.
 #
-# Thin wrapper over the upstream build/scripts/*: it lays out the build tree
-# and runs the same scripts a Jenkins agent would. It deliberately keeps
-# upstream's strategy:
-#   * rpmbuild container — the upstream public image (build/scripts/vars
-#     default: public.ecr.aws/e7j3v3n0/rpmbuild:3), not built locally;
-#   * RPM cache — upstream's public s3://pmm-build-cache (SKIP_S3_CACHE unset),
-#     so Grafana et al. are downloaded prebuilt instead of compiled.
-# Images are published to ghcr.io/datacosmos-br.
-#
-# Every variable below is overridable from the environment. See
-# docs/datacosmos/BUILD.md. Included by the root Makefile.
-#
-# Author: Marlon Costa <marlon.costa@datacosmos.com.br>
+# Keep this file small: common development/build targets stay in the upstream
+# Makefiles. These targets only add datacosmos release versioning, an external
+# build root, GHCR publishing, and upstream sync helpers.
 ###############################################################################
 
 SHELL := /bin/bash -o pipefail
 
-# -----------------------------------------------------------------------------
-# Version
-# -----------------------------------------------------------------------------
-PKG_NAME         := pmm
-# Upstream PMM version (real semver). Feeds the VERSION file and the upstream
-# S3 RPM cache keys, so it must stay a clean X.Y.Z. Derived from the nearest
-# upstream release tag reachable in history; datacosmos tags (-dc* and the
-# current v3-<date>-<count> scheme) are excluded so they never leak in.
-PMM_VERSION      ?= $(shell git describe --tags --abbrev=0 \
-                      --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude '*-dc*' \
-                      2>/dev/null | sed 's/^v//')
-PMM_VERSION      := $(if $(PMM_VERSION),$(PMM_VERSION),3.0.0)
-VERSION          := $(PMM_VERSION)
-RELEASE          ?= $(shell git rev-list --count HEAD 2>/dev/null || echo 1)
-FULL_VERSION     := $(VERSION)-$(RELEASE)
-GIT_BRANCH       := $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null)
-GIT_COMMIT       := $(shell git rev-parse HEAD 2>/dev/null)
+PMM_VERSION ?= $(shell git describe --tags --abbrev=0 \
+	--match 'v[0-9]*.[0-9]*.[0-9]*' --exclude '*-dc*' \
+	2>/dev/null | sed 's/^v//')
+PMM_VERSION := $(if $(PMM_VERSION),$(PMM_VERSION),3.0.0)
 
-# -----------------------------------------------------------------------------
-# Paths — the build tree lives OUTSIDE the repo so `go build ./...` never scans
-# it (an in-repo build tree caused a ~100-error cascade; see docs/datacosmos).
-# -----------------------------------------------------------------------------
-CURDIR           := $(shell pwd)
-ROOT_DIR         ?= $(abspath $(CURDIR)/../pmm-build-root)
-ARTIFACT_DIR     ?= $(abspath $(CURDIR)/../pmm-artifacts)
-PATH_TO_SCRIPTS  := build/scripts
+UPSTREAM_BRANCH ?= upstream/v3
+UPSTREAM_TARGET ?= head
+DC_SOURCE ?= stable
+DIST ?= el9
+ROOT_DIR ?= $(abspath $(CURDIR)/../pmm-build-root)
+ARTIFACT_DIR ?= $(abspath $(CURDIR)/../pmm-artifacts)
+GHCR_NAMESPACE ?= ghcr.io/datacosmos-br
+DC_DATE ?= $(shell date -u +%Y-%m-%d)
+DC_TAG_BASE := $(if $(filter head,$(DC_SOURCE)),v3-$(DC_DATE)-dc,v$(PMM_VERSION)-dc)
+DC_VERSION ?= $(if $(filter head,$(DC_SOURCE)),v3-$(DC_DATE)-dev,$(PMM_VERSION)-dev)
+IMAGE_ARCH ?= amd64
 
-# -----------------------------------------------------------------------------
-# Build configuration — local images only, never a remote registry by default.
-# The rpmbuild container image is NOT overridden: build/scripts/vars defaults
-# it to the upstream-published public.ecr.aws/e7j3v3n0/rpmbuild:3 (multi-arch).
-# -----------------------------------------------------------------------------
-DIST                  ?= el9
-IMAGE_REGISTRY        ?= pmm-local
-CLIENT_IMAGE          ?= $(IMAGE_REGISTRY)/pmm-client:$(FULL_VERSION)
-SERVER_IMAGE          ?= $(IMAGE_REGISTRY)/pmm-server:$(FULL_VERSION)
+FULL_VERSION := $(PMM_VERSION)-$(shell git rev-list --count HEAD 2>/dev/null || echo 1)
+CLIENT_IMAGE ?= pmm-local/pmm-client:$(FULL_VERSION)
+SERVER_IMAGE ?= pmm-local/pmm-server:$(FULL_VERSION)
+CLIENT_PUBLISH_IMAGE ?= $(GHCR_NAMESPACE)/pmm-client:$(DC_VERSION)-$(IMAGE_ARCH)
+SERVER_PUBLISH_IMAGE ?= $(GHCR_NAMESPACE)/pmm-server:$(DC_VERSION)-$(IMAGE_ARCH)
 
-# datacosmos release identifier — v3-<ISO date>-<upstream commit count> — and
-# the GitHub Container Registry namespace images are published to. In CI
-# DC_VERSION always comes from the pushed tag (see datacosmos-release.yml);
-# locally it falls back to a dev-stamped value. Cut a real tag with the
-# `release-tag` target.
-DC_VERSION             ?= v3-$(shell date -u +%Y-%m-%d)-local
-GHCR_NAMESPACE         ?= ghcr.io/datacosmos-br
-
-# Multi-arch. PLATFORMS drives the buildx rpmbuild image. The pmm-client/server
-# images are built per-arch (each on its native runner in CI) and published as
-# <tag>-<arch>; `publish-manifests` then merges them into a multi-arch tag.
-PLATFORMS              ?= linux/amd64,linux/arm64
-BUILDX_BUILDER         ?= pmm-multiarch
-IMAGE_ARCH             ?=
-ARCH_SUFFIX            := $(if $(IMAGE_ARCH),-$(IMAGE_ARCH),)
-
-RPMBUILD_PUBLISH_IMAGE ?= $(GHCR_NAMESPACE)/pmm-rpmbuild:$(DC_VERSION)
-CLIENT_PUBLISH_IMAGE   ?= $(GHCR_NAMESPACE)/pmm-client:$(DC_VERSION)$(ARCH_SUFFIX)
-SERVER_PUBLISH_IMAGE   ?= $(GHCR_NAMESPACE)/pmm-server:$(DC_VERSION)$(ARCH_SUFFIX)
-
-# Switches consumed by build/scripts/*. SKIP_S3_CACHE is intentionally NOT set:
-# build-server-rpm's is_build_needed then reuses the upstream public RPM cache
-# (s3://pmm-build-cache, --no-sign-request) — Grafana et al. are downloaded
-# prebuilt instead of compiled. PUSH_DOCKER unset keeps images local.
 export ROOT_DIR
-export RPMBUILD_DIST   := $(DIST)
+export RPMBUILD_DIST := $(DIST)
 unexport PUSH_DOCKER
 
-# -----------------------------------------------------------------------------
-# Targets
-# -----------------------------------------------------------------------------
-.PHONY: all
-all: prepare client server                        ## Full build (rpmbuild image pulled from upstream)
+.PHONY: dc-upstream
+dc-upstream: ## Merge upstream/v3 head, or latest stable tag with UPSTREAM_TARGET=stable
+	@git fetch upstream --tags
+	@git fetch origin --tags
+	@ref="$(UPSTREAM_BRANCH)"; \
+	if [ "$(UPSTREAM_TARGET)" = "stable" ]; then \
+		ref=$$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | head -1); \
+	fi; \
+	if [ -z "$$ref" ]; then \
+		echo "No upstream ref found for UPSTREAM_TARGET=$(UPSTREAM_TARGET)"; \
+		exit 1; \
+	fi; \
+	echo "Merging $$ref"; \
+	git merge --no-ff "$$ref"
 
-.PHONY: release-tag
-release-tag:                                      ## Create the release tag v3-<ISO date>-<upstream commit count>[.N]
-	@git fetch upstream
-	@count=$$(git rev-list --count upstream/v3); \
-	base="v3-$$(date -u +%Y-%m-%d)-$$count"; tag="$$base"; n=2; \
-	while git rev-parse -q --verify "refs/tags/$$tag" >/dev/null 2>&1; do \
-	    tag="$$base.$$n"; n=$$((n + 1)); \
-	done; \
-	git tag -a "$$tag" -m "datacosmos PMM $$tag (upstream/v3 @ $$(git rev-parse --short upstream/v3))"; \
-	echo "Created $$tag — push it to trigger the release: git push origin $$tag"
+.PHONY: dc-sync
+dc-sync: dc-upstream
 
-.PHONY: release-tag-dc
-release-tag-dc:                                   ## Create the next semver-dcN tag v$(PMM_VERSION)-dc<N>
-	@base="v$(PMM_VERSION)-dc"; n=1; \
-	while git rev-parse -q --verify "refs/tags/$$base$$n" >/dev/null 2>&1; do n=$$((n + 1)); done; \
-	git tag -a "$$base$$n" -m "datacosmos PMM $$base$$n (upstream $(PMM_VERSION) @ $$(git rev-parse --short HEAD))"; \
-	echo "Created $$base$$n — push it to trigger the release: git push origin $$base$$n"
+.PHONY: dc-next
+dc-next: ## Print next release tag; use DC_SOURCE=head for v3-YYYY-MM-DD-dc<N>
+	@git fetch origin --tags
+	@git fetch upstream --tags
+	@base="$(DC_TAG_BASE)"; \
+	last=$$(git tag -l "$${base}*" | sed -n "s/^$${base}\([0-9][0-9]*\)$$/\1/p" | sort -n | tail -1); \
+	printf "%s%s\n" "$$base" "$$(( $${last:-0} + 1 ))"
 
-.PHONY: prepare
-prepare: submodules create-build-dirs             ## Fetch submodules and lay out the build tree
-	@echo "=== PMM $(FULL_VERSION) — branch $(GIT_BRANCH) — ROOT_DIR=$(ROOT_DIR) ==="
+.PHONY: dc-release
+dc-release: ## Create and push next release tag; use DC_SOURCE=head for v3-YYYY-MM-DD-dc<N>
+	@git fetch origin --tags
+	@git fetch upstream --tags
+	@base="$(DC_TAG_BASE)"; \
+	last=$$(git tag -l "$${base}*" | sed -n "s/^$${base}\([0-9][0-9]*\)$$/\1/p" | sort -n | tail -1); \
+	tag="$$base$$(( $${last:-0} + 1 ))"; \
+	git tag -a "$$tag" -m "datacosmos PMM $$tag (@ $$(git rev-parse --short HEAD))"; \
+	git push origin "$$tag"
 
-.PHONY: submodules
-submodules:                                       ## git submodule update (component sources)
-	@echo "=== Updating submodules ==="
-	git submodule update --init --recursive --jobs 10
+.PHONY: dc-tag
+dc-tag: dc-release
 
-.PHONY: create-build-dirs
-create-build-dirs:                                ## Create the $(ROOT_DIR) build layout
-	@echo "=== Laying out $(ROOT_DIR) ==="
-	# Rebuilt fresh each run so the layout is idempotent. tmp/source and
-	# tmp/binary are cleared too: stale per-commit tarballs (pmm-<oldsha>.tar.gz)
-	# collide with the current build. tmp/go (the module cache) is kept.
-	@rm -rf $(ROOT_DIR)/sources $(ROOT_DIR)/tmp/source $(ROOT_DIR)/tmp/binary
-	@mkdir -p $(ROOT_DIR)/sources $(ROOT_DIR)/tmp $(ROOT_DIR)/results $(ARTIFACT_DIR)
-	# build-client-srpm / build-client-rpm bind-mount results/ into the
-	# rpmbuild container and create srpm/ and rpm/ subdirs as the container's
-	# 'builder' user, whose uid differs from the host (CI) user that owns the
-	# tree. World-writable results/ lets the container mkdir there; the build
-	# scripts chown the finished srpm/ and rpm/ back to the host user.
-	@chmod 0777 $(ROOT_DIR)/tmp $(ROOT_DIR)/results
-	@echo "$(PMM_VERSION)" > $(ROOT_DIR)/VERSION
-	# Symlink (never copy) each component source from pmm-submodules: copying
-	# breaks the submodule .git gitlinks and litters the build with junk.
-	@for d in $(CURDIR)/pmm-submodules/sources/*; do \
-	    ln -sfn "$$d" "$(ROOT_DIR)/sources/$$(basename $$d)"; \
-	done
-	@ln -sfn $(CURDIR)/pmm-submodules $(ROOT_DIR)/sources/pmm-submodules
-	# THIS repo is the pmm component source. The build scripts run `git` on it
-	# (rev-parse, archive), so it must be a real checkout — a local clone of
-	# this repo at the current commit, in the GOPATH-style path they expect.
-	# Clone by commit, not branch: in CI the repo is checked out at a tag
-	# (detached HEAD), so there is no branch name to clone.
-	@rm -rf $(ROOT_DIR)/sources/pmm
-	@mkdir -p $(ROOT_DIR)/sources/pmm/src/github.com/percona
-	@git clone --local --no-checkout \
-	    $(CURDIR) $(ROOT_DIR)/sources/pmm/src/github.com/percona/pmm
-	@git -C $(ROOT_DIR)/sources/pmm/src/github.com/percona/pmm checkout --detach $(GIT_COMMIT)
-
-.PHONY: build-rpmbuild-image
-build-rpmbuild-image:                             ## Build the rpmbuild image locally (optional; the build uses the upstream image by default)
-	@echo "=== Building local rpmbuild image pmm-rpmbuild:local ==="
-	docker build --pull \
-	    --tag pmm-rpmbuild:local \
-	    --file build/docker/rpmbuild/Dockerfile.el9 \
-	    build/docker/rpmbuild
-
-.PHONY: ghcr-login
-ghcr-login:                                       ## Log in to ghcr.io (CI: GITHUB_TOKEN; local: gh CLI)
-	# In GitHub Actions the gh CLI runs as GITHUB_TOKEN, which is not a user
-	# ('gh api user' fails) — log in with GITHUB_ACTOR + the token instead.
-	@if [ -n "$$GITHUB_ACTIONS" ]; then \
-	    echo "$$GH_TOKEN" | docker login ghcr.io -u "$$GITHUB_ACTOR" --password-stdin; \
-	else \
-	    gh auth token | docker login ghcr.io -u "$$(gh api user --jq .login)" --password-stdin; \
-	fi
-
-.PHONY: buildx-setup
-buildx-setup:                                     ## Ensure a multi-arch buildx builder exists
-	@docker buildx inspect $(BUILDX_BUILDER) >/dev/null 2>&1 \
-	    || docker buildx create --name $(BUILDX_BUILDER) --driver docker-container --bootstrap
-
-.PHONY: publish-rpmbuild-image
-publish-rpmbuild-image: ghcr-login buildx-setup   ## Build & push multi-arch pmm-rpmbuild to ghcr.io
-	docker buildx build --builder $(BUILDX_BUILDER) \
-	    --platform $(PLATFORMS) \
-	    --tag $(RPMBUILD_PUBLISH_IMAGE) \
-	    --file build/docker/rpmbuild/Dockerfile.el9 \
-	    --push \
-	    build/docker/rpmbuild
-	@echo "Published multi-arch $(RPMBUILD_PUBLISH_IMAGE) ($(PLATFORMS))"
-
-.PHONY: publish-client-image
-publish-client-image: ghcr-login                  ## Push pmm-client (host arch) to ghcr.io as -dcN[-arch]
+.PHONY: dc-build
+dc-build: .dc-prepare .dc-login ## Build, push per-arch images, and collect artifacts
+	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) \
+		$(CURDIR)/build/scripts/build-client
+	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) RPMBUILD_DIST=$(DIST) DOCKER_TAG=$(SERVER_IMAGE) \
+		$(CURDIR)/build/scripts/build-server
 	docker tag $(CLIENT_IMAGE) $(CLIENT_PUBLISH_IMAGE)
-	docker push $(CLIENT_PUBLISH_IMAGE)
-	@echo "Published $(CLIENT_PUBLISH_IMAGE)"
-
-.PHONY: publish-server-image
-publish-server-image: ghcr-login                  ## Push pmm-server (host arch) to ghcr.io as -dcN[-arch]
 	docker tag $(SERVER_IMAGE) $(SERVER_PUBLISH_IMAGE)
+	docker push $(CLIENT_PUBLISH_IMAGE)
 	docker push $(SERVER_PUBLISH_IMAGE)
-	@echo "Published $(SERVER_PUBLISH_IMAGE)"
+	mkdir -p $(ARTIFACT_DIR)/server-rpms
+	cp -a $(ROOT_DIR)/results/. $(ARTIFACT_DIR)/ 2>/dev/null || true
+	find $(ROOT_DIR)/tmp/pmm-server/RPMS -name '*.rpm' -type f \
+		-exec cp -f {} $(ARTIFACT_DIR)/server-rpms/ \; 2>/dev/null || true
+	echo "Artifacts in $(ARTIFACT_DIR)"
 
-.PHONY: publish-manifests
-publish-manifests: ghcr-login                     ## Merge per-arch pmm-client/server images into multi-arch tags
-	docker buildx imagetools create --tag $(GHCR_NAMESPACE)/pmm-client:$(DC_VERSION) \
-	    $(GHCR_NAMESPACE)/pmm-client:$(DC_VERSION)-amd64 \
-	    $(GHCR_NAMESPACE)/pmm-client:$(DC_VERSION)-arm64
-	docker buildx imagetools create --tag $(GHCR_NAMESPACE)/pmm-server:$(DC_VERSION) \
-	    $(GHCR_NAMESPACE)/pmm-server:$(DC_VERSION)-amd64 \
-	    $(GHCR_NAMESPACE)/pmm-server:$(DC_VERSION)-arm64
-	@echo "Published multi-arch pmm-client and pmm-server :$(DC_VERSION)"
+.PHONY: dc-artifacts
+dc-artifacts:
+	mkdir -p $(ARTIFACT_DIR)/server-rpms
+	cp -a $(ROOT_DIR)/results/. $(ARTIFACT_DIR)/ 2>/dev/null || true
+	find $(ROOT_DIR)/tmp/pmm-server/RPMS -name '*.rpm' -type f \
+		-exec cp -f {} $(ARTIFACT_DIR)/server-rpms/ \; 2>/dev/null || true
+	echo "Artifacts in $(ARTIFACT_DIR)"
 
-.PHONY: client
-client: create-build-dirs                         ## Build pmm-client RPM/tarball + Docker image
-	@echo "=== Building pmm-client (local) ==="
-	cd $(ROOT_DIR) && \
-	ROOT_DIR=$(ROOT_DIR) \
-	DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) \
-	    $(CURDIR)/$(PATH_TO_SCRIPTS)/build-client
+.PHONY: dc-clean
+dc-clean: ## Remove datacosmos external build and artifact dirs
+	rm -rf $(ROOT_DIR) $(ARTIFACT_DIR)
 
-.PHONY: server
-server: create-build-dirs                         ## Build pmm-server RPMs + Docker image
-	@echo "=== Building pmm-server (local) ==="
-	cd $(ROOT_DIR) && \
-	ROOT_DIR=$(ROOT_DIR) \
-	RPMBUILD_DIST=$(DIST) \
-	DOCKER_TAG=$(SERVER_IMAGE) \
-	    $(CURDIR)/$(PATH_TO_SCRIPTS)/build-server
+.PHONY: .dc-prepare
+.dc-prepare:
+	git submodule update --init --recursive --jobs 10
+	rm -rf $(ROOT_DIR)/sources $(ROOT_DIR)/tmp/source $(ROOT_DIR)/tmp/binary
+	mkdir -p $(ROOT_DIR)/sources $(ROOT_DIR)/tmp $(ROOT_DIR)/results $(ARTIFACT_DIR)
+	chmod 0777 $(ROOT_DIR)/tmp $(ROOT_DIR)/results
+	echo "$(PMM_VERSION)" > $(ROOT_DIR)/VERSION
+	for d in $(CURDIR)/pmm-submodules/sources/*; do \
+		ln -sfn "$$d" "$(ROOT_DIR)/sources/$$(basename $$d)"; \
+	done
+	ln -sfn $(CURDIR)/pmm-submodules $(ROOT_DIR)/sources/pmm-submodules
+	rm -rf $(ROOT_DIR)/sources/pmm
+	mkdir -p $(ROOT_DIR)/sources/pmm/src/github.com/percona
+	git clone --local --no-checkout $(CURDIR) $(ROOT_DIR)/sources/pmm/src/github.com/percona/pmm
+	git -C $(ROOT_DIR)/sources/pmm/src/github.com/percona/pmm checkout --detach $$(git rev-parse HEAD)
 
-.PHONY: publish
-publish:                                          ## Collect build artifacts into $(ARTIFACT_DIR)
-	@mkdir -p $(ARTIFACT_DIR)/server-rpms
-	@cp -a $(ROOT_DIR)/results/. $(ARTIFACT_DIR)/ 2>/dev/null || true
-	# Server-side RPMs (grafana, victoriametrics, pmm-managed, percona-qan-api2,
-	# vmproxy, percona-dashboards, pmm-dump) are built under tmp/pmm-server/RPMS,
-	# outside results/ — collect them so the GitHub Release carries every RPM.
-	@find $(ROOT_DIR)/tmp/pmm-server/RPMS -name '*.rpm' -type f \
-	    -exec cp -f {} $(ARTIFACT_DIR)/server-rpms/ \; 2>/dev/null || true
-	@echo "Artifacts in $(ARTIFACT_DIR)"
-
-.PHONY: clean
-clean:                                            ## Remove the build tree and artifacts
-	@echo "=== Cleaning $(ROOT_DIR) and $(ARTIFACT_DIR) ==="
-	@rm -rf $(ROOT_DIR) $(ARTIFACT_DIR)
+.PHONY: .dc-login
+.dc-login:
+	@if [ -n "$$GITHUB_ACTIONS" ]; then \
+		echo "$$GH_TOKEN" | docker login ghcr.io -u "$$GITHUB_ACTOR" --password-stdin; \
+	else \
+		gh auth token | docker login ghcr.io -u "$$(gh api user --jq .login)" --password-stdin; \
+	fi

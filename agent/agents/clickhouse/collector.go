@@ -39,6 +39,9 @@ const (
 	prefixAsyncMetrics   = "ClickHouseAsyncMetrics_"
 	prefixProfileEvents  = "ClickHouseProfileEvents_"
 	exporterScrapePrefix = "clickhouse_exporter_"
+
+	systemMetricColumn = "metric"
+	systemEventColumn  = "event"
 )
 
 // scrapeTimeout bounds a single /metrics scrape of the ClickHouse server.
@@ -57,9 +60,9 @@ type systemTable struct {
 // populated on a fresh server — unlike system.query_log, which is empty until
 // the server has served traffic.
 var systemTables = []systemTable{
-	{"system.metrics", "metric", prefixMetrics, prometheus.GaugeValue},
-	{"system.asynchronous_metrics", "metric", prefixAsyncMetrics, prometheus.GaugeValue},
-	{"system.events", "event", prefixProfileEvents, prometheus.CounterValue},
+	{"system.metrics", systemMetricColumn, prefixMetrics, prometheus.GaugeValue},
+	{"system.asynchronous_metrics", systemMetricColumn, prefixAsyncMetrics, prometheus.GaugeValue},
+	{"system.events", systemEventColumn, prefixProfileEvents, prometheus.CounterValue},
 }
 
 // Collector is an unchecked Prometheus collector: the concrete metric names are

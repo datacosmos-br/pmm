@@ -58,6 +58,10 @@ var metricsSourceValues = map[string]string{
 
 // AddClickHouseCommand is used by Kong for CLI flags and commands.
 type AddClickHouseCommand struct {
+	AddCommonFlags
+	flags.MetricsModeFlags
+	flags.LogLevelNoFatalFlags
+
 	ServiceName         string            `name:"name" arg:"" default:"${hostname}-clickhouse" help:"Service name (autodetected default: ${hostname}-clickhouse)"`
 	Address             string            `arg:"" optional:"" help:"ClickHouse address and port (default: 127.0.0.1:9000)"`
 	Socket              string            `help:"Path to ClickHouse socket"`
@@ -82,10 +86,6 @@ type AddClickHouseCommand struct {
 	DisableCollectors   []string          `help:"Comma-separated list of collector names to exclude from exporter"`
 	ExposeExporter      bool              `name:"expose-exporter" help:"Optionally expose the address of the exporter publicly on 0.0.0.0"`
 	QAN                 bool              `name:"qan" help:"Enable Query Analytics"`
-
-	AddCommonFlags
-	flags.MetricsModeFlags
-	flags.LogLevelNoFatalFlags
 }
 
 // GetServiceName returns the service name for AddClickHouseCommand.
@@ -180,7 +180,7 @@ func (cmd *AddClickHouseCommand) RunCmd() (commands.Result, error) {
 				TLSKey:            tlsKey,
 				MetricsMode:       cmd.MetricsMode.EnumValue(),
 				LogLevel:          cmd.LogLevel.EnumValue(),
-				MetricsSource:     pointer.ToString(metricsSource),
+				MetricsSource:     new(metricsSource),
 				NativeMetricsPort: int64(cmd.NativeMetricsPort),
 				Protocol:          cmd.Protocol,
 			},

@@ -57,11 +57,12 @@ func TestClickHouseExplainActionIntegration(t *testing.T) {
 	if err != nil {
 		t.Skipf("clickhouse driver open failed, skipping: %v", err)
 	}
-	defer db.Close() //nolint:errcheck
+	defer db.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	if err := db.PingContext(ctx); err != nil {
+	err = db.PingContext(ctx)
+	if err != nil {
 		t.Skipf("clickhouse %s unreachable, skipping: %v", dsn, err)
 	}
 
@@ -71,7 +72,9 @@ func TestClickHouseExplainActionIntegration(t *testing.T) {
 	_, err = db.ExecContext(ctx, "CREATE TABLE IF NOT EXISTS "+tbl+" (id UInt64) ENGINE = MergeTree ORDER BY id")
 	require.NoError(t, err)
 	t.Cleanup(func() {
-		_, _ = db.Exec("DROP TABLE IF EXISTS " + tbl) //nolint:errcheck
+		cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cleanupCancel()
+		_, _ = db.ExecContext(cleanupCtx, "DROP TABLE IF EXISTS "+tbl)
 	})
 	_, err = db.ExecContext(ctx, "INSERT INTO "+tbl+" SELECT number FROM numbers(10)")
 	require.NoError(t, err)

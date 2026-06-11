@@ -1,14 +1,14 @@
 name: datacosmos release
 
 # The only build/publish workflow on the datacosmos fork. Triggered by a
-# datacosmos version tag (v3-*), it builds the PMM packages and Docker images
+# datacosmos version tag, it builds the PMM packages and Docker images
 # from source for BOTH linux/amd64 and linux/arm64 — each on its native
 # runner — then merges them into multi-arch images and a GitHub Release.
 on:
   push:
     tags:
-      - "v3-*"      # legacy date scheme: v3-<date>-<count>
       - "v*-dc*"    # semver-dcN scheme: v3.8.0-dc2
+      - "v3-*"      # legacy date scheme: v3-<date>-<count>
   workflow_dispatch:
     inputs:
       dc_version:
@@ -86,17 +86,10 @@ jobs:
       # build-server-rpm's is_build_needed reuses upstream's public RPM cache
       # (s3://pmm-build-cache) — Grafana et al. come down prebuilt.
       - name: Build pmm-client and pmm-server (native)
-        run: make -f Makefile.datacosmos client server
-
-      - name: Publish per-arch images to ghcr.io
         env:
           DC_VERSION: ${{ steps.ver.outputs.dc_version }}
         run: |
-          make -f Makefile.datacosmos publish-client-image publish-server-image \
-            DC_VERSION="${DC_VERSION}" IMAGE_ARCH="${MATRIX_ARCH}"
-
-      - name: Collect build artifacts
-        run: make -f Makefile.datacosmos publish
+          make dc-build DC_VERSION="${DC_VERSION}" IMAGE_ARCH="${MATRIX_ARCH}"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -131,7 +124,7 @@ jobs:
       - name: Merge per-arch images into multi-arch tags
         env:
           DC_VERSION: ${{ steps.ver.outputs.dc_version }}
-        run: make -f Makefile.datacosmos publish-manifests DC_VERSION="${DC_VERSION}"
+        run: make dc-publish DC_VERSION="${DC_VERSION}"
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -163,7 +156,6 @@ jobs:
           Images:
           - ghcr.io/datacosmos-br/pmm-server:${DC_VERSION}
           - ghcr.io/datacosmos-br/pmm-client:${DC_VERSION}
-          - ghcr.io/datacosmos-br/pmm-rpmbuild:${DC_VERSION}
 
           Release assets: pmm-client tarballs and every generated RPM
           (pmm-client, pmm-managed, percona-qan-api2, vmproxy, pmm-dump,

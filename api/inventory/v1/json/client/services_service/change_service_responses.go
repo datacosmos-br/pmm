@@ -101,7 +101,6 @@ func (o *ChangeServiceOK) GetPayload() *ChangeServiceOKBody {
 }
 
 func (o *ChangeServiceOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
 	o.Payload = new(ChangeServiceOKBody)
 
 	// response payload
@@ -175,7 +174,6 @@ func (o *ChangeServiceDefault) GetPayload() *ChangeServiceDefaultBody {
 }
 
 func (o *ChangeServiceDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
 	o.Payload = new(ChangeServiceDefaultBody)
 
 	// response payload
@@ -191,7 +189,6 @@ ChangeServiceBody change service body
 swagger:model ChangeServiceBody
 */
 type ChangeServiceBody struct {
-
 	// environment
 	Environment *string `json:"environment,omitempty"`
 
@@ -260,7 +257,6 @@ func (o *ChangeServiceBody) ContextValidate(ctx context.Context, formats strfmt.
 }
 
 func (o *ChangeServiceBody) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -307,7 +303,6 @@ ChangeServiceDefaultBody change service default body
 swagger:model ChangeServiceDefaultBody
 */
 type ChangeServiceDefaultBody struct {
-
 	// code
 	Code int32 `json:"code,omitempty"`
 
@@ -377,9 +372,7 @@ func (o *ChangeServiceDefaultBody) ContextValidate(ctx context.Context, formats 
 }
 
 func (o *ChangeServiceDefaultBody) contextValidateDetails(ctx context.Context, formats strfmt.Registry) error {
-
 	for i := 0; i < len(o.Details); i++ {
-
 		if o.Details[i] != nil {
 
 			if swag.IsZero(o.Details[i]) { // not required
@@ -399,7 +392,6 @@ func (o *ChangeServiceDefaultBody) contextValidateDetails(ctx context.Context, f
 				return err
 			}
 		}
-
 	}
 
 	return nil
@@ -428,7 +420,6 @@ ChangeServiceDefaultBodyDetailsItems0 change service default body details items0
 swagger:model ChangeServiceDefaultBodyDetailsItems0
 */
 type ChangeServiceDefaultBodyDetailsItems0 struct {
-
 	// at type
 	AtType string `json:"@type,omitempty"`
 
@@ -440,7 +431,6 @@ type ChangeServiceDefaultBodyDetailsItems0 struct {
 func (o *ChangeServiceDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 	// stage 1, bind the properties
 	var stage1 struct {
-
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -478,7 +468,6 @@ func (o *ChangeServiceDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error
 // MarshalJSON marshals this object with additional properties into a JSON object
 func (o ChangeServiceDefaultBodyDetailsItems0) MarshalJSON() ([]byte, error) {
 	var stage1 struct {
-
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -542,7 +531,6 @@ ChangeServiceOKBody change service OK body
 swagger:model ChangeServiceOKBody
 */
 type ChangeServiceOKBody struct {
-
 	// clickhouse
 	Clickhouse *ChangeServiceOKBodyClickhouse `json:"clickhouse,omitempty"`
 
@@ -837,7 +825,6 @@ func (o *ChangeServiceOKBody) ContextValidate(ctx context.Context, formats strfm
 }
 
 func (o *ChangeServiceOKBody) contextValidateClickhouse(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.Clickhouse != nil {
 
 		if swag.IsZero(o.Clickhouse) { // not required
@@ -862,7 +849,6 @@ func (o *ChangeServiceOKBody) contextValidateClickhouse(ctx context.Context, for
 }
 
 func (o *ChangeServiceOKBody) contextValidateExternal(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.External != nil {
 
 		if swag.IsZero(o.External) { // not required
@@ -887,7 +873,6 @@ func (o *ChangeServiceOKBody) contextValidateExternal(ctx context.Context, forma
 }
 
 func (o *ChangeServiceOKBody) contextValidateHaproxy(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.Haproxy != nil {
 
 		if swag.IsZero(o.Haproxy) { // not required
@@ -912,7 +897,6 @@ func (o *ChangeServiceOKBody) contextValidateHaproxy(ctx context.Context, format
 }
 
 func (o *ChangeServiceOKBody) contextValidateMongodb(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.Mongodb != nil {
 
 		if swag.IsZero(o.Mongodb) { // not required
@@ -937,7 +921,6 @@ func (o *ChangeServiceOKBody) contextValidateMongodb(ctx context.Context, format
 }
 
 func (o *ChangeServiceOKBody) contextValidateMysql(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.Mysql != nil {
 
 		if swag.IsZero(o.Mysql) { // not required
@@ -962,7 +945,6 @@ func (o *ChangeServiceOKBody) contextValidateMysql(ctx context.Context, formats 
 }
 
 func (o *ChangeServiceOKBody) contextValidatePostgresql(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.Postgresql != nil {
 
 		if swag.IsZero(o.Postgresql) { // not required
@@ -987,7 +969,6 @@ func (o *ChangeServiceOKBody) contextValidatePostgresql(ctx context.Context, for
 }
 
 func (o *ChangeServiceOKBody) contextValidateProxysql(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.Proxysql != nil {
 
 		if swag.IsZero(o.Proxysql) { // not required
@@ -1012,7 +993,6 @@ func (o *ChangeServiceOKBody) contextValidateProxysql(ctx context.Context, forma
 }
 
 func (o *ChangeServiceOKBody) contextValidateValkey(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.Valkey != nil {
 
 		if swag.IsZero(o.Valkey) { // not required
@@ -1059,7 +1039,6 @@ ChangeServiceOKBodyClickhouse ClickHouseService represents a generic ClickHouse 
 swagger:model ChangeServiceOKBodyClickhouse
 */
 type ChangeServiceOKBodyClickhouse struct {
-
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1133,7 +1112,6 @@ ChangeServiceOKBodyExternal ExternalService represents a generic External servic
 swagger:model ChangeServiceOKBodyExternal
 */
 type ChangeServiceOKBodyExternal struct {
-
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1198,7 +1176,6 @@ ChangeServiceOKBodyHaproxy HAProxyService represents a generic HAProxy service i
 swagger:model ChangeServiceOKBodyHaproxy
 */
 type ChangeServiceOKBodyHaproxy struct {
-
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1254,7 +1231,6 @@ ChangeServiceOKBodyMongodb MongoDBService represents a generic MongoDB instance.
 swagger:model ChangeServiceOKBodyMongodb
 */
 type ChangeServiceOKBodyMongodb struct {
-
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1325,7 +1301,6 @@ ChangeServiceOKBodyMysql MySQLService represents a generic MySQL instance.
 swagger:model ChangeServiceOKBodyMysql
 */
 type ChangeServiceOKBodyMysql struct {
-
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1399,7 +1374,6 @@ ChangeServiceOKBodyPostgresql PostgreSQLService represents a generic PostgreSQL 
 swagger:model ChangeServiceOKBodyPostgresql
 */
 type ChangeServiceOKBodyPostgresql struct {
-
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1476,7 +1450,6 @@ ChangeServiceOKBodyProxysql ProxySQLService represents a generic ProxySQL instan
 swagger:model ChangeServiceOKBodyProxysql
 */
 type ChangeServiceOKBodyProxysql struct {
-
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1547,7 +1520,6 @@ ChangeServiceOKBodyValkey ValkeyService represents a generic Valkey instance.
 swagger:model ChangeServiceOKBodyValkey
 */
 type ChangeServiceOKBodyValkey struct {
-
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1618,7 +1590,6 @@ ChangeServiceParamsBodyCustomLabels A wrapper for map[string]string. This type a
 swagger:model ChangeServiceParamsBodyCustomLabels
 */
 type ChangeServiceParamsBodyCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }

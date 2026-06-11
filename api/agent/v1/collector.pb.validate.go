@@ -271,7 +271,8 @@ func (e MetricsBucketValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause)
+		cause,
+	)
 }
 
 var _ error = MetricsBucketValidationError{}
@@ -375,7 +376,8 @@ func (e HistogramItemValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause)
+		cause,
+	)
 }
 
 var _ error = HistogramItemValidationError{}
@@ -527,7 +529,8 @@ func (e MetricsBucket_CommonValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause)
+		cause,
+	)
 }
 
 var _ error = MetricsBucket_CommonValidationError{}
@@ -859,7 +862,8 @@ func (e MetricsBucket_MySQLValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause)
+		cause,
+	)
 }
 
 var _ error = MetricsBucket_MySQLValidationError{}
@@ -1069,7 +1073,8 @@ func (e MetricsBucket_MongoDBValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause)
+		cause,
+	)
 }
 
 var _ error = MetricsBucket_MongoDBValidationError{}
@@ -1321,7 +1326,8 @@ func (e MetricsBucket_PostgreSQLValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause)
+		cause,
+	)
 }
 
 var _ error = MetricsBucket_PostgreSQLValidationError{}
@@ -1495,7 +1501,8 @@ func (e MetricsBucket_ClickHouseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause)
+		cause,
+	)
 }
 
 var _ error = MetricsBucket_ClickHouseValidationError{}

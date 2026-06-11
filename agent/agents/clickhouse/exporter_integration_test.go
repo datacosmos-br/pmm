@@ -119,7 +119,8 @@ func TestClickHouseExporterMatrix(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			cmd := exec.CommandContext(ctx, binPath, //nolint:gosec // binPath comes from the test harness
+			cmd := exec.CommandContext(
+				ctx, binPath, //nolint:gosec // binPath comes from the test harness
 				"--clickhouse.dsn="+dsn,
 				"--web.listen-address="+listenAddr,
 				"--web.telemetry-path=/metrics",

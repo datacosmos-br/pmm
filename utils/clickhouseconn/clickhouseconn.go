@@ -16,11 +16,24 @@
 package clickhouseconn
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"net/url"
 	"strconv"
 	"strings"
+)
+
+const (
+	protocolNative = "native"
+	protocolHTTP   = "http"
+	protocolHTTPS  = "https"
+
+	schemeClickHouse = "clickhouse"
+
+	defaultHTTPPort   uint16 = 8123
+	defaultHTTPSPort  uint16 = 8443
+	defaultNativePort uint16 = 9000
 )
 
 // Config holds ClickHouse connection configuration.
@@ -46,12 +59,12 @@ type Config struct {
 // Returns an error for unknown values.
 func ParseProtocol(raw string) (string, error) {
 	switch strings.TrimSpace(strings.ToLower(raw)) {
-	case "", "native":
-		return "native", nil
-	case "http":
-		return "http", nil
-	case "https":
-		return "https", nil
+	case "", protocolNative:
+		return protocolNative, nil
+	case protocolHTTP:
+		return protocolHTTP, nil
+	case protocolHTTPS:
+		return protocolHTTPS, nil
 	default:
 		return "", fmt.Errorf("unknown clickhouse protocol: %q", raw)
 	}
@@ -60,27 +73,27 @@ func ParseProtocol(raw string) (string, error) {
 // Scheme returns the URI scheme for the configured protocol.
 func (c *Config) Scheme() string {
 	switch c.Protocol {
-	case "http":
-		return "http"
-	case "https":
-		return "https"
+	case protocolHTTP:
+		return protocolHTTP
+	case protocolHTTPS:
+		return protocolHTTPS
 	default:
-		return "clickhouse"
+		return schemeClickHouse
 	}
 }
 
 // ExporterScheme returns the scheme used by exporters.
 // It returns "https" if Protocol is "https" or if Protocol is empty and TLS is enabled, else "http".
 func (c *Config) ExporterScheme() string {
-	if c.Protocol == "https" || (c.Protocol == "" && c.TLS) {
-		return "https"
+	if c.Protocol == protocolHTTPS || (c.Protocol == "" && c.TLS) {
+		return protocolHTTPS
 	}
-	return "http"
+	return protocolHTTP
 }
 
 // IsSecure returns true when the connection should use TLS.
 func (c *Config) IsSecure() bool {
-	return c.Protocol == "https" || c.TLS
+	return c.Protocol == protocolHTTPS || c.TLS
 }
 
 // effectivePort returns the configured Port if non-zero,
@@ -90,19 +103,19 @@ func (c *Config) effectivePort() uint16 {
 		return c.Port
 	}
 	switch c.Protocol {
-	case "http":
-		return 8123
-	case "https":
-		return 8443
+	case protocolHTTP:
+		return defaultHTTPPort
+	case protocolHTTPS:
+		return defaultHTTPSPort
 	default:
-		return 9000
+		return defaultNativePort
 	}
 }
 
 // DSN builds a ClickHouse DSN string from the configuration.
 func (c *Config) DSN() (string, error) {
 	if c.Host == "" {
-		return "", fmt.Errorf("clickhouse host is required")
+		return "", errors.New("clickhouse host is required")
 	}
 
 	u := &url.URL{

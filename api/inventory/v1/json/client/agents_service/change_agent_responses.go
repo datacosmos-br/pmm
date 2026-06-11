@@ -102,7 +102,6 @@ func (o *ChangeAgentOK) GetPayload() *ChangeAgentOKBody {
 }
 
 func (o *ChangeAgentOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
 	o.Payload = new(ChangeAgentOKBody)
 
 	// response payload
@@ -176,7 +175,6 @@ func (o *ChangeAgentDefault) GetPayload() *ChangeAgentDefaultBody {
 }
 
 func (o *ChangeAgentDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
 	o.Payload = new(ChangeAgentDefaultBody)
 
 	// response payload
@@ -192,7 +190,6 @@ ChangeAgentBody change agent body
 swagger:model ChangeAgentBody
 */
 type ChangeAgentBody struct {
-
 	// azure database exporter
 	AzureDatabaseExporter *ChangeAgentParamsBodyAzureDatabaseExporter `json:"azure_database_exporter,omitempty"`
 
@@ -861,7 +858,6 @@ func (o *ChangeAgentBody) ContextValidate(ctx context.Context, formats strfmt.Re
 }
 
 func (o *ChangeAgentBody) contextValidateAzureDatabaseExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.AzureDatabaseExporter != nil {
 
 		if swag.IsZero(o.AzureDatabaseExporter) { // not required
@@ -886,7 +882,6 @@ func (o *ChangeAgentBody) contextValidateAzureDatabaseExporter(ctx context.Conte
 }
 
 func (o *ChangeAgentBody) contextValidateClickhouseExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.ClickhouseExporter != nil {
 
 		if swag.IsZero(o.ClickhouseExporter) { // not required
@@ -911,7 +906,6 @@ func (o *ChangeAgentBody) contextValidateClickhouseExporter(ctx context.Context,
 }
 
 func (o *ChangeAgentBody) contextValidateExternalExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.ExternalExporter != nil {
 
 		if swag.IsZero(o.ExternalExporter) { // not required
@@ -936,7 +930,6 @@ func (o *ChangeAgentBody) contextValidateExternalExporter(ctx context.Context, f
 }
 
 func (o *ChangeAgentBody) contextValidateMongodbExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MongodbExporter != nil {
 
 		if swag.IsZero(o.MongodbExporter) { // not required
@@ -961,7 +954,6 @@ func (o *ChangeAgentBody) contextValidateMongodbExporter(ctx context.Context, fo
 }
 
 func (o *ChangeAgentBody) contextValidateMysqldExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MysqldExporter != nil {
 
 		if swag.IsZero(o.MysqldExporter) { // not required
@@ -986,7 +978,6 @@ func (o *ChangeAgentBody) contextValidateMysqldExporter(ctx context.Context, for
 }
 
 func (o *ChangeAgentBody) contextValidateNodeExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.NodeExporter != nil {
 
 		if swag.IsZero(o.NodeExporter) { // not required
@@ -1011,7 +1002,6 @@ func (o *ChangeAgentBody) contextValidateNodeExporter(ctx context.Context, forma
 }
 
 func (o *ChangeAgentBody) contextValidateNomadAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.NomadAgent != nil {
 
 		if swag.IsZero(o.NomadAgent) { // not required
@@ -1036,7 +1026,6 @@ func (o *ChangeAgentBody) contextValidateNomadAgent(ctx context.Context, formats
 }
 
 func (o *ChangeAgentBody) contextValidatePostgresExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.PostgresExporter != nil {
 
 		if swag.IsZero(o.PostgresExporter) { // not required
@@ -1061,7 +1050,6 @@ func (o *ChangeAgentBody) contextValidatePostgresExporter(ctx context.Context, f
 }
 
 func (o *ChangeAgentBody) contextValidateProxysqlExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.ProxysqlExporter != nil {
 
 		if swag.IsZero(o.ProxysqlExporter) { // not required
@@ -1086,7 +1074,6 @@ func (o *ChangeAgentBody) contextValidateProxysqlExporter(ctx context.Context, f
 }
 
 func (o *ChangeAgentBody) contextValidateQANClickhouseQuerylogAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANClickhouseQuerylogAgent != nil {
 
 		if swag.IsZero(o.QANClickhouseQuerylogAgent) { // not required
@@ -1111,7 +1098,6 @@ func (o *ChangeAgentBody) contextValidateQANClickhouseQuerylogAgent(ctx context.
 }
 
 func (o *ChangeAgentBody) contextValidateQANMongodbMongologAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANMongodbMongologAgent != nil {
 
 		if swag.IsZero(o.QANMongodbMongologAgent) { // not required
@@ -1136,7 +1122,6 @@ func (o *ChangeAgentBody) contextValidateQANMongodbMongologAgent(ctx context.Con
 }
 
 func (o *ChangeAgentBody) contextValidateQANMongodbProfilerAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANMongodbProfilerAgent != nil {
 
 		if swag.IsZero(o.QANMongodbProfilerAgent) { // not required
@@ -1161,7 +1146,6 @@ func (o *ChangeAgentBody) contextValidateQANMongodbProfilerAgent(ctx context.Con
 }
 
 func (o *ChangeAgentBody) contextValidateQANMysqlPerfschemaAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANMysqlPerfschemaAgent != nil {
 
 		if swag.IsZero(o.QANMysqlPerfschemaAgent) { // not required
@@ -1186,7 +1170,6 @@ func (o *ChangeAgentBody) contextValidateQANMysqlPerfschemaAgent(ctx context.Con
 }
 
 func (o *ChangeAgentBody) contextValidateQANMysqlSlowlogAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANMysqlSlowlogAgent != nil {
 
 		if swag.IsZero(o.QANMysqlSlowlogAgent) { // not required
@@ -1211,7 +1194,6 @@ func (o *ChangeAgentBody) contextValidateQANMysqlSlowlogAgent(ctx context.Contex
 }
 
 func (o *ChangeAgentBody) contextValidateQANPostgresqlPgstatementsAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANPostgresqlPgstatementsAgent != nil {
 
 		if swag.IsZero(o.QANPostgresqlPgstatementsAgent) { // not required
@@ -1236,7 +1218,6 @@ func (o *ChangeAgentBody) contextValidateQANPostgresqlPgstatementsAgent(ctx cont
 }
 
 func (o *ChangeAgentBody) contextValidateQANPostgresqlPgstatmonitorAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANPostgresqlPgstatmonitorAgent != nil {
 
 		if swag.IsZero(o.QANPostgresqlPgstatmonitorAgent) { // not required
@@ -1261,7 +1242,6 @@ func (o *ChangeAgentBody) contextValidateQANPostgresqlPgstatmonitorAgent(ctx con
 }
 
 func (o *ChangeAgentBody) contextValidateRDSExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.RDSExporter != nil {
 
 		if swag.IsZero(o.RDSExporter) { // not required
@@ -1286,7 +1266,6 @@ func (o *ChangeAgentBody) contextValidateRDSExporter(ctx context.Context, format
 }
 
 func (o *ChangeAgentBody) contextValidateRtaMongodbAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.RtaMongodbAgent != nil {
 
 		if swag.IsZero(o.RtaMongodbAgent) { // not required
@@ -1311,7 +1290,6 @@ func (o *ChangeAgentBody) contextValidateRtaMongodbAgent(ctx context.Context, fo
 }
 
 func (o *ChangeAgentBody) contextValidateValkeyExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.ValkeyExporter != nil {
 
 		if swag.IsZero(o.ValkeyExporter) { // not required
@@ -1358,7 +1336,6 @@ ChangeAgentDefaultBody change agent default body
 swagger:model ChangeAgentDefaultBody
 */
 type ChangeAgentDefaultBody struct {
-
 	// code
 	Code int32 `json:"code,omitempty"`
 
@@ -1428,9 +1405,7 @@ func (o *ChangeAgentDefaultBody) ContextValidate(ctx context.Context, formats st
 }
 
 func (o *ChangeAgentDefaultBody) contextValidateDetails(ctx context.Context, formats strfmt.Registry) error {
-
 	for i := 0; i < len(o.Details); i++ {
-
 		if o.Details[i] != nil {
 
 			if swag.IsZero(o.Details[i]) { // not required
@@ -1450,7 +1425,6 @@ func (o *ChangeAgentDefaultBody) contextValidateDetails(ctx context.Context, for
 				return err
 			}
 		}
-
 	}
 
 	return nil
@@ -1479,7 +1453,6 @@ ChangeAgentDefaultBodyDetailsItems0 change agent default body details items0
 swagger:model ChangeAgentDefaultBodyDetailsItems0
 */
 type ChangeAgentDefaultBodyDetailsItems0 struct {
-
 	// at type
 	AtType string `json:"@type,omitempty"`
 
@@ -1491,7 +1464,6 @@ type ChangeAgentDefaultBodyDetailsItems0 struct {
 func (o *ChangeAgentDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 	// stage 1, bind the properties
 	var stage1 struct {
-
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -1529,7 +1501,6 @@ func (o *ChangeAgentDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 // MarshalJSON marshals this object with additional properties into a JSON object
 func (o ChangeAgentDefaultBodyDetailsItems0) MarshalJSON() ([]byte, error) {
 	var stage1 struct {
-
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -1593,7 +1564,6 @@ ChangeAgentOKBody change agent OK body
 swagger:model ChangeAgentOKBody
 */
 type ChangeAgentOKBody struct {
-
 	// azure database exporter
 	AzureDatabaseExporter *ChangeAgentOKBodyAzureDatabaseExporter `json:"azure_database_exporter,omitempty"`
 
@@ -2262,7 +2232,6 @@ func (o *ChangeAgentOKBody) ContextValidate(ctx context.Context, formats strfmt.
 }
 
 func (o *ChangeAgentOKBody) contextValidateAzureDatabaseExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.AzureDatabaseExporter != nil {
 
 		if swag.IsZero(o.AzureDatabaseExporter) { // not required
@@ -2287,7 +2256,6 @@ func (o *ChangeAgentOKBody) contextValidateAzureDatabaseExporter(ctx context.Con
 }
 
 func (o *ChangeAgentOKBody) contextValidateClickhouseExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.ClickhouseExporter != nil {
 
 		if swag.IsZero(o.ClickhouseExporter) { // not required
@@ -2312,7 +2280,6 @@ func (o *ChangeAgentOKBody) contextValidateClickhouseExporter(ctx context.Contex
 }
 
 func (o *ChangeAgentOKBody) contextValidateExternalExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.ExternalExporter != nil {
 
 		if swag.IsZero(o.ExternalExporter) { // not required
@@ -2337,7 +2304,6 @@ func (o *ChangeAgentOKBody) contextValidateExternalExporter(ctx context.Context,
 }
 
 func (o *ChangeAgentOKBody) contextValidateMongodbExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MongodbExporter != nil {
 
 		if swag.IsZero(o.MongodbExporter) { // not required
@@ -2362,7 +2328,6 @@ func (o *ChangeAgentOKBody) contextValidateMongodbExporter(ctx context.Context, 
 }
 
 func (o *ChangeAgentOKBody) contextValidateMysqldExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MysqldExporter != nil {
 
 		if swag.IsZero(o.MysqldExporter) { // not required
@@ -2387,7 +2352,6 @@ func (o *ChangeAgentOKBody) contextValidateMysqldExporter(ctx context.Context, f
 }
 
 func (o *ChangeAgentOKBody) contextValidateNodeExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.NodeExporter != nil {
 
 		if swag.IsZero(o.NodeExporter) { // not required
@@ -2412,7 +2376,6 @@ func (o *ChangeAgentOKBody) contextValidateNodeExporter(ctx context.Context, for
 }
 
 func (o *ChangeAgentOKBody) contextValidateNomadAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.NomadAgent != nil {
 
 		if swag.IsZero(o.NomadAgent) { // not required
@@ -2437,7 +2400,6 @@ func (o *ChangeAgentOKBody) contextValidateNomadAgent(ctx context.Context, forma
 }
 
 func (o *ChangeAgentOKBody) contextValidatePostgresExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.PostgresExporter != nil {
 
 		if swag.IsZero(o.PostgresExporter) { // not required
@@ -2462,7 +2424,6 @@ func (o *ChangeAgentOKBody) contextValidatePostgresExporter(ctx context.Context,
 }
 
 func (o *ChangeAgentOKBody) contextValidateProxysqlExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.ProxysqlExporter != nil {
 
 		if swag.IsZero(o.ProxysqlExporter) { // not required
@@ -2487,7 +2448,6 @@ func (o *ChangeAgentOKBody) contextValidateProxysqlExporter(ctx context.Context,
 }
 
 func (o *ChangeAgentOKBody) contextValidateQANClickhouseQuerylogAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANClickhouseQuerylogAgent != nil {
 
 		if swag.IsZero(o.QANClickhouseQuerylogAgent) { // not required
@@ -2512,7 +2472,6 @@ func (o *ChangeAgentOKBody) contextValidateQANClickhouseQuerylogAgent(ctx contex
 }
 
 func (o *ChangeAgentOKBody) contextValidateQANMongodbMongologAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANMongodbMongologAgent != nil {
 
 		if swag.IsZero(o.QANMongodbMongologAgent) { // not required
@@ -2537,7 +2496,6 @@ func (o *ChangeAgentOKBody) contextValidateQANMongodbMongologAgent(ctx context.C
 }
 
 func (o *ChangeAgentOKBody) contextValidateQANMongodbProfilerAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANMongodbProfilerAgent != nil {
 
 		if swag.IsZero(o.QANMongodbProfilerAgent) { // not required
@@ -2562,7 +2520,6 @@ func (o *ChangeAgentOKBody) contextValidateQANMongodbProfilerAgent(ctx context.C
 }
 
 func (o *ChangeAgentOKBody) contextValidateQANMysqlPerfschemaAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANMysqlPerfschemaAgent != nil {
 
 		if swag.IsZero(o.QANMysqlPerfschemaAgent) { // not required
@@ -2587,7 +2544,6 @@ func (o *ChangeAgentOKBody) contextValidateQANMysqlPerfschemaAgent(ctx context.C
 }
 
 func (o *ChangeAgentOKBody) contextValidateQANMysqlSlowlogAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANMysqlSlowlogAgent != nil {
 
 		if swag.IsZero(o.QANMysqlSlowlogAgent) { // not required
@@ -2612,7 +2568,6 @@ func (o *ChangeAgentOKBody) contextValidateQANMysqlSlowlogAgent(ctx context.Cont
 }
 
 func (o *ChangeAgentOKBody) contextValidateQANPostgresqlPgstatementsAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANPostgresqlPgstatementsAgent != nil {
 
 		if swag.IsZero(o.QANPostgresqlPgstatementsAgent) { // not required
@@ -2637,7 +2592,6 @@ func (o *ChangeAgentOKBody) contextValidateQANPostgresqlPgstatementsAgent(ctx co
 }
 
 func (o *ChangeAgentOKBody) contextValidateQANPostgresqlPgstatmonitorAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.QANPostgresqlPgstatmonitorAgent != nil {
 
 		if swag.IsZero(o.QANPostgresqlPgstatmonitorAgent) { // not required
@@ -2662,7 +2616,6 @@ func (o *ChangeAgentOKBody) contextValidateQANPostgresqlPgstatmonitorAgent(ctx c
 }
 
 func (o *ChangeAgentOKBody) contextValidateRDSExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.RDSExporter != nil {
 
 		if swag.IsZero(o.RDSExporter) { // not required
@@ -2687,7 +2640,6 @@ func (o *ChangeAgentOKBody) contextValidateRDSExporter(ctx context.Context, form
 }
 
 func (o *ChangeAgentOKBody) contextValidateRtaMongodbAgent(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.RtaMongodbAgent != nil {
 
 		if swag.IsZero(o.RtaMongodbAgent) { // not required
@@ -2712,7 +2664,6 @@ func (o *ChangeAgentOKBody) contextValidateRtaMongodbAgent(ctx context.Context, 
 }
 
 func (o *ChangeAgentOKBody) contextValidateValkeyExporter(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.ValkeyExporter != nil {
 
 		if swag.IsZero(o.ValkeyExporter) { // not required
@@ -2759,7 +2710,6 @@ ChangeAgentOKBodyAzureDatabaseExporter AzureDatabaseExporter runs on Generic or 
 swagger:model ChangeAgentOKBodyAzureDatabaseExporter
 */
 type ChangeAgentOKBodyAzureDatabaseExporter struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -2986,7 +2936,6 @@ func (o *ChangeAgentOKBodyAzureDatabaseExporter) ContextValidate(ctx context.Con
 }
 
 func (o *ChangeAgentOKBodyAzureDatabaseExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -3033,7 +2982,6 @@ ChangeAgentOKBodyAzureDatabaseExporterMetricsResolutions MetricsResolutions repr
 swagger:model ChangeAgentOKBodyAzureDatabaseExporterMetricsResolutions
 */
 type ChangeAgentOKBodyAzureDatabaseExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -3077,7 +3025,6 @@ ChangeAgentOKBodyClickhouseExporter ClickHouseExporter runs on Generic or Contai
 swagger:model ChangeAgentOKBodyClickhouseExporter
 */
 type ChangeAgentOKBodyClickhouseExporter struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3249,7 +3196,6 @@ func (o *ChangeAgentOKBodyClickhouseExporter) ContextValidate(ctx context.Contex
 }
 
 func (o *ChangeAgentOKBodyClickhouseExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -3296,7 +3242,6 @@ ChangeAgentOKBodyClickhouseExporterMetricsResolutions MetricsResolutions represe
 swagger:model ChangeAgentOKBodyClickhouseExporterMetricsResolutions
 */
 type ChangeAgentOKBodyClickhouseExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -3340,7 +3285,6 @@ ChangeAgentOKBodyExternalExporter ExternalExporter runs on any Node type, includ
 swagger:model ChangeAgentOKBodyExternalExporter
 */
 type ChangeAgentOKBodyExternalExporter struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3509,7 +3453,6 @@ func (o *ChangeAgentOKBodyExternalExporter) ContextValidate(ctx context.Context,
 }
 
 func (o *ChangeAgentOKBodyExternalExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -3556,7 +3499,6 @@ ChangeAgentOKBodyExternalExporterMetricsResolutions MetricsResolutions represent
 swagger:model ChangeAgentOKBodyExternalExporterMetricsResolutions
 */
 type ChangeAgentOKBodyExternalExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -3600,7 +3542,6 @@ ChangeAgentOKBodyMongodbExporter MongoDBExporter runs on Generic or Container No
 swagger:model ChangeAgentOKBodyMongodbExporter
 */
 type ChangeAgentOKBodyMongodbExporter struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3852,7 +3793,6 @@ func (o *ChangeAgentOKBodyMongodbExporter) ContextValidate(ctx context.Context, 
 }
 
 func (o *ChangeAgentOKBodyMongodbExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -3899,7 +3839,6 @@ ChangeAgentOKBodyMongodbExporterMetricsResolutions MetricsResolutions represents
 swagger:model ChangeAgentOKBodyMongodbExporterMetricsResolutions
 */
 type ChangeAgentOKBodyMongodbExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -3943,7 +3882,6 @@ ChangeAgentOKBodyMysqldExporter MySQLdExporter runs on Generic or Container Node
 swagger:model ChangeAgentOKBodyMysqldExporter
 */
 type ChangeAgentOKBodyMysqldExporter struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4205,7 +4143,6 @@ func (o *ChangeAgentOKBodyMysqldExporter) ContextValidate(ctx context.Context, f
 }
 
 func (o *ChangeAgentOKBodyMysqldExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -4252,7 +4189,6 @@ ChangeAgentOKBodyMysqldExporterMetricsResolutions MetricsResolutions represents 
 swagger:model ChangeAgentOKBodyMysqldExporterMetricsResolutions
 */
 type ChangeAgentOKBodyMysqldExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -4296,7 +4232,6 @@ ChangeAgentOKBodyNodeExporter NodeExporter runs on Generic or Container Node and
 swagger:model ChangeAgentOKBodyNodeExporter
 */
 type ChangeAgentOKBodyNodeExporter struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4520,7 +4455,6 @@ func (o *ChangeAgentOKBodyNodeExporter) ContextValidate(ctx context.Context, for
 }
 
 func (o *ChangeAgentOKBodyNodeExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -4567,7 +4501,6 @@ ChangeAgentOKBodyNodeExporterMetricsResolutions MetricsResolutions represents Pr
 swagger:model ChangeAgentOKBodyNodeExporterMetricsResolutions
 */
 type ChangeAgentOKBodyNodeExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -4611,7 +4544,6 @@ ChangeAgentOKBodyNomadAgent change agent OK body nomad agent
 swagger:model ChangeAgentOKBodyNomadAgent
 */
 type ChangeAgentOKBodyNomadAgent struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4742,7 +4674,6 @@ ChangeAgentOKBodyPostgresExporter PostgresExporter runs on Generic or Container 
 swagger:model ChangeAgentOKBodyPostgresExporter
 */
 type ChangeAgentOKBodyPostgresExporter struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4987,7 +4918,6 @@ func (o *ChangeAgentOKBodyPostgresExporter) ContextValidate(ctx context.Context,
 }
 
 func (o *ChangeAgentOKBodyPostgresExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -5034,7 +4964,6 @@ ChangeAgentOKBodyPostgresExporterMetricsResolutions MetricsResolutions represent
 swagger:model ChangeAgentOKBodyPostgresExporterMetricsResolutions
 */
 type ChangeAgentOKBodyPostgresExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -5078,7 +5007,6 @@ ChangeAgentOKBodyProxysqlExporter ProxySQLExporter runs on Generic or Container 
 swagger:model ChangeAgentOKBodyProxysqlExporter
 */
 type ChangeAgentOKBodyProxysqlExporter struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -5317,7 +5245,6 @@ func (o *ChangeAgentOKBodyProxysqlExporter) ContextValidate(ctx context.Context,
 }
 
 func (o *ChangeAgentOKBodyProxysqlExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -5364,7 +5291,6 @@ ChangeAgentOKBodyProxysqlExporterMetricsResolutions MetricsResolutions represent
 swagger:model ChangeAgentOKBodyProxysqlExporterMetricsResolutions
 */
 type ChangeAgentOKBodyProxysqlExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -5408,7 +5334,6 @@ ChangeAgentOKBodyQANClickhouseQuerylogAgent QANClickHouseQueryLogAgent runs with
 swagger:model ChangeAgentOKBodyQANClickhouseQuerylogAgent
 */
 type ChangeAgentOKBodyQANClickhouseQuerylogAgent struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -5621,7 +5546,6 @@ ChangeAgentOKBodyQANMongodbMongologAgent QANMongoDBMongologAgent runs within pmm
 swagger:model ChangeAgentOKBodyQANMongodbMongologAgent
 */
 type ChangeAgentOKBodyQANMongodbMongologAgent struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -5831,7 +5755,6 @@ ChangeAgentOKBodyQANMongodbProfilerAgent QANMongoDBProfilerAgent runs within pmm
 swagger:model ChangeAgentOKBodyQANMongodbProfilerAgent
 */
 type ChangeAgentOKBodyQANMongodbProfilerAgent struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -6041,7 +5964,6 @@ ChangeAgentOKBodyQANMysqlPerfschemaAgent QANMySQLPerfSchemaAgent runs within pmm
 swagger:model ChangeAgentOKBodyQANMysqlPerfschemaAgent
 */
 type ChangeAgentOKBodyQANMysqlPerfschemaAgent struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -6269,7 +6191,6 @@ ChangeAgentOKBodyQANMysqlSlowlogAgent QANMySQLSlowlogAgent runs within pmm-agent
 swagger:model ChangeAgentOKBodyQANMysqlSlowlogAgent
 */
 type ChangeAgentOKBodyQANMysqlSlowlogAgent struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -6500,7 +6421,6 @@ ChangeAgentOKBodyQANPostgresqlPgstatementsAgent QANPostgreSQLPgStatementsAgent r
 swagger:model ChangeAgentOKBodyQANPostgresqlPgstatementsAgent
 */
 type ChangeAgentOKBodyQANPostgresqlPgstatementsAgent struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -6713,7 +6633,6 @@ ChangeAgentOKBodyQANPostgresqlPgstatmonitorAgent QANPostgreSQLPgStatMonitorAgent
 swagger:model ChangeAgentOKBodyQANPostgresqlPgstatmonitorAgent
 */
 type ChangeAgentOKBodyQANPostgresqlPgstatmonitorAgent struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -6929,7 +6848,6 @@ ChangeAgentOKBodyRDSExporter RDSExporter runs on Generic or Container Node and e
 swagger:model ChangeAgentOKBodyRDSExporter
 */
 type ChangeAgentOKBodyRDSExporter struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -7162,7 +7080,6 @@ func (o *ChangeAgentOKBodyRDSExporter) ContextValidate(ctx context.Context, form
 }
 
 func (o *ChangeAgentOKBodyRDSExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -7209,7 +7126,6 @@ ChangeAgentOKBodyRDSExporterMetricsResolutions MetricsResolutions represents Pro
 swagger:model ChangeAgentOKBodyRDSExporterMetricsResolutions
 */
 type ChangeAgentOKBodyRDSExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -7253,7 +7169,6 @@ ChangeAgentOKBodyRtaMongodbAgent RTAMongoDBAgent runs within pmm-agent and sends
 swagger:model ChangeAgentOKBodyRtaMongodbAgent
 */
 type ChangeAgentOKBodyRtaMongodbAgent struct {
-
 	// Unique agent identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -7474,7 +7389,6 @@ func (o *ChangeAgentOKBodyRtaMongodbAgent) ContextValidate(ctx context.Context, 
 }
 
 func (o *ChangeAgentOKBodyRtaMongodbAgent) contextValidateRtaOptions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.RtaOptions != nil {
 
 		if swag.IsZero(o.RtaOptions) { // not required
@@ -7521,7 +7435,6 @@ ChangeAgentOKBodyRtaMongodbAgentRtaOptions RTAOptions holds Real-Time Query Anal
 swagger:model ChangeAgentOKBodyRtaMongodbAgentRtaOptions
 */
 type ChangeAgentOKBodyRtaMongodbAgentRtaOptions struct {
-
 	// Query collect interval (default 2s is set by server).
 	CollectInterval string `json:"collect_interval,omitempty"`
 }
@@ -7559,7 +7472,6 @@ ChangeAgentOKBodyValkeyExporter ValkeyExporter runs on Generic or Container Node
 swagger:model ChangeAgentOKBodyValkeyExporter
 */
 type ChangeAgentOKBodyValkeyExporter struct {
-
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -7734,7 +7646,6 @@ func (o *ChangeAgentOKBodyValkeyExporter) ContextValidate(ctx context.Context, f
 }
 
 func (o *ChangeAgentOKBodyValkeyExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -7781,7 +7692,6 @@ ChangeAgentOKBodyValkeyExporterMetricsResolutions MetricsResolutions represents 
 swagger:model ChangeAgentOKBodyValkeyExporterMetricsResolutions
 */
 type ChangeAgentOKBodyValkeyExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -7825,7 +7735,6 @@ ChangeAgentParamsBodyAzureDatabaseExporter change agent params body azure databa
 swagger:model ChangeAgentParamsBodyAzureDatabaseExporter
 */
 type ChangeAgentParamsBodyAzureDatabaseExporter struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -8001,7 +7910,6 @@ func (o *ChangeAgentParamsBodyAzureDatabaseExporter) ContextValidate(ctx context
 }
 
 func (o *ChangeAgentParamsBodyAzureDatabaseExporter) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -8026,7 +7934,6 @@ func (o *ChangeAgentParamsBodyAzureDatabaseExporter) contextValidateCustomLabels
 }
 
 func (o *ChangeAgentParamsBodyAzureDatabaseExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -8073,7 +7980,6 @@ ChangeAgentParamsBodyAzureDatabaseExporterCustomLabels A wrapper for map[string]
 swagger:model ChangeAgentParamsBodyAzureDatabaseExporterCustomLabels
 */
 type ChangeAgentParamsBodyAzureDatabaseExporterCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -8111,7 +8017,6 @@ ChangeAgentParamsBodyAzureDatabaseExporterMetricsResolutions MetricsResolutions 
 swagger:model ChangeAgentParamsBodyAzureDatabaseExporterMetricsResolutions
 */
 type ChangeAgentParamsBodyAzureDatabaseExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -8155,7 +8060,6 @@ ChangeAgentParamsBodyClickhouseExporter change agent params body clickhouse expo
 swagger:model ChangeAgentParamsBodyClickhouseExporter
 */
 type ChangeAgentParamsBodyClickhouseExporter struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -8346,7 +8250,6 @@ func (o *ChangeAgentParamsBodyClickhouseExporter) ContextValidate(ctx context.Co
 }
 
 func (o *ChangeAgentParamsBodyClickhouseExporter) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -8371,7 +8274,6 @@ func (o *ChangeAgentParamsBodyClickhouseExporter) contextValidateCustomLabels(ct
 }
 
 func (o *ChangeAgentParamsBodyClickhouseExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -8418,7 +8320,6 @@ ChangeAgentParamsBodyClickhouseExporterCustomLabels A wrapper for map[string]str
 swagger:model ChangeAgentParamsBodyClickhouseExporterCustomLabels
 */
 type ChangeAgentParamsBodyClickhouseExporterCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -8456,7 +8357,6 @@ ChangeAgentParamsBodyClickhouseExporterMetricsResolutions MetricsResolutions rep
 swagger:model ChangeAgentParamsBodyClickhouseExporterMetricsResolutions
 */
 type ChangeAgentParamsBodyClickhouseExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -8500,7 +8400,6 @@ ChangeAgentParamsBodyExternalExporter change agent params body external exporter
 swagger:model ChangeAgentParamsBodyExternalExporter
 */
 type ChangeAgentParamsBodyExternalExporter struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -8609,7 +8508,6 @@ func (o *ChangeAgentParamsBodyExternalExporter) ContextValidate(ctx context.Cont
 }
 
 func (o *ChangeAgentParamsBodyExternalExporter) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -8634,7 +8532,6 @@ func (o *ChangeAgentParamsBodyExternalExporter) contextValidateCustomLabels(ctx 
 }
 
 func (o *ChangeAgentParamsBodyExternalExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -8681,7 +8578,6 @@ ChangeAgentParamsBodyExternalExporterCustomLabels A wrapper for map[string]strin
 swagger:model ChangeAgentParamsBodyExternalExporterCustomLabels
 */
 type ChangeAgentParamsBodyExternalExporterCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -8719,7 +8615,6 @@ ChangeAgentParamsBodyExternalExporterMetricsResolutions MetricsResolutions repre
 swagger:model ChangeAgentParamsBodyExternalExporterMetricsResolutions
 */
 type ChangeAgentParamsBodyExternalExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -8763,7 +8658,6 @@ ChangeAgentParamsBodyMongodbExporter change agent params body mongodb exporter
 swagger:model ChangeAgentParamsBodyMongodbExporter
 */
 type ChangeAgentParamsBodyMongodbExporter struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -8975,7 +8869,6 @@ func (o *ChangeAgentParamsBodyMongodbExporter) ContextValidate(ctx context.Conte
 }
 
 func (o *ChangeAgentParamsBodyMongodbExporter) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -9000,7 +8893,6 @@ func (o *ChangeAgentParamsBodyMongodbExporter) contextValidateCustomLabels(ctx c
 }
 
 func (o *ChangeAgentParamsBodyMongodbExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -9047,7 +8939,6 @@ ChangeAgentParamsBodyMongodbExporterCustomLabels A wrapper for map[string]string
 swagger:model ChangeAgentParamsBodyMongodbExporterCustomLabels
 */
 type ChangeAgentParamsBodyMongodbExporterCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -9085,7 +8976,6 @@ ChangeAgentParamsBodyMongodbExporterMetricsResolutions MetricsResolutions repres
 swagger:model ChangeAgentParamsBodyMongodbExporterMetricsResolutions
 */
 type ChangeAgentParamsBodyMongodbExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -9129,7 +9019,6 @@ ChangeAgentParamsBodyMysqldExporter change agent params body mysqld exporter
 swagger:model ChangeAgentParamsBodyMysqldExporter
 */
 type ChangeAgentParamsBodyMysqldExporter struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -9329,7 +9218,6 @@ func (o *ChangeAgentParamsBodyMysqldExporter) ContextValidate(ctx context.Contex
 }
 
 func (o *ChangeAgentParamsBodyMysqldExporter) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -9354,7 +9242,6 @@ func (o *ChangeAgentParamsBodyMysqldExporter) contextValidateCustomLabels(ctx co
 }
 
 func (o *ChangeAgentParamsBodyMysqldExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -9401,7 +9288,6 @@ ChangeAgentParamsBodyMysqldExporterCustomLabels A wrapper for map[string]string.
 swagger:model ChangeAgentParamsBodyMysqldExporterCustomLabels
 */
 type ChangeAgentParamsBodyMysqldExporterCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -9439,7 +9325,6 @@ ChangeAgentParamsBodyMysqldExporterMetricsResolutions MetricsResolutions represe
 swagger:model ChangeAgentParamsBodyMysqldExporterMetricsResolutions
 */
 type ChangeAgentParamsBodyMysqldExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -9483,7 +9368,6 @@ ChangeAgentParamsBodyNodeExporter change agent params body node exporter
 swagger:model ChangeAgentParamsBodyNodeExporter
 */
 type ChangeAgentParamsBodyNodeExporter struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -9650,7 +9534,6 @@ func (o *ChangeAgentParamsBodyNodeExporter) ContextValidate(ctx context.Context,
 }
 
 func (o *ChangeAgentParamsBodyNodeExporter) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -9675,7 +9558,6 @@ func (o *ChangeAgentParamsBodyNodeExporter) contextValidateCustomLabels(ctx cont
 }
 
 func (o *ChangeAgentParamsBodyNodeExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -9722,7 +9604,6 @@ ChangeAgentParamsBodyNodeExporterCustomLabels A wrapper for map[string]string. T
 swagger:model ChangeAgentParamsBodyNodeExporterCustomLabels
 */
 type ChangeAgentParamsBodyNodeExporterCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -9760,7 +9641,6 @@ ChangeAgentParamsBodyNodeExporterMetricsResolutions MetricsResolutions represent
 swagger:model ChangeAgentParamsBodyNodeExporterMetricsResolutions
 */
 type ChangeAgentParamsBodyNodeExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -9804,7 +9684,6 @@ ChangeAgentParamsBodyNomadAgent change agent params body nomad agent
 swagger:model ChangeAgentParamsBodyNomadAgent
 */
 type ChangeAgentParamsBodyNomadAgent struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 }
@@ -9842,7 +9721,6 @@ ChangeAgentParamsBodyPostgresExporter change agent params body postgres exporter
 swagger:model ChangeAgentParamsBodyPostgresExporter
 */
 type ChangeAgentParamsBodyPostgresExporter struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -10045,7 +9923,6 @@ func (o *ChangeAgentParamsBodyPostgresExporter) ContextValidate(ctx context.Cont
 }
 
 func (o *ChangeAgentParamsBodyPostgresExporter) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -10070,7 +9947,6 @@ func (o *ChangeAgentParamsBodyPostgresExporter) contextValidateCustomLabels(ctx 
 }
 
 func (o *ChangeAgentParamsBodyPostgresExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -10117,7 +9993,6 @@ ChangeAgentParamsBodyPostgresExporterCustomLabels A wrapper for map[string]strin
 swagger:model ChangeAgentParamsBodyPostgresExporterCustomLabels
 */
 type ChangeAgentParamsBodyPostgresExporterCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -10155,7 +10030,6 @@ ChangeAgentParamsBodyPostgresExporterMetricsResolutions MetricsResolutions repre
 swagger:model ChangeAgentParamsBodyPostgresExporterMetricsResolutions
 */
 type ChangeAgentParamsBodyPostgresExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -10199,7 +10073,6 @@ ChangeAgentParamsBodyProxysqlExporter change agent params body proxysql exporter
 swagger:model ChangeAgentParamsBodyProxysqlExporter
 */
 type ChangeAgentParamsBodyProxysqlExporter struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -10384,7 +10257,6 @@ func (o *ChangeAgentParamsBodyProxysqlExporter) ContextValidate(ctx context.Cont
 }
 
 func (o *ChangeAgentParamsBodyProxysqlExporter) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -10409,7 +10281,6 @@ func (o *ChangeAgentParamsBodyProxysqlExporter) contextValidateCustomLabels(ctx 
 }
 
 func (o *ChangeAgentParamsBodyProxysqlExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -10456,7 +10327,6 @@ ChangeAgentParamsBodyProxysqlExporterCustomLabels A wrapper for map[string]strin
 swagger:model ChangeAgentParamsBodyProxysqlExporterCustomLabels
 */
 type ChangeAgentParamsBodyProxysqlExporterCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -10494,7 +10364,6 @@ ChangeAgentParamsBodyProxysqlExporterMetricsResolutions MetricsResolutions repre
 swagger:model ChangeAgentParamsBodyProxysqlExporterMetricsResolutions
 */
 type ChangeAgentParamsBodyProxysqlExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -10538,7 +10407,6 @@ ChangeAgentParamsBodyQANClickhouseQuerylogAgent change agent params body QAN cli
 swagger:model ChangeAgentParamsBodyQANClickhouseQuerylogAgent
 */
 type ChangeAgentParamsBodyQANClickhouseQuerylogAgent struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -10726,7 +10594,6 @@ func (o *ChangeAgentParamsBodyQANClickhouseQuerylogAgent) ContextValidate(ctx co
 }
 
 func (o *ChangeAgentParamsBodyQANClickhouseQuerylogAgent) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -10751,7 +10618,6 @@ func (o *ChangeAgentParamsBodyQANClickhouseQuerylogAgent) contextValidateCustomL
 }
 
 func (o *ChangeAgentParamsBodyQANClickhouseQuerylogAgent) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -10798,7 +10664,6 @@ ChangeAgentParamsBodyQANClickhouseQuerylogAgentCustomLabels A wrapper for map[st
 swagger:model ChangeAgentParamsBodyQANClickhouseQuerylogAgentCustomLabels
 */
 type ChangeAgentParamsBodyQANClickhouseQuerylogAgentCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -10836,7 +10701,6 @@ ChangeAgentParamsBodyQANClickhouseQuerylogAgentMetricsResolutions MetricsResolut
 swagger:model ChangeAgentParamsBodyQANClickhouseQuerylogAgentMetricsResolutions
 */
 type ChangeAgentParamsBodyQANClickhouseQuerylogAgentMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -10880,7 +10744,6 @@ ChangeAgentParamsBodyQANMongodbMongologAgent change agent params body QAN mongod
 swagger:model ChangeAgentParamsBodyQANMongodbMongologAgent
 */
 type ChangeAgentParamsBodyQANMongodbMongologAgent struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -11071,7 +10934,6 @@ func (o *ChangeAgentParamsBodyQANMongodbMongologAgent) ContextValidate(ctx conte
 }
 
 func (o *ChangeAgentParamsBodyQANMongodbMongologAgent) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -11096,7 +10958,6 @@ func (o *ChangeAgentParamsBodyQANMongodbMongologAgent) contextValidateCustomLabe
 }
 
 func (o *ChangeAgentParamsBodyQANMongodbMongologAgent) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -11143,7 +11004,6 @@ ChangeAgentParamsBodyQANMongodbMongologAgentCustomLabels A wrapper for map[strin
 swagger:model ChangeAgentParamsBodyQANMongodbMongologAgentCustomLabels
 */
 type ChangeAgentParamsBodyQANMongodbMongologAgentCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -11181,7 +11041,6 @@ ChangeAgentParamsBodyQANMongodbMongologAgentMetricsResolutions MetricsResolution
 swagger:model ChangeAgentParamsBodyQANMongodbMongologAgentMetricsResolutions
 */
 type ChangeAgentParamsBodyQANMongodbMongologAgentMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -11225,7 +11084,6 @@ ChangeAgentParamsBodyQANMongodbProfilerAgent change agent params body QAN mongod
 swagger:model ChangeAgentParamsBodyQANMongodbProfilerAgent
 */
 type ChangeAgentParamsBodyQANMongodbProfilerAgent struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -11416,7 +11274,6 @@ func (o *ChangeAgentParamsBodyQANMongodbProfilerAgent) ContextValidate(ctx conte
 }
 
 func (o *ChangeAgentParamsBodyQANMongodbProfilerAgent) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -11441,7 +11298,6 @@ func (o *ChangeAgentParamsBodyQANMongodbProfilerAgent) contextValidateCustomLabe
 }
 
 func (o *ChangeAgentParamsBodyQANMongodbProfilerAgent) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -11488,7 +11344,6 @@ ChangeAgentParamsBodyQANMongodbProfilerAgentCustomLabels A wrapper for map[strin
 swagger:model ChangeAgentParamsBodyQANMongodbProfilerAgentCustomLabels
 */
 type ChangeAgentParamsBodyQANMongodbProfilerAgentCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -11526,7 +11381,6 @@ ChangeAgentParamsBodyQANMongodbProfilerAgentMetricsResolutions MetricsResolution
 swagger:model ChangeAgentParamsBodyQANMongodbProfilerAgentMetricsResolutions
 */
 type ChangeAgentParamsBodyQANMongodbProfilerAgentMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -11570,7 +11424,6 @@ ChangeAgentParamsBodyQANMysqlPerfschemaAgent change agent params body QAN mysql 
 swagger:model ChangeAgentParamsBodyQANMysqlPerfschemaAgent
 */
 type ChangeAgentParamsBodyQANMysqlPerfschemaAgent struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -11764,7 +11617,6 @@ func (o *ChangeAgentParamsBodyQANMysqlPerfschemaAgent) ContextValidate(ctx conte
 }
 
 func (o *ChangeAgentParamsBodyQANMysqlPerfschemaAgent) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -11789,7 +11641,6 @@ func (o *ChangeAgentParamsBodyQANMysqlPerfschemaAgent) contextValidateCustomLabe
 }
 
 func (o *ChangeAgentParamsBodyQANMysqlPerfschemaAgent) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -11836,7 +11687,6 @@ ChangeAgentParamsBodyQANMysqlPerfschemaAgentCustomLabels A wrapper for map[strin
 swagger:model ChangeAgentParamsBodyQANMysqlPerfschemaAgentCustomLabels
 */
 type ChangeAgentParamsBodyQANMysqlPerfschemaAgentCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -11874,7 +11724,6 @@ ChangeAgentParamsBodyQANMysqlPerfschemaAgentMetricsResolutions MetricsResolution
 swagger:model ChangeAgentParamsBodyQANMysqlPerfschemaAgentMetricsResolutions
 */
 type ChangeAgentParamsBodyQANMysqlPerfschemaAgentMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -11918,7 +11767,6 @@ ChangeAgentParamsBodyQANMysqlSlowlogAgent change agent params body QAN mysql slo
 swagger:model ChangeAgentParamsBodyQANMysqlSlowlogAgent
 */
 type ChangeAgentParamsBodyQANMysqlSlowlogAgent struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -12115,7 +11963,6 @@ func (o *ChangeAgentParamsBodyQANMysqlSlowlogAgent) ContextValidate(ctx context.
 }
 
 func (o *ChangeAgentParamsBodyQANMysqlSlowlogAgent) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -12140,7 +11987,6 @@ func (o *ChangeAgentParamsBodyQANMysqlSlowlogAgent) contextValidateCustomLabels(
 }
 
 func (o *ChangeAgentParamsBodyQANMysqlSlowlogAgent) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -12187,7 +12033,6 @@ ChangeAgentParamsBodyQANMysqlSlowlogAgentCustomLabels A wrapper for map[string]s
 swagger:model ChangeAgentParamsBodyQANMysqlSlowlogAgentCustomLabels
 */
 type ChangeAgentParamsBodyQANMysqlSlowlogAgentCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -12225,7 +12070,6 @@ ChangeAgentParamsBodyQANMysqlSlowlogAgentMetricsResolutions MetricsResolutions r
 swagger:model ChangeAgentParamsBodyQANMysqlSlowlogAgentMetricsResolutions
 */
 type ChangeAgentParamsBodyQANMysqlSlowlogAgentMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -12269,7 +12113,6 @@ ChangeAgentParamsBodyQANPostgresqlPgstatementsAgent change agent params body QAN
 swagger:model ChangeAgentParamsBodyQANPostgresqlPgstatementsAgent
 */
 type ChangeAgentParamsBodyQANPostgresqlPgstatementsAgent struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -12457,7 +12300,6 @@ func (o *ChangeAgentParamsBodyQANPostgresqlPgstatementsAgent) ContextValidate(ct
 }
 
 func (o *ChangeAgentParamsBodyQANPostgresqlPgstatementsAgent) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -12482,7 +12324,6 @@ func (o *ChangeAgentParamsBodyQANPostgresqlPgstatementsAgent) contextValidateCus
 }
 
 func (o *ChangeAgentParamsBodyQANPostgresqlPgstatementsAgent) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -12529,7 +12370,6 @@ ChangeAgentParamsBodyQANPostgresqlPgstatementsAgentCustomLabels A wrapper for ma
 swagger:model ChangeAgentParamsBodyQANPostgresqlPgstatementsAgentCustomLabels
 */
 type ChangeAgentParamsBodyQANPostgresqlPgstatementsAgentCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -12567,7 +12407,6 @@ ChangeAgentParamsBodyQANPostgresqlPgstatementsAgentMetricsResolutions MetricsRes
 swagger:model ChangeAgentParamsBodyQANPostgresqlPgstatementsAgentMetricsResolutions
 */
 type ChangeAgentParamsBodyQANPostgresqlPgstatementsAgentMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -12611,7 +12450,6 @@ ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgent change agent params body QA
 swagger:model ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgent
 */
 type ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgent struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -12802,7 +12640,6 @@ func (o *ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgent) ContextValidate(c
 }
 
 func (o *ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgent) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -12827,7 +12664,6 @@ func (o *ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgent) contextValidateCu
 }
 
 func (o *ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgent) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -12874,7 +12710,6 @@ ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgentCustomLabels A wrapper for m
 swagger:model ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgentCustomLabels
 */
 type ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgentCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -12912,7 +12747,6 @@ ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgentMetricsResolutions MetricsRe
 swagger:model ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgentMetricsResolutions
 */
 type ChangeAgentParamsBodyQANPostgresqlPgstatmonitorAgentMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -12956,7 +12790,6 @@ ChangeAgentParamsBodyRDSExporter change agent params body RDS exporter
 swagger:model ChangeAgentParamsBodyRDSExporter
 */
 type ChangeAgentParamsBodyRDSExporter struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -13129,7 +12962,6 @@ func (o *ChangeAgentParamsBodyRDSExporter) ContextValidate(ctx context.Context, 
 }
 
 func (o *ChangeAgentParamsBodyRDSExporter) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -13154,7 +12986,6 @@ func (o *ChangeAgentParamsBodyRDSExporter) contextValidateCustomLabels(ctx conte
 }
 
 func (o *ChangeAgentParamsBodyRDSExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -13201,7 +13032,6 @@ ChangeAgentParamsBodyRDSExporterCustomLabels A wrapper for map[string]string. Th
 swagger:model ChangeAgentParamsBodyRDSExporterCustomLabels
 */
 type ChangeAgentParamsBodyRDSExporterCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -13239,7 +13069,6 @@ ChangeAgentParamsBodyRDSExporterMetricsResolutions MetricsResolutions represents
 swagger:model ChangeAgentParamsBodyRDSExporterMetricsResolutions
 */
 type ChangeAgentParamsBodyRDSExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -13283,7 +13112,6 @@ ChangeAgentParamsBodyRtaMongodbAgent change agent params body rta mongodb agent
 swagger:model ChangeAgentParamsBodyRtaMongodbAgent
 */
 type ChangeAgentParamsBodyRtaMongodbAgent struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -13465,7 +13293,6 @@ func (o *ChangeAgentParamsBodyRtaMongodbAgent) ContextValidate(ctx context.Conte
 }
 
 func (o *ChangeAgentParamsBodyRtaMongodbAgent) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -13490,7 +13317,6 @@ func (o *ChangeAgentParamsBodyRtaMongodbAgent) contextValidateCustomLabels(ctx c
 }
 
 func (o *ChangeAgentParamsBodyRtaMongodbAgent) contextValidateRtaOptions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.RtaOptions != nil {
 
 		if swag.IsZero(o.RtaOptions) { // not required
@@ -13537,7 +13363,6 @@ ChangeAgentParamsBodyRtaMongodbAgentCustomLabels A wrapper for map[string]string
 swagger:model ChangeAgentParamsBodyRtaMongodbAgentCustomLabels
 */
 type ChangeAgentParamsBodyRtaMongodbAgentCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -13575,7 +13400,6 @@ ChangeAgentParamsBodyRtaMongodbAgentRtaOptions RTAOptions holds Real-Time Query 
 swagger:model ChangeAgentParamsBodyRtaMongodbAgentRtaOptions
 */
 type ChangeAgentParamsBodyRtaMongodbAgentRtaOptions struct {
-
 	// Query collect interval (default 2s is set by server).
 	CollectInterval string `json:"collect_interval,omitempty"`
 }
@@ -13613,7 +13437,6 @@ ChangeAgentParamsBodyValkeyExporter change agent params body valkey exporter
 swagger:model ChangeAgentParamsBodyValkeyExporter
 */
 type ChangeAgentParamsBodyValkeyExporter struct {
-
 	// Enable this Agent. Agents are enabled by default when they get added.
 	Enable *bool `json:"enable,omitempty"`
 
@@ -13807,7 +13630,6 @@ func (o *ChangeAgentParamsBodyValkeyExporter) ContextValidate(ctx context.Contex
 }
 
 func (o *ChangeAgentParamsBodyValkeyExporter) contextValidateCustomLabels(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.CustomLabels != nil {
 
 		if swag.IsZero(o.CustomLabels) { // not required
@@ -13832,7 +13654,6 @@ func (o *ChangeAgentParamsBodyValkeyExporter) contextValidateCustomLabels(ctx co
 }
 
 func (o *ChangeAgentParamsBodyValkeyExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
-
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -13879,7 +13700,6 @@ ChangeAgentParamsBodyValkeyExporterCustomLabels A wrapper for map[string]string.
 swagger:model ChangeAgentParamsBodyValkeyExporterCustomLabels
 */
 type ChangeAgentParamsBodyValkeyExporterCustomLabels struct {
-
 	// values
 	Values map[string]string `json:"values,omitempty"`
 }
@@ -13917,7 +13737,6 @@ ChangeAgentParamsBodyValkeyExporterMetricsResolutions MetricsResolutions represe
 swagger:model ChangeAgentParamsBodyValkeyExporterMetricsResolutions
 */
 type ChangeAgentParamsBodyValkeyExporterMetricsResolutions struct {
-
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 

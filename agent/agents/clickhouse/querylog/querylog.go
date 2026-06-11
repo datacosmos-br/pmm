@@ -55,6 +55,10 @@ const (
 	// ChangesBufferSize is the capacity of the changes channel; it absorbs a
 	// few buckets before a slow consumer back-pressures the collection loop.
 	changesBufferSize = 10
+
+	queryLogTypeColumn = "type"
+
+	defaultUInt64Literal = "toUInt64(0)"
 )
 
 // requiredColumns are the system.query_log columns that must exist on every
@@ -63,7 +67,7 @@ const (
 // DESCRIBE TABLE and substituted with a typed zero default in buildSelectList,
 // so the same agent works across ClickHouse versions.
 var requiredColumns = []string{
-	"type", "event_time", "query_id", "query",
+	queryLogTypeColumn, "event_time", "query_id", "query",
 	"query_duration_ms", "read_rows", "read_bytes",
 	"memory_usage", "exception_code", "databases", "tables", "user",
 }
@@ -315,7 +319,8 @@ func (m *ClickHouseQueryLog) readRows(ctx context.Context, columns map[string]st
 		"SELECT %s FROM system.query_log "+
 			"WHERE event_time >= ? AND type IN (%d, %d) "+
 			"ORDER BY event_time",
-		selectList, queryLogTypeQueryFinish, queryLogTypeExceptionWhileProcessing)
+		selectList, queryLogTypeQueryFinish, queryLogTypeExceptionWhileProcessing,
+	)
 
 	sqlRows, err := m.db.QueryContext(ctx, query, m.watermark)
 	if err != nil {
@@ -379,15 +384,15 @@ func buildSelectList(columns map[string]struct{}) string {
 	// Fixed order — scanRow relies on it.
 	defaults := map[string]string{
 		"event_time_microseconds": "toDateTime64(0, 6)",
-		"normalized_query_hash":   "toUInt64(0)",
+		"normalized_query_hash":   defaultUInt64Literal,
 		"query_kind":              "''",
-		"result_rows":             "toUInt64(0)",
-		"result_bytes":            "toUInt64(0)",
-		"written_rows":            "toUInt64(0)",
-		"written_bytes":           "toUInt64(0)",
+		"result_rows":             defaultUInt64Literal,
+		"result_bytes":            defaultUInt64Literal,
+		"written_rows":            defaultUInt64Literal,
+		"written_bytes":           defaultUInt64Literal,
 	}
 	order := []string{
-		"type", "event_time", "event_time_microseconds", "query_id", "query",
+		queryLogTypeColumn, "event_time", "event_time_microseconds", "query_id", "query",
 		"normalized_query_hash", "query_kind", "query_duration_ms",
 		"read_rows", "read_bytes", "result_rows", "result_bytes",
 		"memory_usage", "written_rows", "written_bytes",
