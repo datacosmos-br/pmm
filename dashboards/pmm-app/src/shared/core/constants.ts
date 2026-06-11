@@ -10,6 +10,7 @@ export const DATABASE_LABELS = {
   [Databases.postgresql]: 'PostgreSQL',
   [Databases.proxysql]: 'ProxySQL',
   [Databases.haproxy]: 'HAProxy',
+  [Databases.clickhouse]: 'ClickHouse',
 };
 
 export const SERVICE_ID_PREFIX = '/service_id/';

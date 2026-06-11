@@ -1,7 +1,7 @@
 import { logger } from 'shared/core/logger';
 import { ActionResult, getActionResult, catchActionError } from 'shared/components/Actions';
 import { Databases } from 'shared/core';
-import { mongodbMethods, mysqlMethods } from '../database-models';
+import { clickhouseMethods, mongodbMethods, mysqlMethods } from '../database-models';
 import { DatabasesType, QueryExampleResponseItem } from '../Details.types';
 import { ClassicExplainInterface, FetchExplainsResult } from './Explain.types';
 
@@ -97,6 +97,19 @@ export const fetchExplains = async (
     if (databaseType === Databases.mongodb) {
       const jsonResult = await mongodbMethods
         .getExplainJSON({ example }, true)
+        .then(getActionResult)
+        .catch(catchActionError);
+
+      return {
+        jsonExplain: jsonResult,
+        classicExplain: actionResult,
+        visualExplain: actionResult,
+      };
+    }
+
+    if (databaseType === Databases.clickhouse && hasExample) {
+      const jsonResult = await clickhouseMethods
+        .getExplain({ example, queryId }, true)
         .then(getActionResult)
         .catch(catchActionError);
 

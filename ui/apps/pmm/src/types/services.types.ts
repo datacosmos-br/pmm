@@ -6,6 +6,7 @@ export enum ServiceType {
   proxysql = 'SERVICE_TYPE_PROXYSQL_SERVICE',
   haproxy = 'SERVICE_TYPE_HAPROXY_SERVICE',
   valkey = 'SERVICE_TYPE_VALKEY_SERVICE',
+  clickhouse = 'SERVICE_TYPE_CLICKHOUSE_SERVICE',
   external = 'SERVICE_TYPE_EXTERNAL_SERVICE',
 }
 
@@ -17,6 +18,7 @@ export enum ManagedServiceType {
   proxysql = 'proxysql',
   haproxy = 'haproxy',
   valkey = 'valkey',
+  clickhouse = 'clickhouse',
   external = 'external',
 }
 

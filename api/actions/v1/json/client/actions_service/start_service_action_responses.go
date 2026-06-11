@@ -192,6 +192,9 @@ swagger:model StartServiceActionBody
 */
 type StartServiceActionBody struct {
 
+	// clickhouse explain
+	ClickhouseExplain *StartServiceActionParamsBodyClickhouseExplain `json:"clickhouse_explain,omitempty"`
+
 	// mongodb explain
 	MongodbExplain *StartServiceActionParamsBodyMongodbExplain `json:"mongodb_explain,omitempty"`
 
@@ -232,6 +235,10 @@ type StartServiceActionBody struct {
 // Validate validates this start service action body
 func (o *StartServiceActionBody) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := o.validateClickhouseExplain(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := o.validateMongodbExplain(formats); err != nil {
 		res = append(res, err)
@@ -284,6 +291,29 @@ func (o *StartServiceActionBody) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *StartServiceActionBody) validateClickhouseExplain(formats strfmt.Registry) error {
+	if swag.IsZero(o.ClickhouseExplain) { // not required
+		return nil
+	}
+
+	if o.ClickhouseExplain != nil {
+		if err := o.ClickhouseExplain.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("body" + "." + "clickhouse_explain")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("body" + "." + "clickhouse_explain")
+			}
+
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -567,6 +597,10 @@ func (o *StartServiceActionBody) validatePTPostgresSummary(formats strfmt.Regist
 func (o *StartServiceActionBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.contextValidateClickhouseExplain(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.contextValidateMongodbExplain(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -618,6 +652,31 @@ func (o *StartServiceActionBody) ContextValidate(ctx context.Context, formats st
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *StartServiceActionBody) contextValidateClickhouseExplain(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.ClickhouseExplain != nil {
+
+		if swag.IsZero(o.ClickhouseExplain) { // not required
+			return nil
+		}
+
+		if err := o.ClickhouseExplain.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("body" + "." + "clickhouse_explain")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("body" + "." + "clickhouse_explain")
+			}
+
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -1180,6 +1239,9 @@ swagger:model StartServiceActionOKBody
 */
 type StartServiceActionOKBody struct {
 
+	// clickhouse explain
+	ClickhouseExplain *StartServiceActionOKBodyClickhouseExplain `json:"clickhouse_explain,omitempty"`
+
 	// mongodb explain
 	MongodbExplain *StartServiceActionOKBodyMongodbExplain `json:"mongodb_explain,omitempty"`
 
@@ -1220,6 +1282,10 @@ type StartServiceActionOKBody struct {
 // Validate validates this start service action OK body
 func (o *StartServiceActionOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := o.validateClickhouseExplain(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := o.validateMongodbExplain(formats); err != nil {
 		res = append(res, err)
@@ -1272,6 +1338,29 @@ func (o *StartServiceActionOKBody) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *StartServiceActionOKBody) validateClickhouseExplain(formats strfmt.Registry) error {
+	if swag.IsZero(o.ClickhouseExplain) { // not required
+		return nil
+	}
+
+	if o.ClickhouseExplain != nil {
+		if err := o.ClickhouseExplain.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("startServiceActionOk" + "." + "clickhouse_explain")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("startServiceActionOk" + "." + "clickhouse_explain")
+			}
+
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -1555,6 +1644,10 @@ func (o *StartServiceActionOKBody) validatePTPostgresSummary(formats strfmt.Regi
 func (o *StartServiceActionOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.contextValidateClickhouseExplain(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.contextValidateMongodbExplain(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1606,6 +1699,31 @@ func (o *StartServiceActionOKBody) ContextValidate(ctx context.Context, formats 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *StartServiceActionOKBody) contextValidateClickhouseExplain(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.ClickhouseExplain != nil {
+
+		if swag.IsZero(o.ClickhouseExplain) { // not required
+			return nil
+		}
+
+		if err := o.ClickhouseExplain.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("startServiceActionOk" + "." + "clickhouse_explain")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("startServiceActionOk" + "." + "clickhouse_explain")
+			}
+
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -1920,6 +2038,47 @@ func (o *StartServiceActionOKBody) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (o *StartServiceActionOKBody) UnmarshalBinary(b []byte) error {
 	var res StartServiceActionOKBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+StartServiceActionOKBodyClickhouseExplain start service action OK body clickhouse explain
+swagger:model StartServiceActionOKBodyClickhouseExplain
+*/
+type StartServiceActionOKBodyClickhouseExplain struct {
+
+	// Unique Action ID.
+	ActionID string `json:"action_id,omitempty"`
+
+	// pmm-agent ID where to this Action was started.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+}
+
+// Validate validates this start service action OK body clickhouse explain
+func (o *StartServiceActionOKBodyClickhouseExplain) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this start service action OK body clickhouse explain based on context it is used
+func (o *StartServiceActionOKBodyClickhouseExplain) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *StartServiceActionOKBodyClickhouseExplain) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *StartServiceActionOKBodyClickhouseExplain) UnmarshalBinary(b []byte) error {
+	var res StartServiceActionOKBodyClickhouseExplain
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
@@ -2412,6 +2571,53 @@ func (o *StartServiceActionOKBodyPostgresqlShowIndex) MarshalBinary() ([]byte, e
 // UnmarshalBinary interface implementation
 func (o *StartServiceActionOKBodyPostgresqlShowIndex) UnmarshalBinary(b []byte) error {
 	var res StartServiceActionOKBodyPostgresqlShowIndex
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+StartServiceActionParamsBodyClickhouseExplain start service action params body clickhouse explain
+swagger:model StartServiceActionParamsBodyClickhouseExplain
+*/
+type StartServiceActionParamsBodyClickhouseExplain struct {
+
+	// pmm-agent ID where to run this Action.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Service ID for this Action. Required.
+	ServiceID string `json:"service_id,omitempty"`
+
+	// Query. Required.
+	Query string `json:"query,omitempty"`
+
+	// Explain type: PLAN, PIPELINE, AST, ESTIMATE. Defaults to PLAN.
+	ExplainType string `json:"explain_type,omitempty"`
+}
+
+// Validate validates this start service action params body clickhouse explain
+func (o *StartServiceActionParamsBodyClickhouseExplain) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this start service action params body clickhouse explain based on context it is used
+func (o *StartServiceActionParamsBodyClickhouseExplain) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *StartServiceActionParamsBodyClickhouseExplain) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *StartServiceActionParamsBodyClickhouseExplain) UnmarshalBinary(b []byte) error {
+	var res StartServiceActionParamsBodyClickhouseExplain
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

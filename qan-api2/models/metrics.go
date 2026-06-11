@@ -369,7 +369,49 @@ SUM(m_storage_time_reading_micros_cnt) AS m_storage_time_reading_micros_cnt,
 SUM(m_storage_time_reading_micros_sum) AS m_storage_time_reading_micros_sum,
 MIN(m_storage_time_reading_micros_min) AS m_storage_time_reading_micros_min,
 MAX(m_storage_time_reading_micros_max) AS m_storage_time_reading_micros_max,
-AVG(m_storage_time_reading_micros_p99) AS m_storage_time_reading_micros_p99
+AVG(m_storage_time_reading_micros_p99) AS m_storage_time_reading_micros_p99,
+
+SUM(m_read_rows_cnt) AS m_read_rows_cnt,
+SUM(m_read_rows_sum) AS m_read_rows_sum,
+MIN(m_read_rows_min) AS m_read_rows_min,
+MAX(m_read_rows_max) AS m_read_rows_max,
+AVG(m_read_rows_p99) AS m_read_rows_p99,
+
+SUM(m_read_bytes_cnt) AS m_read_bytes_cnt,
+SUM(m_read_bytes_sum) AS m_read_bytes_sum,
+MIN(m_read_bytes_min) AS m_read_bytes_min,
+MAX(m_read_bytes_max) AS m_read_bytes_max,
+AVG(m_read_bytes_p99) AS m_read_bytes_p99,
+
+SUM(m_result_rows_cnt) AS m_result_rows_cnt,
+SUM(m_result_rows_sum) AS m_result_rows_sum,
+MIN(m_result_rows_min) AS m_result_rows_min,
+MAX(m_result_rows_max) AS m_result_rows_max,
+AVG(m_result_rows_p99) AS m_result_rows_p99,
+
+SUM(m_result_bytes_cnt) AS m_result_bytes_cnt,
+SUM(m_result_bytes_sum) AS m_result_bytes_sum,
+MIN(m_result_bytes_min) AS m_result_bytes_min,
+MAX(m_result_bytes_max) AS m_result_bytes_max,
+AVG(m_result_bytes_p99) AS m_result_bytes_p99,
+
+SUM(m_memory_usage_cnt) AS m_memory_usage_cnt,
+SUM(m_memory_usage_sum) AS m_memory_usage_sum,
+MIN(m_memory_usage_min) AS m_memory_usage_min,
+MAX(m_memory_usage_max) AS m_memory_usage_max,
+AVG(m_memory_usage_p99) AS m_memory_usage_p99,
+
+SUM(m_written_rows_cnt) AS m_written_rows_cnt,
+SUM(m_written_rows_sum) AS m_written_rows_sum,
+MIN(m_written_rows_min) AS m_written_rows_min,
+MAX(m_written_rows_max) AS m_written_rows_max,
+AVG(m_written_rows_p99) AS m_written_rows_p99,
+
+SUM(m_written_bytes_cnt) AS m_written_bytes_cnt,
+SUM(m_written_bytes_sum) AS m_written_bytes_sum,
+MIN(m_written_bytes_min) AS m_written_bytes_min,
+MAX(m_written_bytes_max) AS m_written_bytes_max,
+AVG(m_written_bytes_p99) AS m_written_bytes_p99
 
 FROM metrics
 WHERE period_start >= :period_start_from AND period_start <= :period_start_to
