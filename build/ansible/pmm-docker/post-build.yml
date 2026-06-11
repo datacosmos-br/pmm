@@ -52,20 +52,41 @@
         - grafana.ini
         - nomad-server.ini
 
-    - name: Clean pmm-server dir
-      shell: find /usr/share/pmm-server -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -rf --
+    - name: Find pmm-server entries
+      find:
+        paths: /usr/share/pmm-server
+        file_type: any
+        hidden: true
+        recurse: false
+      register: pmm_server_entries
 
-    - name: Clean /srv directory for fresh initialization on first start
+    - name: Clean pmm-server dir
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ pmm_server_entries.files }}"
+
+    - name: Find /srv entries for fresh initialization on first start
+      find:
+        paths: /srv
+        file_type: any
+        hidden: true
+        recurse: false
+      register: srv_entries
+
+    - name: Clean /srv entries for fresh initialization on first start
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ srv_entries.files }}"
+
+    - name: Ensure /srv directory for fresh initialization on first start
       file:
         path: /srv
-        state: "{{ item }}"
+        state: directory
         owner: pmm
         group: root
         mode: 0775
-      loop:
-        - absent
-        - directory
-      no_log: true
 
     - name: Create empty log directory for nginx
       file:
