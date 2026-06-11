@@ -131,9 +131,9 @@ gobuild_component() {
          [ ${component} = 'proxysql_exporter' ] || [ ${component} = 'rds_exporter' ] || \
          [ ${component} = 'postgres_exporter' ] || [ ${component} = 'azure_metrics_exporter' ]; then
         if [ ${component} = 'mysqld_exporter' ]; then
-            build_command="cd ${component_source_dir} && make GO_BUILD_LDFLAGS=\"-ldflags \\\"\${PROMETHEUS_GO_BUILD_LDFLAGS}\\\"\" release"
+            build_command="cd ${component_source_dir} && make DOCKER_IMAGE_TAG=\"${component_branch}\" GO_BUILD_LDFLAGS=\"-ldflags \\\"\${PROMETHEUS_GO_BUILD_LDFLAGS}\\\"\" release"
         else
-            build_command="cd ${component_source_dir} && make GO_BUILD_LDFLAGS=\"\${PROMETHEUS_GO_BUILD_LDFLAGS}\" release"
+            build_command="cd ${component_source_dir} && make DOCKER_IMAGE_TAG=\"${component_branch}\" GO_BUILD_LDFLAGS=\"\${PROMETHEUS_GO_BUILD_LDFLAGS}\" release"
         fi
     elif [ ${component} = 'percona-toolkit' ]; then
         build_command="cd ${component_source_dir}/${component_path} && go build -o \${binary_dir}/${result_file} ."

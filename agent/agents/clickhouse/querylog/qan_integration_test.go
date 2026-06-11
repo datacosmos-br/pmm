@@ -116,7 +116,9 @@ func TestClickHouseQANMatrix(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			db, err := sql.Open("clickhouse", dsn)
 			require.NoError(t, err)
-			defer db.Close()
+			t.Cleanup(func() {
+				require.NoError(t, db.Close(), "closing the ClickHouse workload connection must succeed")
+			})
 
 			pingCtx, pingCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer pingCancel()
@@ -142,7 +144,9 @@ func TestClickHouseQANMatrix(t *testing.T) {
 				MaxQueryLength: 0,
 			}, logrus.WithField("test", t.Name()))
 			require.NoError(t, err)
-			defer agent.db.Close()
+			t.Cleanup(func() {
+				require.NoError(t, agent.db.Close(), "closing the ClickHouse QAN agent connection must succeed")
+			})
 			agent.watermark = time.Now().Truncate(time.Second)
 
 			table := "default." + marker
@@ -223,7 +227,8 @@ func generateWorkload(t *testing.T, db *sql.DB, marker, table string) {
 	t.Cleanup(func() {
 		dropCtx, dropCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer dropCancel()
-		_, _ = db.ExecContext(dropCtx, "DROP TABLE IF EXISTS "+table)
+		_, dropErr := db.ExecContext(dropCtx, "DROP TABLE IF EXISTS "+table)
+		require.NoError(t, dropErr, "dropping the per-run table must succeed")
 	})
 
 	// Five SELECTs differing only by an integer literal — identical fingerprint.
@@ -296,17 +301,13 @@ func waitForQueryLog(t *testing.T, db *sql.DB, marker string) {
 
 // flushQueryLog issues SYSTEM FLUSH LOGS, which both creates system.query_log
 // on a fresh server and flushes its buffered rows. Only the test does this;
-// the production agent must never flush. A failure here is not fatal — the
-// bounded poll in waitForQueryLog still governs success — so it is logged and
-// the caller proceeds.
+// the production agent must never flush.
 func flushQueryLog(t *testing.T, db *sql.DB) {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	_, err := db.ExecContext(ctx, "SYSTEM FLUSH LOGS")
-	if err != nil {
-		t.Logf("SYSTEM FLUSH LOGS failed (will rely on poll): %v", err)
-	}
+	require.NoError(t, err, "SYSTEM FLUSH LOGS must succeed before polling system.query_log")
 }
 
 // isUnknownTableError reports whether err is a ClickHouse UNKNOWN_TABLE
