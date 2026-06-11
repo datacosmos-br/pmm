@@ -554,6 +554,9 @@ func (c *Client) handleStartActionRequest(p *agentv1.StartActionRequest) error {
 	case *agentv1.StartActionRequest_MongodbExplainParams:
 		action, err = actions.NewMongoDBExplainAction(p.ActionId, timeout, params.MongodbExplainParams, cfg.Paths.TempDir)
 
+	case *agentv1.StartActionRequest_ClickhouseExplainParams:
+		action, err = actions.NewClickHouseExplainAction(p.ActionId, timeout, params.ClickhouseExplainParams, cfg.Paths.TempDir)
+
 	case *agentv1.StartActionRequest_MysqlQueryShowParams:
 		action = actions.NewMySQLQueryShowAction(p.ActionId, timeout, params.MysqlQueryShowParams)
 
