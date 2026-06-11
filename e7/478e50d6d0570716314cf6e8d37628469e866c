@@ -1,0 +1,19 @@
+build/scripts/build-client-binary
+  s_aab4a0cd64efa1::t_c3fa8a8cd966d3 141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e7478e50d6d0570716314cf6e8d37628469e866c",
+  "prompts": {},
+  "sessions": {
+    "s_aab4a0cd64efa1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb702-2aca-74d1-b728-f0e419a88ab8",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
