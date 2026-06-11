@@ -1,0 +1,89 @@
+build/scripts/build-server-docker
+  s_8fc773802c87e6::t_dfa8668f35551c 14-18
+dashboards/pmm-app/src/shared/components/Form/Radio/RadioButtonGroup.styles.ts
+  s_7216b814c83710::t_4e2d6a58ffcb21 4
+  s_7216b814c83710::t_a985bbed7e2d19 20
+dashboards/pmm-app/src/pmm-qan/panel/components/Filters/Filters.styles.ts
+  s_7216b814c83710::t_a985bbed7e2d19 51
+  s_7216b814c83710::t_4e2d6a58ffcb21 7
+dashboards/pmm-app/src/pmm-qan/panel/components/Overview/components/QanTable/Table.styles.ts
+  s_7216b814c83710::t_4e2d6a58ffcb21 5
+  s_7216b814c83710::t_a985bbed7e2d19 176
+dashboards/pmm-app/src/shared/components/Form/FieldAdapters/FieldAdapters.styles.ts
+  s_7216b814c83710::t_a985bbed7e2d19 19
+  s_7216b814c83710::t_4e2d6a58ffcb21 4
+dashboards/pmm-app/src/pmm-qan/panel/components/Overview/components/Dimension/Dimension.styles.ts
+  s_7216b814c83710::t_a985bbed7e2d19 30
+  s_7216b814c83710::t_4e2d6a58ffcb21 5
+dashboards/pmm-app/src/shared/components/Form/Checkbox/Checkbox.styles.tsx
+  s_7216b814c83710::t_a985bbed7e2d19 112
+  s_7216b814c83710::t_4e2d6a58ffcb21 5
+dashboards/pmm-app/src/pmm-qan/panel/components/Overview/components/DefaultColumns/DefaultColumns.styles.ts
+  s_7216b814c83710::t_a985bbed7e2d19 30
+  s_7216b814c83710::t_4e2d6a58ffcb21 5
+dashboards/pmm-app/src/shared/components/Elements/LinkTooltip/LinkTooltip.styles.ts
+  s_7216b814c83710::t_4e2d6a58ffcb21 4
+  s_7216b814c83710::t_a985bbed7e2d19 20
+dashboards/pmm-app/src/pmm-qan/panel/QueryAnalytics.styles.ts
+  s_7216b814c83710::t_4e2d6a58ffcb21 6
+  s_7216b814c83710::t_a985bbed7e2d19 73
+dashboards/pmm-app/src/shared/components/Form/Radio/RadioButton.styles.ts
+  s_7216b814c83710::t_a985bbed7e2d19 44
+  s_7216b814c83710::t_4e2d6a58ffcb21 4
+dashboards/pmm-app/src/shared/components/Elements/Table/Table.styles.ts
+  s_7216b814c83710::t_4e2d6a58ffcb21 4
+  s_7216b814c83710::t_a985bbed7e2d19 79
+dashboards/pmm-app/src/pmm-qan/panel/components/Overview/components/Search/Search.styles.ts
+  s_7216b814c83710::t_a985bbed7e2d19 41
+  s_7216b814c83710::t_4e2d6a58ffcb21 4
+dashboards/pmm-app/src/shared/components/Elements/Charts/Latency/Latency.styles.ts
+  s_7216b814c83710::t_a985bbed7e2d19 24
+  s_7216b814c83710::t_4e2d6a58ffcb21 4
+dashboards/pmm-app/src/shared/components/Elements/Icons/Icons.styles.ts
+  s_7216b814c83710::t_4e2d6a58ffcb21 5
+  s_7216b814c83710::t_a985bbed7e2d19 16
+dashboards/pmm-app/src/pmm-qan/panel/components/ManageColumns/ManageColumns.styles.ts
+  s_7216b814c83710::t_a985bbed7e2d19 116
+  s_7216b814c83710::t_4e2d6a58ffcb21 6
+dashboards/pmm-app/src/shared/components/Elements/Modal/Modal.styles.ts
+  s_7216b814c83710::t_4e2d6a58ffcb21 4
+  s_7216b814c83710::t_a985bbed7e2d19 54
+dashboards/pmm-app/src/pmm-qan/panel/components/Filters/components/CheckboxGroup/CheckboxGroup.styles.ts
+  s_7216b814c83710::t_4e2d6a58ffcb21 6
+  s_7216b814c83710::t_a985bbed7e2d19 77
+dashboards/pmm-app/src/shared/components/Form/FieldAdapters/Field.tsx
+  s_7216b814c83710::t_4e2d6a58ffcb21 4,16
+dashboards/pmm-app/src/pmm-qan/panel/components/Details/Explain/components/ReplacedQueryMessage/ReplacedQueryMessage.styles.ts
+  s_7216b814c83710::t_4e2d6a58ffcb21 6
+  s_7216b814c83710::t_a985bbed7e2d19 26
+dashboards/pmm-app/src/pmm-qan/panel/components/Details/Details.styles.ts
+  s_7216b814c83710::t_4e2d6a58ffcb21 6
+  s_7216b814c83710::t_a985bbed7e2d19 40
+dashboards/pmm-app/src/pmm-qan/panel/components/Overview/components/MetricColumns/MetricColumn.styles.ts
+  s_7216b814c83710::t_a985bbed7e2d19 49
+  s_7216b814c83710::t_4e2d6a58ffcb21 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "2ed03e301ce225c36c0c3108c748a4484c0ccfee",
+  "prompts": {},
+  "sessions": {
+    "s_7216b814c83710": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb6f6-460f-7570-9bd9-dd6189397820",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_8fc773802c87e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb7ab-490c-7693-96e1-753a77e6ba9d",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
