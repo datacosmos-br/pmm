@@ -18,8 +18,11 @@ cp "${root_dir}/results/tarball/pmm-client-${pmm_version}.tar.gz" "${docker_root
 git -C ${PMM_SRC_DIR:-${root_dir}/sources/pmm/src/github.com/percona/pmm} rev-parse HEAD > ${docker_root}/gitCommit
 ls -la ${rpms_dir}
 docker run --rm -v ${rpms_dir}:/home/builder/rpm/RPMS ${rpmbuild_docker_image} sh -c "
+    set -o errexit
     sudo chown -R builder /home/builder/rpm/RPMS
-    until /usr/bin/createrepo_c --update /home/builder/rpm/RPMS; do
+    find /home/builder/rpm/RPMS -maxdepth 1 -name '*.rpm' -type f -printf '%f\n' > /tmp/rpm-pkglist
+    test -s /tmp/rpm-pkglist
+    until /usr/bin/createrepo_c --update --pkglist /tmp/rpm-pkglist /home/builder/rpm/RPMS; do
         echo waiting...
         sleep 1
     done
