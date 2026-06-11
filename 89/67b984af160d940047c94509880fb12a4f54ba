@@ -1,0 +1,41 @@
+dashboards/pmm-app/src/pmm-qan/panel/components/Details/Details.tsx
+  s_766c358d84b6e2::t_5f9cd566d2e2ed 40
+ui/apps/pmm/src/contexts/navigation/navigation.utils.tsx
+  s_766c358d84b6e2::t_c28225138b4ee9 47
+dashboards/pmm-app/src/pmm-qan/panel/components/Details/database-models/clickhouse/clickhouse.ts
+  s_766c358d84b6e2::t_5f9cd566d2e2ed 7-17
+dashboards/pmm-app/src/pmm-qan/panel/components/Details/Explain/Explain.tools.ts
+  s_68ab3b967b2582::t_fee161ab1ba6eb 4,110-112
+ui/apps/pmm/src/pages/help-center/welcome-card/WelcomeCard.utils.ts
+  s_766c358d84b6e2::t_c28225138b4ee9 19
+ui/apps/pmm/src/contexts/navigation/navigation.constants.ts
+  s_766c358d84b6e2::t_c28225138b4ee9 379-401
+ui/apps/pmm/src/utils/testStubs.ts
+  s_766c358d84b6e2::t_c28225138b4ee9 127
+dashboards/pmm-app/src/pmm-qan/panel/components/Details/database-models/clickhouse/service.ts
+  s_766c358d84b6e2::t_5f9cd566d2e2ed 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "8967b984af160d940047c94509880fb12a4f54ba",
+  "prompts": {},
+  "sessions": {
+    "s_68ab3b967b2582": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7627480e-5c4e-4864-8518-e3cbf3982b1a",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_766c358d84b6e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f70874aa-b264-42d3-b8bb-d7dde6bfa0a2",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
