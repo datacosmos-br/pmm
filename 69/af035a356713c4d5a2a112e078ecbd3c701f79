@@ -1,0 +1,19 @@
+build/scripts/build-server-rpm
+  s_9611f97f970de7::t_889011c0c2a002 115-117,120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "69af035a356713c4d5a2a112e078ecbd3c701f79",
+  "prompts": {},
+  "sessions": {
+    "s_9611f97f970de7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48c99c3e-e108-433e-9f9d-20adb133fd93",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
