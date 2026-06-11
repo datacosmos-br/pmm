@@ -270,8 +270,9 @@ type AddDBMSServiceParams struct {
 // Must be performed in transaction.
 func AddNewService(q *reform.Querier, serviceType ServiceType, params *AddDBMSServiceParams) (*Service, error) {
 	switch serviceType {
-	case MySQLServiceType, MongoDBServiceType, PostgreSQLServiceType, ProxySQLServiceType, ValkeyServiceType:
-		if err := validateDBConnectionOptions(params.Socket, params.Address, params.Port); err != nil {
+	case MySQLServiceType, MongoDBServiceType, PostgreSQLServiceType, ProxySQLServiceType, ValkeyServiceType, ClickHouseServiceType:
+		err := validateDBConnectionOptions(params.Socket, params.Address, params.Port)
+		if err != nil {
 			return nil, err
 		}
 		if params.ExternalGroup != "" {

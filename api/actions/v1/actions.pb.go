@@ -7,15 +7,14 @@
 package actionsv1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -41,6 +40,7 @@ const (
 	ActionType_ACTION_TYPE_PT_MYSQL_SUMMARY             ActionType = 9
 	ActionType_ACTION_TYPE_PT_PG_SUMMARY                ActionType = 10
 	ActionType_ACTION_TYPE_PT_MONGODB_SUMMARY           ActionType = 11
+	ActionType_ACTION_TYPE_CLICKHOUSE_EXPLAIN           ActionType = 12
 )
 
 // Enum value maps for ActionType.
@@ -58,6 +58,7 @@ var (
 		9:  "ACTION_TYPE_PT_MYSQL_SUMMARY",
 		10: "ACTION_TYPE_PT_PG_SUMMARY",
 		11: "ACTION_TYPE_PT_MONGODB_SUMMARY",
+		12: "ACTION_TYPE_CLICKHOUSE_EXPLAIN",
 	}
 	ActionType_value = map[string]int32{
 		"ACTION_TYPE_UNSPECIFIED":                  0,
@@ -72,6 +73,7 @@ var (
 		"ACTION_TYPE_PT_MYSQL_SUMMARY":             9,
 		"ACTION_TYPE_PT_PG_SUMMARY":                10,
 		"ACTION_TYPE_PT_MONGODB_SUMMARY":           11,
+		"ACTION_TYPE_CLICKHOUSE_EXPLAIN":           12,
 	}
 )
 
@@ -1380,6 +1382,132 @@ func (x *StartMongoDBExplainActionResult) GetPmmAgentId() string {
 	return ""
 }
 
+type StartClickHouseExplainActionRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// pmm-agent ID where to run this Action.
+	PmmAgentId string `protobuf:"bytes,1,opt,name=pmm_agent_id,json=pmmAgentId,proto3" json:"pmm_agent_id,omitempty"`
+	// Service ID for this Action. Required.
+	ServiceId string `protobuf:"bytes,2,opt,name=service_id,json=serviceId,proto3" json:"service_id,omitempty"`
+	// Query. Required.
+	Query string `protobuf:"bytes,3,opt,name=query,proto3" json:"query,omitempty"`
+	// Explain type: PLAN, PIPELINE, AST, ESTIMATE. Defaults to PLAN.
+	ExplainType   string `protobuf:"bytes,4,opt,name=explain_type,json=explainType,proto3" json:"explain_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartClickHouseExplainActionRequest) Reset() {
+	*x = StartClickHouseExplainActionRequest{}
+	mi := &file_actions_v1_actions_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartClickHouseExplainActionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartClickHouseExplainActionRequest) ProtoMessage() {}
+
+func (x *StartClickHouseExplainActionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_actions_v1_actions_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartClickHouseExplainActionRequest.ProtoReflect.Descriptor instead.
+func (*StartClickHouseExplainActionRequest) Descriptor() ([]byte, []int) {
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *StartClickHouseExplainActionRequest) GetPmmAgentId() string {
+	if x != nil {
+		return x.PmmAgentId
+	}
+	return ""
+}
+
+func (x *StartClickHouseExplainActionRequest) GetServiceId() string {
+	if x != nil {
+		return x.ServiceId
+	}
+	return ""
+}
+
+func (x *StartClickHouseExplainActionRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *StartClickHouseExplainActionRequest) GetExplainType() string {
+	if x != nil {
+		return x.ExplainType
+	}
+	return ""
+}
+
+type StartClickHouseExplainActionResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Unique Action ID.
+	ActionId string `protobuf:"bytes,1,opt,name=action_id,json=actionId,proto3" json:"action_id,omitempty"`
+	// pmm-agent ID where to this Action was started.
+	PmmAgentId    string `protobuf:"bytes,2,opt,name=pmm_agent_id,json=pmmAgentId,proto3" json:"pmm_agent_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartClickHouseExplainActionResponse) Reset() {
+	*x = StartClickHouseExplainActionResponse{}
+	mi := &file_actions_v1_actions_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartClickHouseExplainActionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartClickHouseExplainActionResponse) ProtoMessage() {}
+
+func (x *StartClickHouseExplainActionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_actions_v1_actions_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartClickHouseExplainActionResponse.ProtoReflect.Descriptor instead.
+func (*StartClickHouseExplainActionResponse) Descriptor() ([]byte, []int) {
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *StartClickHouseExplainActionResponse) GetActionId() string {
+	if x != nil {
+		return x.ActionId
+	}
+	return ""
+}
+
+func (x *StartClickHouseExplainActionResponse) GetPmmAgentId() string {
+	if x != nil {
+		return x.PmmAgentId
+	}
+	return ""
+}
+
 // Message to prepare pt-pg-summary data
 type StartPTPgSummaryActionParams struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -1393,7 +1521,7 @@ type StartPTPgSummaryActionParams struct {
 
 func (x *StartPTPgSummaryActionParams) Reset() {
 	*x = StartPTPgSummaryActionParams{}
-	mi := &file_actions_v1_actions_proto_msgTypes[20]
+	mi := &file_actions_v1_actions_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1405,7 +1533,7 @@ func (x *StartPTPgSummaryActionParams) String() string {
 func (*StartPTPgSummaryActionParams) ProtoMessage() {}
 
 func (x *StartPTPgSummaryActionParams) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[20]
+	mi := &file_actions_v1_actions_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1418,7 +1546,7 @@ func (x *StartPTPgSummaryActionParams) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartPTPgSummaryActionParams.ProtoReflect.Descriptor instead.
 func (*StartPTPgSummaryActionParams) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{20}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *StartPTPgSummaryActionParams) GetPmmAgentId() string {
@@ -1448,7 +1576,7 @@ type StartPTPgSummaryActionResult struct {
 
 func (x *StartPTPgSummaryActionResult) Reset() {
 	*x = StartPTPgSummaryActionResult{}
-	mi := &file_actions_v1_actions_proto_msgTypes[21]
+	mi := &file_actions_v1_actions_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1460,7 +1588,7 @@ func (x *StartPTPgSummaryActionResult) String() string {
 func (*StartPTPgSummaryActionResult) ProtoMessage() {}
 
 func (x *StartPTPgSummaryActionResult) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[21]
+	mi := &file_actions_v1_actions_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1473,7 +1601,7 @@ func (x *StartPTPgSummaryActionResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartPTPgSummaryActionResult.ProtoReflect.Descriptor instead.
 func (*StartPTPgSummaryActionResult) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{21}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *StartPTPgSummaryActionResult) GetActionId() string {
@@ -1503,7 +1631,7 @@ type StartPTMongoDBSummaryActionParams struct {
 
 func (x *StartPTMongoDBSummaryActionParams) Reset() {
 	*x = StartPTMongoDBSummaryActionParams{}
-	mi := &file_actions_v1_actions_proto_msgTypes[22]
+	mi := &file_actions_v1_actions_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1515,7 +1643,7 @@ func (x *StartPTMongoDBSummaryActionParams) String() string {
 func (*StartPTMongoDBSummaryActionParams) ProtoMessage() {}
 
 func (x *StartPTMongoDBSummaryActionParams) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[22]
+	mi := &file_actions_v1_actions_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1528,7 +1656,7 @@ func (x *StartPTMongoDBSummaryActionParams) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use StartPTMongoDBSummaryActionParams.ProtoReflect.Descriptor instead.
 func (*StartPTMongoDBSummaryActionParams) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{22}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *StartPTMongoDBSummaryActionParams) GetPmmAgentId() string {
@@ -1558,7 +1686,7 @@ type StartPTMongoDBSummaryActionResult struct {
 
 func (x *StartPTMongoDBSummaryActionResult) Reset() {
 	*x = StartPTMongoDBSummaryActionResult{}
-	mi := &file_actions_v1_actions_proto_msgTypes[23]
+	mi := &file_actions_v1_actions_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1570,7 +1698,7 @@ func (x *StartPTMongoDBSummaryActionResult) String() string {
 func (*StartPTMongoDBSummaryActionResult) ProtoMessage() {}
 
 func (x *StartPTMongoDBSummaryActionResult) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[23]
+	mi := &file_actions_v1_actions_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1583,7 +1711,7 @@ func (x *StartPTMongoDBSummaryActionResult) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use StartPTMongoDBSummaryActionResult.ProtoReflect.Descriptor instead.
 func (*StartPTMongoDBSummaryActionResult) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{23}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *StartPTMongoDBSummaryActionResult) GetActionId() string {
@@ -1613,7 +1741,7 @@ type StartPTMySQLSummaryActionParams struct {
 
 func (x *StartPTMySQLSummaryActionParams) Reset() {
 	*x = StartPTMySQLSummaryActionParams{}
-	mi := &file_actions_v1_actions_proto_msgTypes[24]
+	mi := &file_actions_v1_actions_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1625,7 +1753,7 @@ func (x *StartPTMySQLSummaryActionParams) String() string {
 func (*StartPTMySQLSummaryActionParams) ProtoMessage() {}
 
 func (x *StartPTMySQLSummaryActionParams) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[24]
+	mi := &file_actions_v1_actions_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1638,7 +1766,7 @@ func (x *StartPTMySQLSummaryActionParams) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartPTMySQLSummaryActionParams.ProtoReflect.Descriptor instead.
 func (*StartPTMySQLSummaryActionParams) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{24}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *StartPTMySQLSummaryActionParams) GetPmmAgentId() string {
@@ -1668,7 +1796,7 @@ type StartPTMySQLSummaryActionResult struct {
 
 func (x *StartPTMySQLSummaryActionResult) Reset() {
 	*x = StartPTMySQLSummaryActionResult{}
-	mi := &file_actions_v1_actions_proto_msgTypes[25]
+	mi := &file_actions_v1_actions_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1680,7 +1808,7 @@ func (x *StartPTMySQLSummaryActionResult) String() string {
 func (*StartPTMySQLSummaryActionResult) ProtoMessage() {}
 
 func (x *StartPTMySQLSummaryActionResult) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[25]
+	mi := &file_actions_v1_actions_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1693,7 +1821,7 @@ func (x *StartPTMySQLSummaryActionResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartPTMySQLSummaryActionResult.ProtoReflect.Descriptor instead.
 func (*StartPTMySQLSummaryActionResult) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{25}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *StartPTMySQLSummaryActionResult) GetActionId() string {
@@ -1722,7 +1850,7 @@ type StartPTSummaryActionRequest struct {
 
 func (x *StartPTSummaryActionRequest) Reset() {
 	*x = StartPTSummaryActionRequest{}
-	mi := &file_actions_v1_actions_proto_msgTypes[26]
+	mi := &file_actions_v1_actions_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1734,7 +1862,7 @@ func (x *StartPTSummaryActionRequest) String() string {
 func (*StartPTSummaryActionRequest) ProtoMessage() {}
 
 func (x *StartPTSummaryActionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[26]
+	mi := &file_actions_v1_actions_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1747,7 +1875,7 @@ func (x *StartPTSummaryActionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartPTSummaryActionRequest.ProtoReflect.Descriptor instead.
 func (*StartPTSummaryActionRequest) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{26}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *StartPTSummaryActionRequest) GetPmmAgentId() string {
@@ -1776,7 +1904,7 @@ type StartPTSummaryActionResponse struct {
 
 func (x *StartPTSummaryActionResponse) Reset() {
 	*x = StartPTSummaryActionResponse{}
-	mi := &file_actions_v1_actions_proto_msgTypes[27]
+	mi := &file_actions_v1_actions_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1788,7 +1916,7 @@ func (x *StartPTSummaryActionResponse) String() string {
 func (*StartPTSummaryActionResponse) ProtoMessage() {}
 
 func (x *StartPTSummaryActionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[27]
+	mi := &file_actions_v1_actions_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1801,7 +1929,7 @@ func (x *StartPTSummaryActionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartPTSummaryActionResponse.ProtoReflect.Descriptor instead.
 func (*StartPTSummaryActionResponse) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{27}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *StartPTSummaryActionResponse) GetActionId() string {
@@ -1828,7 +1956,7 @@ type CancelActionRequest struct {
 
 func (x *CancelActionRequest) Reset() {
 	*x = CancelActionRequest{}
-	mi := &file_actions_v1_actions_proto_msgTypes[28]
+	mi := &file_actions_v1_actions_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1840,7 +1968,7 @@ func (x *CancelActionRequest) String() string {
 func (*CancelActionRequest) ProtoMessage() {}
 
 func (x *CancelActionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[28]
+	mi := &file_actions_v1_actions_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1853,7 +1981,7 @@ func (x *CancelActionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelActionRequest.ProtoReflect.Descriptor instead.
 func (*CancelActionRequest) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{28}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *CancelActionRequest) GetActionId() string {
@@ -1871,7 +1999,7 @@ type CancelActionResponse struct {
 
 func (x *CancelActionResponse) Reset() {
 	*x = CancelActionResponse{}
-	mi := &file_actions_v1_actions_proto_msgTypes[29]
+	mi := &file_actions_v1_actions_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1883,7 +2011,7 @@ func (x *CancelActionResponse) String() string {
 func (*CancelActionResponse) ProtoMessage() {}
 
 func (x *CancelActionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[29]
+	mi := &file_actions_v1_actions_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1896,7 +2024,7 @@ func (x *CancelActionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelActionResponse.ProtoReflect.Descriptor instead.
 func (*CancelActionResponse) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{29}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{31}
 }
 
 type StartServiceActionRequest struct {
@@ -1915,6 +2043,7 @@ type StartServiceActionRequest struct {
 	//	*StartServiceActionRequest_PtMongodbSummary
 	//	*StartServiceActionRequest_PtMysqlSummary
 	//	*StartServiceActionRequest_PtPostgresSummary
+	//	*StartServiceActionRequest_ClickhouseExplain
 	Action        isStartServiceActionRequest_Action `protobuf_oneof:"action"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1922,7 +2051,7 @@ type StartServiceActionRequest struct {
 
 func (x *StartServiceActionRequest) Reset() {
 	*x = StartServiceActionRequest{}
-	mi := &file_actions_v1_actions_proto_msgTypes[30]
+	mi := &file_actions_v1_actions_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1934,7 +2063,7 @@ func (x *StartServiceActionRequest) String() string {
 func (*StartServiceActionRequest) ProtoMessage() {}
 
 func (x *StartServiceActionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[30]
+	mi := &file_actions_v1_actions_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1947,7 +2076,7 @@ func (x *StartServiceActionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartServiceActionRequest.ProtoReflect.Descriptor instead.
 func (*StartServiceActionRequest) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{30}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *StartServiceActionRequest) GetAction() isStartServiceActionRequest_Action {
@@ -2065,6 +2194,15 @@ func (x *StartServiceActionRequest) GetPtPostgresSummary() *StartPTPgSummaryActi
 	return nil
 }
 
+func (x *StartServiceActionRequest) GetClickhouseExplain() *StartClickHouseExplainActionRequest {
+	if x != nil {
+		if x, ok := x.Action.(*StartServiceActionRequest_ClickhouseExplain); ok {
+			return x.ClickhouseExplain
+		}
+	}
+	return nil
+}
+
 type isStartServiceActionRequest_Action interface {
 	isStartServiceActionRequest_Action()
 }
@@ -2117,6 +2255,10 @@ type StartServiceActionRequest_PtPostgresSummary struct {
 	PtPostgresSummary *StartPTPgSummaryActionParams `protobuf:"bytes,12,opt,name=pt_postgres_summary,json=ptPostgresSummary,proto3,oneof"`
 }
 
+type StartServiceActionRequest_ClickhouseExplain struct {
+	ClickhouseExplain *StartClickHouseExplainActionRequest `protobuf:"bytes,13,opt,name=clickhouse_explain,json=clickhouseExplain,proto3,oneof"`
+}
+
 func (*StartServiceActionRequest_MysqlExplain) isStartServiceActionRequest_Action() {}
 
 func (*StartServiceActionRequest_MysqlExplainJson) isStartServiceActionRequest_Action() {}
@@ -2141,6 +2283,8 @@ func (*StartServiceActionRequest_PtMysqlSummary) isStartServiceActionRequest_Act
 
 func (*StartServiceActionRequest_PtPostgresSummary) isStartServiceActionRequest_Action() {}
 
+func (*StartServiceActionRequest_ClickhouseExplain) isStartServiceActionRequest_Action() {}
+
 type StartServiceActionResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Action:
@@ -2157,6 +2301,7 @@ type StartServiceActionResponse struct {
 	//	*StartServiceActionResponse_PtMongodbSummary
 	//	*StartServiceActionResponse_PtMysqlSummary
 	//	*StartServiceActionResponse_PtPostgresSummary
+	//	*StartServiceActionResponse_ClickhouseExplain
 	Action        isStartServiceActionResponse_Action `protobuf_oneof:"action"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2164,7 +2309,7 @@ type StartServiceActionResponse struct {
 
 func (x *StartServiceActionResponse) Reset() {
 	*x = StartServiceActionResponse{}
-	mi := &file_actions_v1_actions_proto_msgTypes[31]
+	mi := &file_actions_v1_actions_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2176,7 +2321,7 @@ func (x *StartServiceActionResponse) String() string {
 func (*StartServiceActionResponse) ProtoMessage() {}
 
 func (x *StartServiceActionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_actions_v1_actions_proto_msgTypes[31]
+	mi := &file_actions_v1_actions_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2189,7 +2334,7 @@ func (x *StartServiceActionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartServiceActionResponse.ProtoReflect.Descriptor instead.
 func (*StartServiceActionResponse) Descriptor() ([]byte, []int) {
-	return file_actions_v1_actions_proto_rawDescGZIP(), []int{31}
+	return file_actions_v1_actions_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *StartServiceActionResponse) GetAction() isStartServiceActionResponse_Action {
@@ -2307,6 +2452,15 @@ func (x *StartServiceActionResponse) GetPtPostgresSummary() *StartPTPgSummaryAct
 	return nil
 }
 
+func (x *StartServiceActionResponse) GetClickhouseExplain() *StartClickHouseExplainActionResponse {
+	if x != nil {
+		if x, ok := x.Action.(*StartServiceActionResponse_ClickhouseExplain); ok {
+			return x.ClickhouseExplain
+		}
+	}
+	return nil
+}
+
 type isStartServiceActionResponse_Action interface {
 	isStartServiceActionResponse_Action()
 }
@@ -2359,6 +2513,10 @@ type StartServiceActionResponse_PtPostgresSummary struct {
 	PtPostgresSummary *StartPTPgSummaryActionResult `protobuf:"bytes,12,opt,name=pt_postgres_summary,json=ptPostgresSummary,proto3,oneof"`
 }
 
+type StartServiceActionResponse_ClickhouseExplain struct {
+	ClickhouseExplain *StartClickHouseExplainActionResponse `protobuf:"bytes,13,opt,name=clickhouse_explain,json=clickhouseExplain,proto3,oneof"`
+}
+
 func (*StartServiceActionResponse_MysqlExplain) isStartServiceActionResponse_Action() {}
 
 func (*StartServiceActionResponse_MysqlExplainJson) isStartServiceActionResponse_Action() {}
@@ -2383,6 +2541,8 @@ func (*StartServiceActionResponse_PtMongodbSummary) isStartServiceActionResponse
 func (*StartServiceActionResponse_PtMysqlSummary) isStartServiceActionResponse_Action() {}
 
 func (*StartServiceActionResponse_PtPostgresSummary) isStartServiceActionResponse_Action() {}
+
+func (*StartServiceActionResponse_ClickhouseExplain) isStartServiceActionResponse_Action() {}
 
 var File_actions_v1_actions_proto protoreflect.FileDescriptor
 
@@ -2504,6 +2664,17 @@ const file_actions_v1_actions_proto_rawDesc = "" +
 	"\x1fStartMongoDBExplainActionResult\x12\x1b\n" +
 	"\taction_id\x18\x01 \x01(\tR\bactionId\x12 \n" +
 	"\fpmm_agent_id\x18\x02 \x01(\tR\n" +
+	"pmmAgentId\"\xb1\x01\n" +
+	"#StartClickHouseExplainActionRequest\x12 \n" +
+	"\fpmm_agent_id\x18\x01 \x01(\tR\n" +
+	"pmmAgentId\x12&\n" +
+	"\n" +
+	"service_id\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\tserviceId\x12\x1d\n" +
+	"\x05query\x18\x03 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x05query\x12!\n" +
+	"\fexplain_type\x18\x04 \x01(\tR\vexplainType\"e\n" +
+	"$StartClickHouseExplainActionResponse\x12\x1b\n" +
+	"\taction_id\x18\x01 \x01(\tR\bactionId\x12 \n" +
+	"\fpmm_agent_id\x18\x02 \x01(\tR\n" +
 	"pmmAgentId\"_\n" +
 	"\x1cStartPTPgSummaryActionParams\x12 \n" +
 	"\fpmm_agent_id\x18\x01 \x01(\tR\n" +
@@ -2542,7 +2713,8 @@ const file_actions_v1_actions_proto_rawDesc = "" +
 	"pmmAgentId\";\n" +
 	"\x13CancelActionRequest\x12$\n" +
 	"\taction_id\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\bactionId\"\x16\n" +
-	"\x14CancelActionResponse\"\xcf\t\n" +
+	"\x14CancelActionResponse\"\xb1\n" +
+	"\n" +
 	"\x19StartServiceActionRequest\x12P\n" +
 	"\rmysql_explain\x18\x01 \x01(\v2).actions.v1.StartMySQLExplainActionParamsH\x00R\fmysqlExplain\x12]\n" +
 	"\x12mysql_explain_json\x18\x02 \x01(\v2-.actions.v1.StartMySQLExplainJSONActionParamsH\x00R\x10mysqlExplainJson\x12\x7f\n" +
@@ -2556,8 +2728,10 @@ const file_actions_v1_actions_proto_rawDesc = "" +
 	"\x12pt_mongodb_summary\x18\n" +
 	" \x01(\v2-.actions.v1.StartPTMongoDBSummaryActionParamsH\x00R\x10ptMongodbSummary\x12W\n" +
 	"\x10pt_mysql_summary\x18\v \x01(\v2+.actions.v1.StartPTMySQLSummaryActionParamsH\x00R\x0eptMysqlSummary\x12Z\n" +
-	"\x13pt_postgres_summary\x18\f \x01(\v2(.actions.v1.StartPTPgSummaryActionParamsH\x00R\x11ptPostgresSummaryB\b\n" +
-	"\x06action\"\xd8\t\n" +
+	"\x13pt_postgres_summary\x18\f \x01(\v2(.actions.v1.StartPTPgSummaryActionParamsH\x00R\x11ptPostgresSummary\x12`\n" +
+	"\x12clickhouse_explain\x18\r \x01(\v2/.actions.v1.StartClickHouseExplainActionRequestH\x00R\x11clickhouseExplainB\b\n" +
+	"\x06action\"\xbb\n" +
+	"\n" +
 	"\x1aStartServiceActionResponse\x12P\n" +
 	"\rmysql_explain\x18\x01 \x01(\v2).actions.v1.StartMySQLExplainActionResultH\x00R\fmysqlExplain\x12]\n" +
 	"\x12mysql_explain_json\x18\x02 \x01(\v2-.actions.v1.StartMySQLExplainJSONActionResultH\x00R\x10mysqlExplainJson\x12\x7f\n" +
@@ -2571,8 +2745,9 @@ const file_actions_v1_actions_proto_rawDesc = "" +
 	"\x12pt_mongodb_summary\x18\n" +
 	" \x01(\v2-.actions.v1.StartPTMongoDBSummaryActionResultH\x00R\x10ptMongodbSummary\x12W\n" +
 	"\x10pt_mysql_summary\x18\v \x01(\v2+.actions.v1.StartPTMySQLSummaryActionResultH\x00R\x0eptMysqlSummary\x12Z\n" +
-	"\x13pt_postgres_summary\x18\f \x01(\v2(.actions.v1.StartPTPgSummaryActionResultH\x00R\x11ptPostgresSummaryB\b\n" +
-	"\x06action*\xb3\x03\n" +
+	"\x13pt_postgres_summary\x18\f \x01(\v2(.actions.v1.StartPTPgSummaryActionResultH\x00R\x11ptPostgresSummary\x12a\n" +
+	"\x12clickhouse_explain\x18\r \x01(\v20.actions.v1.StartClickHouseExplainActionResponseH\x00R\x11clickhouseExplainB\b\n" +
+	"\x06action*\xd7\x03\n" +
 	"\n" +
 	"ActionType\x12\x1b\n" +
 	"\x17ACTION_TYPE_UNSPECIFIED\x10\x00\x12\x1d\n" +
@@ -2587,10 +2762,12 @@ const file_actions_v1_actions_proto_rawDesc = "" +
 	"\x1cACTION_TYPE_PT_MYSQL_SUMMARY\x10\t\x12\x1d\n" +
 	"\x19ACTION_TYPE_PT_PG_SUMMARY\x10\n" +
 	"\x12\"\n" +
-	"\x1eACTION_TYPE_PT_MONGODB_SUMMARY\x10\v2\xf1\x05\n" +
+	"\x1eACTION_TYPE_PT_MONGODB_SUMMARY\x10\v\x12\"\n" +
+	"\x1eACTION_TYPE_CLICKHOUSE_EXPLAIN\x10\f2\xe6\a\n" +
 	"\x0eActionsService\x12\x9c\x01\n" +
 	"\tGetAction\x12\x1c.actions.v1.GetActionRequest\x1a\x1d.actions.v1.GetActionResponse\"R\x92A0\x12\n" +
-	"Get Action\x1a\"Gets the result of a given Action.\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/actions/{action_id}\x12\xc3\x01\n" +
+	"Get Action\x1a\"Gets the result of a given Action.\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/actions/{action_id}\x12\xf2\x01\n" +
+	"\x1cStartClickHouseExplainAction\x12/.actions.v1.StartClickHouseExplainActionRequest\x1a0.actions.v1.StartClickHouseExplainActionResponse\"o\x92AD\x12\x1fStart ClickHouse EXPLAIN Action\x1a!Starts ClickHouse EXPLAIN Action.\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/v1/actions:clickhouseExplain\x12\xc3\x01\n" +
 	"\x12StartServiceAction\x12%.actions.v1.StartServiceActionRequest\x1a&.actions.v1.StartServiceActionResponse\"^\x92A2\x12\x16Start a Service Action\x1a\x18Starts a Service Action.\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/v1/actions:startServiceAction\x12\xd9\x01\n" +
 	"\x14StartPTSummaryAction\x12'.actions.v1.StartPTSummaryActionRequest\x1a(.actions.v1.StartPTSummaryActionResponse\"n\x92AE\x12\x19Start 'PT Summary' Action\x1a(Starts 'Percona Toolkit Summary' Action.\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/v1/actions:startNodeAction\x12\x9d\x01\n" +
 	"\fCancelAction\x12\x1f.actions.v1.CancelActionRequest\x1a .actions.v1.CancelActionResponse\"J\x92A$\x12\x10Cancel an Action\x1a\x10Stops an Action.\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/v1/actions:cancelActionB\x98\x01\n" +
@@ -2610,46 +2787,45 @@ func file_actions_v1_actions_proto_rawDescGZIP() []byte {
 	return file_actions_v1_actions_proto_rawDescData
 }
 
-var (
-	file_actions_v1_actions_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-	file_actions_v1_actions_proto_msgTypes  = make([]protoimpl.MessageInfo, 32)
-	file_actions_v1_actions_proto_goTypes   = []any{
-		ActionType(0),                                        // 0: actions.v1.ActionType
-		(*GetActionRequest)(nil),                             // 1: actions.v1.GetActionRequest
-		(*GetActionResponse)(nil),                            // 2: actions.v1.GetActionResponse
-		(*StartMySQLExplainActionParams)(nil),                // 3: actions.v1.StartMySQLExplainActionParams
-		(*StartMySQLExplainActionResult)(nil),                // 4: actions.v1.StartMySQLExplainActionResult
-		(*StartMySQLExplainJSONActionParams)(nil),            // 5: actions.v1.StartMySQLExplainJSONActionParams
-		(*StartMySQLExplainJSONActionResult)(nil),            // 6: actions.v1.StartMySQLExplainJSONActionResult
-		(*StartMySQLExplainTraditionalJSONActionParams)(nil), // 7: actions.v1.StartMySQLExplainTraditionalJSONActionParams
-		(*StartMySQLExplainTraditionalJSONActionResult)(nil), // 8: actions.v1.StartMySQLExplainTraditionalJSONActionResult
-		(*StartMySQLShowCreateTableActionParams)(nil),        // 9: actions.v1.StartMySQLShowCreateTableActionParams
-		(*StartMySQLShowCreateTableActionResult)(nil),        // 10: actions.v1.StartMySQLShowCreateTableActionResult
-		(*StartMySQLShowTableStatusActionParams)(nil),        // 11: actions.v1.StartMySQLShowTableStatusActionParams
-		(*StartMySQLShowTableStatusActionResult)(nil),        // 12: actions.v1.StartMySQLShowTableStatusActionResult
-		(*StartMySQLShowIndexActionParams)(nil),              // 13: actions.v1.StartMySQLShowIndexActionParams
-		(*StartMySQLShowIndexActionResult)(nil),              // 14: actions.v1.StartMySQLShowIndexActionResult
-		(*StartPostgreSQLShowCreateTableActionParams)(nil),   // 15: actions.v1.StartPostgreSQLShowCreateTableActionParams
-		(*StartPostgreSQLShowCreateTableActionResult)(nil),   // 16: actions.v1.StartPostgreSQLShowCreateTableActionResult
-		(*StartPostgreSQLShowIndexActionParams)(nil),         // 17: actions.v1.StartPostgreSQLShowIndexActionParams
-		(*StartPostgreSQLShowIndexActionResult)(nil),         // 18: actions.v1.StartPostgreSQLShowIndexActionResult
-		(*StartMongoDBExplainActionParams)(nil),              // 19: actions.v1.StartMongoDBExplainActionParams
-		(*StartMongoDBExplainActionResult)(nil),              // 20: actions.v1.StartMongoDBExplainActionResult
-		(*StartPTPgSummaryActionParams)(nil),                 // 21: actions.v1.StartPTPgSummaryActionParams
-		(*StartPTPgSummaryActionResult)(nil),                 // 22: actions.v1.StartPTPgSummaryActionResult
-		(*StartPTMongoDBSummaryActionParams)(nil),            // 23: actions.v1.StartPTMongoDBSummaryActionParams
-		(*StartPTMongoDBSummaryActionResult)(nil),            // 24: actions.v1.StartPTMongoDBSummaryActionResult
-		(*StartPTMySQLSummaryActionParams)(nil),              // 25: actions.v1.StartPTMySQLSummaryActionParams
-		(*StartPTMySQLSummaryActionResult)(nil),              // 26: actions.v1.StartPTMySQLSummaryActionResult
-		(*StartPTSummaryActionRequest)(nil),                  // 27: actions.v1.StartPTSummaryActionRequest
-		(*StartPTSummaryActionResponse)(nil),                 // 28: actions.v1.StartPTSummaryActionResponse
-		(*CancelActionRequest)(nil),                          // 29: actions.v1.CancelActionRequest
-		(*CancelActionResponse)(nil),                         // 30: actions.v1.CancelActionResponse
-		(*StartServiceActionRequest)(nil),                    // 31: actions.v1.StartServiceActionRequest
-		(*StartServiceActionResponse)(nil),                   // 32: actions.v1.StartServiceActionResponse
-	}
-)
-
+var file_actions_v1_actions_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_actions_v1_actions_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
+var file_actions_v1_actions_proto_goTypes = []any{
+	(ActionType)(0),                                      // 0: actions.v1.ActionType
+	(*GetActionRequest)(nil),                             // 1: actions.v1.GetActionRequest
+	(*GetActionResponse)(nil),                            // 2: actions.v1.GetActionResponse
+	(*StartMySQLExplainActionParams)(nil),                // 3: actions.v1.StartMySQLExplainActionParams
+	(*StartMySQLExplainActionResult)(nil),                // 4: actions.v1.StartMySQLExplainActionResult
+	(*StartMySQLExplainJSONActionParams)(nil),            // 5: actions.v1.StartMySQLExplainJSONActionParams
+	(*StartMySQLExplainJSONActionResult)(nil),            // 6: actions.v1.StartMySQLExplainJSONActionResult
+	(*StartMySQLExplainTraditionalJSONActionParams)(nil), // 7: actions.v1.StartMySQLExplainTraditionalJSONActionParams
+	(*StartMySQLExplainTraditionalJSONActionResult)(nil), // 8: actions.v1.StartMySQLExplainTraditionalJSONActionResult
+	(*StartMySQLShowCreateTableActionParams)(nil),        // 9: actions.v1.StartMySQLShowCreateTableActionParams
+	(*StartMySQLShowCreateTableActionResult)(nil),        // 10: actions.v1.StartMySQLShowCreateTableActionResult
+	(*StartMySQLShowTableStatusActionParams)(nil),        // 11: actions.v1.StartMySQLShowTableStatusActionParams
+	(*StartMySQLShowTableStatusActionResult)(nil),        // 12: actions.v1.StartMySQLShowTableStatusActionResult
+	(*StartMySQLShowIndexActionParams)(nil),              // 13: actions.v1.StartMySQLShowIndexActionParams
+	(*StartMySQLShowIndexActionResult)(nil),              // 14: actions.v1.StartMySQLShowIndexActionResult
+	(*StartPostgreSQLShowCreateTableActionParams)(nil),   // 15: actions.v1.StartPostgreSQLShowCreateTableActionParams
+	(*StartPostgreSQLShowCreateTableActionResult)(nil),   // 16: actions.v1.StartPostgreSQLShowCreateTableActionResult
+	(*StartPostgreSQLShowIndexActionParams)(nil),         // 17: actions.v1.StartPostgreSQLShowIndexActionParams
+	(*StartPostgreSQLShowIndexActionResult)(nil),         // 18: actions.v1.StartPostgreSQLShowIndexActionResult
+	(*StartMongoDBExplainActionParams)(nil),              // 19: actions.v1.StartMongoDBExplainActionParams
+	(*StartMongoDBExplainActionResult)(nil),              // 20: actions.v1.StartMongoDBExplainActionResult
+	(*StartClickHouseExplainActionRequest)(nil),          // 21: actions.v1.StartClickHouseExplainActionRequest
+	(*StartClickHouseExplainActionResponse)(nil),         // 22: actions.v1.StartClickHouseExplainActionResponse
+	(*StartPTPgSummaryActionParams)(nil),                 // 23: actions.v1.StartPTPgSummaryActionParams
+	(*StartPTPgSummaryActionResult)(nil),                 // 24: actions.v1.StartPTPgSummaryActionResult
+	(*StartPTMongoDBSummaryActionParams)(nil),            // 25: actions.v1.StartPTMongoDBSummaryActionParams
+	(*StartPTMongoDBSummaryActionResult)(nil),            // 26: actions.v1.StartPTMongoDBSummaryActionResult
+	(*StartPTMySQLSummaryActionParams)(nil),              // 27: actions.v1.StartPTMySQLSummaryActionParams
+	(*StartPTMySQLSummaryActionResult)(nil),              // 28: actions.v1.StartPTMySQLSummaryActionResult
+	(*StartPTSummaryActionRequest)(nil),                  // 29: actions.v1.StartPTSummaryActionRequest
+	(*StartPTSummaryActionResponse)(nil),                 // 30: actions.v1.StartPTSummaryActionResponse
+	(*CancelActionRequest)(nil),                          // 31: actions.v1.CancelActionRequest
+	(*CancelActionResponse)(nil),                         // 32: actions.v1.CancelActionResponse
+	(*StartServiceActionRequest)(nil),                    // 33: actions.v1.StartServiceActionRequest
+	(*StartServiceActionResponse)(nil),                   // 34: actions.v1.StartServiceActionResponse
+}
 var file_actions_v1_actions_proto_depIdxs = []int32{
 	3,  // 0: actions.v1.StartServiceActionRequest.mysql_explain:type_name -> actions.v1.StartMySQLExplainActionParams
 	5,  // 1: actions.v1.StartServiceActionRequest.mysql_explain_json:type_name -> actions.v1.StartMySQLExplainJSONActionParams
@@ -2660,34 +2836,38 @@ var file_actions_v1_actions_proto_depIdxs = []int32{
 	15, // 6: actions.v1.StartServiceActionRequest.postgres_show_create_table:type_name -> actions.v1.StartPostgreSQLShowCreateTableActionParams
 	17, // 7: actions.v1.StartServiceActionRequest.postgres_show_index:type_name -> actions.v1.StartPostgreSQLShowIndexActionParams
 	19, // 8: actions.v1.StartServiceActionRequest.mongodb_explain:type_name -> actions.v1.StartMongoDBExplainActionParams
-	23, // 9: actions.v1.StartServiceActionRequest.pt_mongodb_summary:type_name -> actions.v1.StartPTMongoDBSummaryActionParams
-	25, // 10: actions.v1.StartServiceActionRequest.pt_mysql_summary:type_name -> actions.v1.StartPTMySQLSummaryActionParams
-	21, // 11: actions.v1.StartServiceActionRequest.pt_postgres_summary:type_name -> actions.v1.StartPTPgSummaryActionParams
-	4,  // 12: actions.v1.StartServiceActionResponse.mysql_explain:type_name -> actions.v1.StartMySQLExplainActionResult
-	6,  // 13: actions.v1.StartServiceActionResponse.mysql_explain_json:type_name -> actions.v1.StartMySQLExplainJSONActionResult
-	8,  // 14: actions.v1.StartServiceActionResponse.mysql_explain_traditional_json:type_name -> actions.v1.StartMySQLExplainTraditionalJSONActionResult
-	14, // 15: actions.v1.StartServiceActionResponse.mysql_show_index:type_name -> actions.v1.StartMySQLShowIndexActionResult
-	10, // 16: actions.v1.StartServiceActionResponse.mysql_show_create_table:type_name -> actions.v1.StartMySQLShowCreateTableActionResult
-	12, // 17: actions.v1.StartServiceActionResponse.mysql_show_table_status:type_name -> actions.v1.StartMySQLShowTableStatusActionResult
-	16, // 18: actions.v1.StartServiceActionResponse.postgresql_show_create_table:type_name -> actions.v1.StartPostgreSQLShowCreateTableActionResult
-	18, // 19: actions.v1.StartServiceActionResponse.postgresql_show_index:type_name -> actions.v1.StartPostgreSQLShowIndexActionResult
-	20, // 20: actions.v1.StartServiceActionResponse.mongodb_explain:type_name -> actions.v1.StartMongoDBExplainActionResult
-	24, // 21: actions.v1.StartServiceActionResponse.pt_mongodb_summary:type_name -> actions.v1.StartPTMongoDBSummaryActionResult
-	26, // 22: actions.v1.StartServiceActionResponse.pt_mysql_summary:type_name -> actions.v1.StartPTMySQLSummaryActionResult
-	22, // 23: actions.v1.StartServiceActionResponse.pt_postgres_summary:type_name -> actions.v1.StartPTPgSummaryActionResult
-	1,  // 24: actions.v1.ActionsService.GetAction:input_type -> actions.v1.GetActionRequest
-	31, // 25: actions.v1.ActionsService.StartServiceAction:input_type -> actions.v1.StartServiceActionRequest
-	27, // 26: actions.v1.ActionsService.StartPTSummaryAction:input_type -> actions.v1.StartPTSummaryActionRequest
-	29, // 27: actions.v1.ActionsService.CancelAction:input_type -> actions.v1.CancelActionRequest
-	2,  // 28: actions.v1.ActionsService.GetAction:output_type -> actions.v1.GetActionResponse
-	32, // 29: actions.v1.ActionsService.StartServiceAction:output_type -> actions.v1.StartServiceActionResponse
-	28, // 30: actions.v1.ActionsService.StartPTSummaryAction:output_type -> actions.v1.StartPTSummaryActionResponse
-	30, // 31: actions.v1.ActionsService.CancelAction:output_type -> actions.v1.CancelActionResponse
-	28, // [28:32] is the sub-list for method output_type
-	24, // [24:28] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	25, // 9: actions.v1.StartServiceActionRequest.pt_mongodb_summary:type_name -> actions.v1.StartPTMongoDBSummaryActionParams
+	27, // 10: actions.v1.StartServiceActionRequest.pt_mysql_summary:type_name -> actions.v1.StartPTMySQLSummaryActionParams
+	23, // 11: actions.v1.StartServiceActionRequest.pt_postgres_summary:type_name -> actions.v1.StartPTPgSummaryActionParams
+	21, // 12: actions.v1.StartServiceActionRequest.clickhouse_explain:type_name -> actions.v1.StartClickHouseExplainActionRequest
+	4,  // 13: actions.v1.StartServiceActionResponse.mysql_explain:type_name -> actions.v1.StartMySQLExplainActionResult
+	6,  // 14: actions.v1.StartServiceActionResponse.mysql_explain_json:type_name -> actions.v1.StartMySQLExplainJSONActionResult
+	8,  // 15: actions.v1.StartServiceActionResponse.mysql_explain_traditional_json:type_name -> actions.v1.StartMySQLExplainTraditionalJSONActionResult
+	14, // 16: actions.v1.StartServiceActionResponse.mysql_show_index:type_name -> actions.v1.StartMySQLShowIndexActionResult
+	10, // 17: actions.v1.StartServiceActionResponse.mysql_show_create_table:type_name -> actions.v1.StartMySQLShowCreateTableActionResult
+	12, // 18: actions.v1.StartServiceActionResponse.mysql_show_table_status:type_name -> actions.v1.StartMySQLShowTableStatusActionResult
+	16, // 19: actions.v1.StartServiceActionResponse.postgresql_show_create_table:type_name -> actions.v1.StartPostgreSQLShowCreateTableActionResult
+	18, // 20: actions.v1.StartServiceActionResponse.postgresql_show_index:type_name -> actions.v1.StartPostgreSQLShowIndexActionResult
+	20, // 21: actions.v1.StartServiceActionResponse.mongodb_explain:type_name -> actions.v1.StartMongoDBExplainActionResult
+	26, // 22: actions.v1.StartServiceActionResponse.pt_mongodb_summary:type_name -> actions.v1.StartPTMongoDBSummaryActionResult
+	28, // 23: actions.v1.StartServiceActionResponse.pt_mysql_summary:type_name -> actions.v1.StartPTMySQLSummaryActionResult
+	24, // 24: actions.v1.StartServiceActionResponse.pt_postgres_summary:type_name -> actions.v1.StartPTPgSummaryActionResult
+	22, // 25: actions.v1.StartServiceActionResponse.clickhouse_explain:type_name -> actions.v1.StartClickHouseExplainActionResponse
+	1,  // 26: actions.v1.ActionsService.GetAction:input_type -> actions.v1.GetActionRequest
+	21, // 27: actions.v1.ActionsService.StartClickHouseExplainAction:input_type -> actions.v1.StartClickHouseExplainActionRequest
+	33, // 28: actions.v1.ActionsService.StartServiceAction:input_type -> actions.v1.StartServiceActionRequest
+	29, // 29: actions.v1.ActionsService.StartPTSummaryAction:input_type -> actions.v1.StartPTSummaryActionRequest
+	31, // 30: actions.v1.ActionsService.CancelAction:input_type -> actions.v1.CancelActionRequest
+	2,  // 31: actions.v1.ActionsService.GetAction:output_type -> actions.v1.GetActionResponse
+	22, // 32: actions.v1.ActionsService.StartClickHouseExplainAction:output_type -> actions.v1.StartClickHouseExplainActionResponse
+	34, // 33: actions.v1.ActionsService.StartServiceAction:output_type -> actions.v1.StartServiceActionResponse
+	30, // 34: actions.v1.ActionsService.StartPTSummaryAction:output_type -> actions.v1.StartPTSummaryActionResponse
+	32, // 35: actions.v1.ActionsService.CancelAction:output_type -> actions.v1.CancelActionResponse
+	31, // [31:36] is the sub-list for method output_type
+	26, // [26:31] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_actions_v1_actions_proto_init() }
@@ -2695,7 +2875,7 @@ func file_actions_v1_actions_proto_init() {
 	if File_actions_v1_actions_proto != nil {
 		return
 	}
-	file_actions_v1_actions_proto_msgTypes[30].OneofWrappers = []any{
+	file_actions_v1_actions_proto_msgTypes[32].OneofWrappers = []any{
 		(*StartServiceActionRequest_MysqlExplain)(nil),
 		(*StartServiceActionRequest_MysqlExplainJson)(nil),
 		(*StartServiceActionRequest_MysqlExplainTraditionalJson)(nil),
@@ -2708,8 +2888,9 @@ func file_actions_v1_actions_proto_init() {
 		(*StartServiceActionRequest_PtMongodbSummary)(nil),
 		(*StartServiceActionRequest_PtMysqlSummary)(nil),
 		(*StartServiceActionRequest_PtPostgresSummary)(nil),
+		(*StartServiceActionRequest_ClickhouseExplain)(nil),
 	}
-	file_actions_v1_actions_proto_msgTypes[31].OneofWrappers = []any{
+	file_actions_v1_actions_proto_msgTypes[33].OneofWrappers = []any{
 		(*StartServiceActionResponse_MysqlExplain)(nil),
 		(*StartServiceActionResponse_MysqlExplainJson)(nil),
 		(*StartServiceActionResponse_MysqlExplainTraditionalJson)(nil),
@@ -2722,6 +2903,7 @@ func file_actions_v1_actions_proto_init() {
 		(*StartServiceActionResponse_PtMongodbSummary)(nil),
 		(*StartServiceActionResponse_PtMysqlSummary)(nil),
 		(*StartServiceActionResponse_PtPostgresSummary)(nil),
+		(*StartServiceActionResponse_ClickhouseExplain)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2729,7 +2911,7 @@ func file_actions_v1_actions_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_actions_v1_actions_proto_rawDesc), len(file_actions_v1_actions_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   32,
+			NumMessages:   34,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

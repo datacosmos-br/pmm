@@ -7,19 +7,17 @@
 package agentv1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
+	v11 "github.com/percona/pmm/api/backup/v1"
+	_ "github.com/percona/pmm/api/extensions/v1"
+	v1 "github.com/percona/pmm/api/inventory/v1"
 	status "google.golang.org/genproto/googleapis/rpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-
-	v11 "github.com/percona/pmm/api/backup/v1"
-	_ "github.com/percona/pmm/api/extensions/v1"
-	v1 "github.com/percona/pmm/api/inventory/v1"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -132,7 +130,7 @@ func (x StartActionRequest_RestartSystemServiceParams_SystemService) Number() pr
 
 // Deprecated: Use StartActionRequest_RestartSystemServiceParams_SystemService.Descriptor instead.
 func (StartActionRequest_RestartSystemServiceParams_SystemService) EnumDescriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 20, 0}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 21, 0}
 }
 
 // TextFiles contains files which can be used to connect to DB (certificates, keys and etc).
@@ -1000,6 +998,7 @@ type StartActionRequest struct {
 	//	*StartActionRequest_PostgresqlShowCreateTableParams
 	//	*StartActionRequest_PostgresqlShowIndexParams
 	//	*StartActionRequest_MongodbExplainParams
+	//	*StartActionRequest_ClickhouseExplainParams
 	//	*StartActionRequest_PtSummaryParams
 	//	*StartActionRequest_PtPgSummaryParams
 	//	*StartActionRequest_PtMongodbSummaryParams
@@ -1128,6 +1127,15 @@ func (x *StartActionRequest) GetMongodbExplainParams() *StartActionRequest_Mongo
 	if x != nil {
 		if x, ok := x.Params.(*StartActionRequest_MongodbExplainParams); ok {
 			return x.MongodbExplainParams
+		}
+	}
+	return nil
+}
+
+func (x *StartActionRequest) GetClickhouseExplainParams() *StartActionRequest_ClickHouseExplainParams {
+	if x != nil {
+		if x, ok := x.Params.(*StartActionRequest_ClickhouseExplainParams); ok {
+			return x.ClickhouseExplainParams
 		}
 	}
 	return nil
@@ -1291,6 +1299,10 @@ type StartActionRequest_MongodbExplainParams struct {
 	MongodbExplainParams *StartActionRequest_MongoDBExplainParams `protobuf:"bytes,16,opt,name=mongodb_explain_params,json=mongodbExplainParams,proto3,oneof"`
 }
 
+type StartActionRequest_ClickhouseExplainParams struct {
+	ClickhouseExplainParams *StartActionRequest_ClickHouseExplainParams `protobuf:"bytes,30,opt,name=clickhouse_explain_params,json=clickhouseExplainParams,proto3,oneof"`
+}
+
 type StartActionRequest_PtSummaryParams struct {
 	PtSummaryParams *StartActionRequest_PTSummaryParams `protobuf:"bytes,17,opt,name=pt_summary_params,json=ptSummaryParams,proto3,oneof"`
 }
@@ -1360,6 +1372,8 @@ func (*StartActionRequest_PostgresqlShowCreateTableParams) isStartActionRequest_
 func (*StartActionRequest_PostgresqlShowIndexParams) isStartActionRequest_Params() {}
 
 func (*StartActionRequest_MongodbExplainParams) isStartActionRequest_Params() {}
+
+func (*StartActionRequest_ClickhouseExplainParams) isStartActionRequest_Params() {}
 
 func (*StartActionRequest_PtSummaryParams) isStartActionRequest_Params() {}
 
@@ -4434,6 +4448,70 @@ func (x *StartActionRequest_MongoDBExplainParams) GetTextFiles() *TextFiles {
 	return nil
 }
 
+// ClickHouseExplainParams describes ClickHouse EXPLAIN action parameters.
+type StartActionRequest_ClickHouseExplainParams struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// DSN for the service. May contain connection (dial) timeout.
+	Dsn string `protobuf:"bytes,1,opt,name=dsn,proto3" json:"dsn,omitempty"`
+	// Query to explain.
+	Query string `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty"`
+	// Explain type: PLAN, PIPELINE, AST, ESTIMATE.
+	ExplainType   string `protobuf:"bytes,3,opt,name=explain_type,json=explainType,proto3" json:"explain_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartActionRequest_ClickHouseExplainParams) Reset() {
+	*x = StartActionRequest_ClickHouseExplainParams{}
+	mi := &file_agent_v1_agent_proto_msgTypes[57]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartActionRequest_ClickHouseExplainParams) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartActionRequest_ClickHouseExplainParams) ProtoMessage() {}
+
+func (x *StartActionRequest_ClickHouseExplainParams) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_v1_agent_proto_msgTypes[57]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartActionRequest_ClickHouseExplainParams.ProtoReflect.Descriptor instead.
+func (*StartActionRequest_ClickHouseExplainParams) Descriptor() ([]byte, []int) {
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 7}
+}
+
+func (x *StartActionRequest_ClickHouseExplainParams) GetDsn() string {
+	if x != nil {
+		return x.Dsn
+	}
+	return ""
+}
+
+func (x *StartActionRequest_ClickHouseExplainParams) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *StartActionRequest_ClickHouseExplainParams) GetExplainType() string {
+	if x != nil {
+		return x.ExplainType
+	}
+	return ""
+}
+
 // PTSummaryParams describes parameters for PT summary.
 type StartActionRequest_PTSummaryParams struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -4443,7 +4521,7 @@ type StartActionRequest_PTSummaryParams struct {
 
 func (x *StartActionRequest_PTSummaryParams) Reset() {
 	*x = StartActionRequest_PTSummaryParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[57]
+	mi := &file_agent_v1_agent_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4455,7 +4533,7 @@ func (x *StartActionRequest_PTSummaryParams) String() string {
 func (*StartActionRequest_PTSummaryParams) ProtoMessage() {}
 
 func (x *StartActionRequest_PTSummaryParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[57]
+	mi := &file_agent_v1_agent_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4468,7 +4546,7 @@ func (x *StartActionRequest_PTSummaryParams) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use StartActionRequest_PTSummaryParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_PTSummaryParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 7}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 8}
 }
 
 // PTPgSummaryParams describes parameters for PT PG summary.
@@ -4484,7 +4562,7 @@ type StartActionRequest_PTPgSummaryParams struct {
 
 func (x *StartActionRequest_PTPgSummaryParams) Reset() {
 	*x = StartActionRequest_PTPgSummaryParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[58]
+	mi := &file_agent_v1_agent_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4496,7 +4574,7 @@ func (x *StartActionRequest_PTPgSummaryParams) String() string {
 func (*StartActionRequest_PTPgSummaryParams) ProtoMessage() {}
 
 func (x *StartActionRequest_PTPgSummaryParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[58]
+	mi := &file_agent_v1_agent_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4509,7 +4587,7 @@ func (x *StartActionRequest_PTPgSummaryParams) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use StartActionRequest_PTPgSummaryParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_PTPgSummaryParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 8}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 9}
 }
 
 func (x *StartActionRequest_PTPgSummaryParams) GetHost() string {
@@ -4553,7 +4631,7 @@ type StartActionRequest_PTMongoDBSummaryParams struct {
 
 func (x *StartActionRequest_PTMongoDBSummaryParams) Reset() {
 	*x = StartActionRequest_PTMongoDBSummaryParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[59]
+	mi := &file_agent_v1_agent_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4565,7 +4643,7 @@ func (x *StartActionRequest_PTMongoDBSummaryParams) String() string {
 func (*StartActionRequest_PTMongoDBSummaryParams) ProtoMessage() {}
 
 func (x *StartActionRequest_PTMongoDBSummaryParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[59]
+	mi := &file_agent_v1_agent_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4578,7 +4656,7 @@ func (x *StartActionRequest_PTMongoDBSummaryParams) ProtoReflect() protoreflect.
 
 // Deprecated: Use StartActionRequest_PTMongoDBSummaryParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_PTMongoDBSummaryParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 9}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 10}
 }
 
 func (x *StartActionRequest_PTMongoDBSummaryParams) GetHost() string {
@@ -4623,7 +4701,7 @@ type StartActionRequest_PTMySQLSummaryParams struct {
 
 func (x *StartActionRequest_PTMySQLSummaryParams) Reset() {
 	*x = StartActionRequest_PTMySQLSummaryParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[60]
+	mi := &file_agent_v1_agent_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4635,7 +4713,7 @@ func (x *StartActionRequest_PTMySQLSummaryParams) String() string {
 func (*StartActionRequest_PTMySQLSummaryParams) ProtoMessage() {}
 
 func (x *StartActionRequest_PTMySQLSummaryParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[60]
+	mi := &file_agent_v1_agent_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4648,7 +4726,7 @@ func (x *StartActionRequest_PTMySQLSummaryParams) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use StartActionRequest_PTMySQLSummaryParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_PTMySQLSummaryParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 10}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 11}
 }
 
 func (x *StartActionRequest_PTMySQLSummaryParams) GetHost() string {
@@ -4703,7 +4781,7 @@ type StartActionRequest_MySQLQueryShowParams struct {
 
 func (x *StartActionRequest_MySQLQueryShowParams) Reset() {
 	*x = StartActionRequest_MySQLQueryShowParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[61]
+	mi := &file_agent_v1_agent_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4715,7 +4793,7 @@ func (x *StartActionRequest_MySQLQueryShowParams) String() string {
 func (*StartActionRequest_MySQLQueryShowParams) ProtoMessage() {}
 
 func (x *StartActionRequest_MySQLQueryShowParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[61]
+	mi := &file_agent_v1_agent_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4728,7 +4806,7 @@ func (x *StartActionRequest_MySQLQueryShowParams) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use StartActionRequest_MySQLQueryShowParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_MySQLQueryShowParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 11}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 12}
 }
 
 func (x *StartActionRequest_MySQLQueryShowParams) GetDsn() string {
@@ -4776,7 +4854,7 @@ type StartActionRequest_MySQLQuerySelectParams struct {
 
 func (x *StartActionRequest_MySQLQuerySelectParams) Reset() {
 	*x = StartActionRequest_MySQLQuerySelectParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[62]
+	mi := &file_agent_v1_agent_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4788,7 +4866,7 @@ func (x *StartActionRequest_MySQLQuerySelectParams) String() string {
 func (*StartActionRequest_MySQLQuerySelectParams) ProtoMessage() {}
 
 func (x *StartActionRequest_MySQLQuerySelectParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[62]
+	mi := &file_agent_v1_agent_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4801,7 +4879,7 @@ func (x *StartActionRequest_MySQLQuerySelectParams) ProtoReflect() protoreflect.
 
 // Deprecated: Use StartActionRequest_MySQLQuerySelectParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_MySQLQuerySelectParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 12}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 13}
 }
 
 func (x *StartActionRequest_MySQLQuerySelectParams) GetDsn() string {
@@ -4847,7 +4925,7 @@ type StartActionRequest_PostgreSQLQueryShowParams struct {
 
 func (x *StartActionRequest_PostgreSQLQueryShowParams) Reset() {
 	*x = StartActionRequest_PostgreSQLQueryShowParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[63]
+	mi := &file_agent_v1_agent_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4859,7 +4937,7 @@ func (x *StartActionRequest_PostgreSQLQueryShowParams) String() string {
 func (*StartActionRequest_PostgreSQLQueryShowParams) ProtoMessage() {}
 
 func (x *StartActionRequest_PostgreSQLQueryShowParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[63]
+	mi := &file_agent_v1_agent_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4872,7 +4950,7 @@ func (x *StartActionRequest_PostgreSQLQueryShowParams) ProtoReflect() protorefle
 
 // Deprecated: Use StartActionRequest_PostgreSQLQueryShowParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_PostgreSQLQueryShowParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 13}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 14}
 }
 
 func (x *StartActionRequest_PostgreSQLQueryShowParams) GetDsn() string {
@@ -4913,7 +4991,7 @@ type StartActionRequest_PostgreSQLQuerySelectParams struct {
 
 func (x *StartActionRequest_PostgreSQLQuerySelectParams) Reset() {
 	*x = StartActionRequest_PostgreSQLQuerySelectParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[64]
+	mi := &file_agent_v1_agent_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4925,7 +5003,7 @@ func (x *StartActionRequest_PostgreSQLQuerySelectParams) String() string {
 func (*StartActionRequest_PostgreSQLQuerySelectParams) ProtoMessage() {}
 
 func (x *StartActionRequest_PostgreSQLQuerySelectParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[64]
+	mi := &file_agent_v1_agent_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4938,7 +5016,7 @@ func (x *StartActionRequest_PostgreSQLQuerySelectParams) ProtoReflect() protoref
 
 // Deprecated: Use StartActionRequest_PostgreSQLQuerySelectParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_PostgreSQLQuerySelectParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 14}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 15}
 }
 
 func (x *StartActionRequest_PostgreSQLQuerySelectParams) GetDsn() string {
@@ -4983,7 +5061,7 @@ type StartActionRequest_MongoDBQueryGetParameterParams struct {
 
 func (x *StartActionRequest_MongoDBQueryGetParameterParams) Reset() {
 	*x = StartActionRequest_MongoDBQueryGetParameterParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[65]
+	mi := &file_agent_v1_agent_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4995,7 +5073,7 @@ func (x *StartActionRequest_MongoDBQueryGetParameterParams) String() string {
 func (*StartActionRequest_MongoDBQueryGetParameterParams) ProtoMessage() {}
 
 func (x *StartActionRequest_MongoDBQueryGetParameterParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[65]
+	mi := &file_agent_v1_agent_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5008,7 +5086,7 @@ func (x *StartActionRequest_MongoDBQueryGetParameterParams) ProtoReflect() proto
 
 // Deprecated: Use StartActionRequest_MongoDBQueryGetParameterParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_MongoDBQueryGetParameterParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 15}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 16}
 }
 
 func (x *StartActionRequest_MongoDBQueryGetParameterParams) GetDsn() string {
@@ -5039,7 +5117,7 @@ type StartActionRequest_MongoDBQueryBuildInfoParams struct {
 
 func (x *StartActionRequest_MongoDBQueryBuildInfoParams) Reset() {
 	*x = StartActionRequest_MongoDBQueryBuildInfoParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[66]
+	mi := &file_agent_v1_agent_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5051,7 +5129,7 @@ func (x *StartActionRequest_MongoDBQueryBuildInfoParams) String() string {
 func (*StartActionRequest_MongoDBQueryBuildInfoParams) ProtoMessage() {}
 
 func (x *StartActionRequest_MongoDBQueryBuildInfoParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[66]
+	mi := &file_agent_v1_agent_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5064,7 +5142,7 @@ func (x *StartActionRequest_MongoDBQueryBuildInfoParams) ProtoReflect() protoref
 
 // Deprecated: Use StartActionRequest_MongoDBQueryBuildInfoParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_MongoDBQueryBuildInfoParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 16}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 17}
 }
 
 func (x *StartActionRequest_MongoDBQueryBuildInfoParams) GetDsn() string {
@@ -5095,7 +5173,7 @@ type StartActionRequest_MongoDBQueryGetCmdLineOptsParams struct {
 
 func (x *StartActionRequest_MongoDBQueryGetCmdLineOptsParams) Reset() {
 	*x = StartActionRequest_MongoDBQueryGetCmdLineOptsParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[67]
+	mi := &file_agent_v1_agent_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5107,7 +5185,7 @@ func (x *StartActionRequest_MongoDBQueryGetCmdLineOptsParams) String() string {
 func (*StartActionRequest_MongoDBQueryGetCmdLineOptsParams) ProtoMessage() {}
 
 func (x *StartActionRequest_MongoDBQueryGetCmdLineOptsParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[67]
+	mi := &file_agent_v1_agent_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5120,7 +5198,7 @@ func (x *StartActionRequest_MongoDBQueryGetCmdLineOptsParams) ProtoReflect() pro
 
 // Deprecated: Use StartActionRequest_MongoDBQueryGetCmdLineOptsParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_MongoDBQueryGetCmdLineOptsParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 17}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 18}
 }
 
 func (x *StartActionRequest_MongoDBQueryGetCmdLineOptsParams) GetDsn() string {
@@ -5151,7 +5229,7 @@ type StartActionRequest_MongoDBQueryReplSetGetStatusParams struct {
 
 func (x *StartActionRequest_MongoDBQueryReplSetGetStatusParams) Reset() {
 	*x = StartActionRequest_MongoDBQueryReplSetGetStatusParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[68]
+	mi := &file_agent_v1_agent_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5163,7 +5241,7 @@ func (x *StartActionRequest_MongoDBQueryReplSetGetStatusParams) String() string 
 func (*StartActionRequest_MongoDBQueryReplSetGetStatusParams) ProtoMessage() {}
 
 func (x *StartActionRequest_MongoDBQueryReplSetGetStatusParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[68]
+	mi := &file_agent_v1_agent_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5176,7 +5254,7 @@ func (x *StartActionRequest_MongoDBQueryReplSetGetStatusParams) ProtoReflect() p
 
 // Deprecated: Use StartActionRequest_MongoDBQueryReplSetGetStatusParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_MongoDBQueryReplSetGetStatusParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 18}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 19}
 }
 
 func (x *StartActionRequest_MongoDBQueryReplSetGetStatusParams) GetDsn() string {
@@ -5207,7 +5285,7 @@ type StartActionRequest_MongoDBQueryGetDiagnosticDataParams struct {
 
 func (x *StartActionRequest_MongoDBQueryGetDiagnosticDataParams) Reset() {
 	*x = StartActionRequest_MongoDBQueryGetDiagnosticDataParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[69]
+	mi := &file_agent_v1_agent_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5219,7 +5297,7 @@ func (x *StartActionRequest_MongoDBQueryGetDiagnosticDataParams) String() string
 func (*StartActionRequest_MongoDBQueryGetDiagnosticDataParams) ProtoMessage() {}
 
 func (x *StartActionRequest_MongoDBQueryGetDiagnosticDataParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[69]
+	mi := &file_agent_v1_agent_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5232,7 +5310,7 @@ func (x *StartActionRequest_MongoDBQueryGetDiagnosticDataParams) ProtoReflect() 
 
 // Deprecated: Use StartActionRequest_MongoDBQueryGetDiagnosticDataParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_MongoDBQueryGetDiagnosticDataParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 19}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 20}
 }
 
 func (x *StartActionRequest_MongoDBQueryGetDiagnosticDataParams) GetDsn() string {
@@ -5259,7 +5337,7 @@ type StartActionRequest_RestartSystemServiceParams struct {
 
 func (x *StartActionRequest_RestartSystemServiceParams) Reset() {
 	*x = StartActionRequest_RestartSystemServiceParams{}
-	mi := &file_agent_v1_agent_proto_msgTypes[70]
+	mi := &file_agent_v1_agent_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5271,7 +5349,7 @@ func (x *StartActionRequest_RestartSystemServiceParams) String() string {
 func (*StartActionRequest_RestartSystemServiceParams) ProtoMessage() {}
 
 func (x *StartActionRequest_RestartSystemServiceParams) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[70]
+	mi := &file_agent_v1_agent_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5284,7 +5362,7 @@ func (x *StartActionRequest_RestartSystemServiceParams) ProtoReflect() protorefl
 
 // Deprecated: Use StartActionRequest_RestartSystemServiceParams.ProtoReflect.Descriptor instead.
 func (*StartActionRequest_RestartSystemServiceParams) Descriptor() ([]byte, []int) {
-	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 20}
+	return file_agent_v1_agent_proto_rawDescGZIP(), []int{14, 21}
 }
 
 func (x *StartActionRequest_RestartSystemServiceParams) GetSystemService() StartActionRequest_RestartSystemServiceParams_SystemService {
@@ -5305,7 +5383,7 @@ type CheckConnectionResponse_Stats struct {
 
 func (x *CheckConnectionResponse_Stats) Reset() {
 	*x = CheckConnectionResponse_Stats{}
-	mi := &file_agent_v1_agent_proto_msgTypes[71]
+	mi := &file_agent_v1_agent_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5317,7 +5395,7 @@ func (x *CheckConnectionResponse_Stats) String() string {
 func (*CheckConnectionResponse_Stats) ProtoMessage() {}
 
 func (x *CheckConnectionResponse_Stats) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[71]
+	mi := &file_agent_v1_agent_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5369,7 +5447,7 @@ type StartJobRequest_MySQLBackup struct {
 
 func (x *StartJobRequest_MySQLBackup) Reset() {
 	*x = StartJobRequest_MySQLBackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[72]
+	mi := &file_agent_v1_agent_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5381,7 +5459,7 @@ func (x *StartJobRequest_MySQLBackup) String() string {
 func (*StartJobRequest_MySQLBackup) ProtoMessage() {}
 
 func (x *StartJobRequest_MySQLBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[72]
+	mi := &file_agent_v1_agent_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5493,7 +5571,7 @@ type StartJobRequest_MySQLRestoreBackup struct {
 
 func (x *StartJobRequest_MySQLRestoreBackup) Reset() {
 	*x = StartJobRequest_MySQLRestoreBackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[73]
+	mi := &file_agent_v1_agent_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5505,7 +5583,7 @@ func (x *StartJobRequest_MySQLRestoreBackup) String() string {
 func (*StartJobRequest_MySQLRestoreBackup) ProtoMessage() {}
 
 func (x *StartJobRequest_MySQLRestoreBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[73]
+	mi := &file_agent_v1_agent_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5598,7 +5676,7 @@ type StartJobRequest_MongoDBBackup struct {
 
 func (x *StartJobRequest_MongoDBBackup) Reset() {
 	*x = StartJobRequest_MongoDBBackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[74]
+	mi := &file_agent_v1_agent_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5610,7 +5688,7 @@ func (x *StartJobRequest_MongoDBBackup) String() string {
 func (*StartJobRequest_MongoDBBackup) ProtoMessage() {}
 
 func (x *StartJobRequest_MongoDBBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[74]
+	mi := &file_agent_v1_agent_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5739,7 +5817,7 @@ type StartJobRequest_MongoDBRestoreBackup struct {
 
 func (x *StartJobRequest_MongoDBRestoreBackup) Reset() {
 	*x = StartJobRequest_MongoDBRestoreBackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[75]
+	mi := &file_agent_v1_agent_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5751,7 +5829,7 @@ func (x *StartJobRequest_MongoDBRestoreBackup) String() string {
 func (*StartJobRequest_MongoDBRestoreBackup) ProtoMessage() {}
 
 func (x *StartJobRequest_MongoDBRestoreBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[75]
+	mi := &file_agent_v1_agent_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5862,7 +5940,7 @@ type JobResult_Error struct {
 
 func (x *JobResult_Error) Reset() {
 	*x = JobResult_Error{}
-	mi := &file_agent_v1_agent_proto_msgTypes[76]
+	mi := &file_agent_v1_agent_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5874,7 +5952,7 @@ func (x *JobResult_Error) String() string {
 func (*JobResult_Error) ProtoMessage() {}
 
 func (x *JobResult_Error) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[76]
+	mi := &file_agent_v1_agent_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5909,7 +5987,7 @@ type JobResult_MongoDBBackup struct {
 
 func (x *JobResult_MongoDBBackup) Reset() {
 	*x = JobResult_MongoDBBackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[77]
+	mi := &file_agent_v1_agent_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5921,7 +5999,7 @@ func (x *JobResult_MongoDBBackup) String() string {
 func (*JobResult_MongoDBBackup) ProtoMessage() {}
 
 func (x *JobResult_MongoDBBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[77]
+	mi := &file_agent_v1_agent_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5962,7 +6040,7 @@ type JobResult_MySQLBackup struct {
 
 func (x *JobResult_MySQLBackup) Reset() {
 	*x = JobResult_MySQLBackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[78]
+	mi := &file_agent_v1_agent_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5974,7 +6052,7 @@ func (x *JobResult_MySQLBackup) String() string {
 func (*JobResult_MySQLBackup) ProtoMessage() {}
 
 func (x *JobResult_MySQLBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[78]
+	mi := &file_agent_v1_agent_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6006,7 +6084,7 @@ type JobResult_MySQLRestoreBackup struct {
 
 func (x *JobResult_MySQLRestoreBackup) Reset() {
 	*x = JobResult_MySQLRestoreBackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[79]
+	mi := &file_agent_v1_agent_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6018,7 +6096,7 @@ func (x *JobResult_MySQLRestoreBackup) String() string {
 func (*JobResult_MySQLRestoreBackup) ProtoMessage() {}
 
 func (x *JobResult_MySQLRestoreBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[79]
+	mi := &file_agent_v1_agent_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6043,7 +6121,7 @@ type JobResult_MongoDBRestoreBackup struct {
 
 func (x *JobResult_MongoDBRestoreBackup) Reset() {
 	*x = JobResult_MongoDBRestoreBackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[80]
+	mi := &file_agent_v1_agent_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6055,7 +6133,7 @@ func (x *JobResult_MongoDBRestoreBackup) String() string {
 func (*JobResult_MongoDBRestoreBackup) ProtoMessage() {}
 
 func (x *JobResult_MongoDBRestoreBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[80]
+	mi := &file_agent_v1_agent_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6080,7 +6158,7 @@ type JobProgress_MySQLBackup struct {
 
 func (x *JobProgress_MySQLBackup) Reset() {
 	*x = JobProgress_MySQLBackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[81]
+	mi := &file_agent_v1_agent_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6092,7 +6170,7 @@ func (x *JobProgress_MySQLBackup) String() string {
 func (*JobProgress_MySQLBackup) ProtoMessage() {}
 
 func (x *JobProgress_MySQLBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[81]
+	mi := &file_agent_v1_agent_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6117,7 +6195,7 @@ type JobProgress_MySQLRestoreBackup struct {
 
 func (x *JobProgress_MySQLRestoreBackup) Reset() {
 	*x = JobProgress_MySQLRestoreBackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[82]
+	mi := &file_agent_v1_agent_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6129,7 +6207,7 @@ func (x *JobProgress_MySQLRestoreBackup) String() string {
 func (*JobProgress_MySQLRestoreBackup) ProtoMessage() {}
 
 func (x *JobProgress_MySQLRestoreBackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[82]
+	mi := &file_agent_v1_agent_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6157,7 +6235,7 @@ type JobProgress_Logs struct {
 
 func (x *JobProgress_Logs) Reset() {
 	*x = JobProgress_Logs{}
-	mi := &file_agent_v1_agent_proto_msgTypes[83]
+	mi := &file_agent_v1_agent_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6169,7 +6247,7 @@ func (x *JobProgress_Logs) String() string {
 func (*JobProgress_Logs) ProtoMessage() {}
 
 func (x *JobProgress_Logs) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[83]
+	mi := &file_agent_v1_agent_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6215,7 +6293,7 @@ type GetVersionsRequest_MySQLd struct {
 
 func (x *GetVersionsRequest_MySQLd) Reset() {
 	*x = GetVersionsRequest_MySQLd{}
-	mi := &file_agent_v1_agent_proto_msgTypes[84]
+	mi := &file_agent_v1_agent_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6227,7 +6305,7 @@ func (x *GetVersionsRequest_MySQLd) String() string {
 func (*GetVersionsRequest_MySQLd) ProtoMessage() {}
 
 func (x *GetVersionsRequest_MySQLd) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[84]
+	mi := &file_agent_v1_agent_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6252,7 +6330,7 @@ type GetVersionsRequest_Xtrabackup struct {
 
 func (x *GetVersionsRequest_Xtrabackup) Reset() {
 	*x = GetVersionsRequest_Xtrabackup{}
-	mi := &file_agent_v1_agent_proto_msgTypes[85]
+	mi := &file_agent_v1_agent_proto_msgTypes[86]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6264,7 +6342,7 @@ func (x *GetVersionsRequest_Xtrabackup) String() string {
 func (*GetVersionsRequest_Xtrabackup) ProtoMessage() {}
 
 func (x *GetVersionsRequest_Xtrabackup) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[85]
+	mi := &file_agent_v1_agent_proto_msgTypes[86]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6289,7 +6367,7 @@ type GetVersionsRequest_Xbcloud struct {
 
 func (x *GetVersionsRequest_Xbcloud) Reset() {
 	*x = GetVersionsRequest_Xbcloud{}
-	mi := &file_agent_v1_agent_proto_msgTypes[86]
+	mi := &file_agent_v1_agent_proto_msgTypes[87]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6301,7 +6379,7 @@ func (x *GetVersionsRequest_Xbcloud) String() string {
 func (*GetVersionsRequest_Xbcloud) ProtoMessage() {}
 
 func (x *GetVersionsRequest_Xbcloud) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[86]
+	mi := &file_agent_v1_agent_proto_msgTypes[87]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6326,7 +6404,7 @@ type GetVersionsRequest_Qpress struct {
 
 func (x *GetVersionsRequest_Qpress) Reset() {
 	*x = GetVersionsRequest_Qpress{}
-	mi := &file_agent_v1_agent_proto_msgTypes[87]
+	mi := &file_agent_v1_agent_proto_msgTypes[88]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6338,7 +6416,7 @@ func (x *GetVersionsRequest_Qpress) String() string {
 func (*GetVersionsRequest_Qpress) ProtoMessage() {}
 
 func (x *GetVersionsRequest_Qpress) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[87]
+	mi := &file_agent_v1_agent_proto_msgTypes[88]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6363,7 +6441,7 @@ type GetVersionsRequest_MongoDB struct {
 
 func (x *GetVersionsRequest_MongoDB) Reset() {
 	*x = GetVersionsRequest_MongoDB{}
-	mi := &file_agent_v1_agent_proto_msgTypes[88]
+	mi := &file_agent_v1_agent_proto_msgTypes[89]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6375,7 +6453,7 @@ func (x *GetVersionsRequest_MongoDB) String() string {
 func (*GetVersionsRequest_MongoDB) ProtoMessage() {}
 
 func (x *GetVersionsRequest_MongoDB) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[88]
+	mi := &file_agent_v1_agent_proto_msgTypes[89]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6400,7 +6478,7 @@ type GetVersionsRequest_PBM struct {
 
 func (x *GetVersionsRequest_PBM) Reset() {
 	*x = GetVersionsRequest_PBM{}
-	mi := &file_agent_v1_agent_proto_msgTypes[89]
+	mi := &file_agent_v1_agent_proto_msgTypes[90]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6412,7 +6490,7 @@ func (x *GetVersionsRequest_PBM) String() string {
 func (*GetVersionsRequest_PBM) ProtoMessage() {}
 
 func (x *GetVersionsRequest_PBM) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[89]
+	mi := &file_agent_v1_agent_proto_msgTypes[90]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6446,7 +6524,7 @@ type GetVersionsRequest_Software struct {
 
 func (x *GetVersionsRequest_Software) Reset() {
 	*x = GetVersionsRequest_Software{}
-	mi := &file_agent_v1_agent_proto_msgTypes[90]
+	mi := &file_agent_v1_agent_proto_msgTypes[91]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6458,7 +6536,7 @@ func (x *GetVersionsRequest_Software) String() string {
 func (*GetVersionsRequest_Software) ProtoMessage() {}
 
 func (x *GetVersionsRequest_Software) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[90]
+	mi := &file_agent_v1_agent_proto_msgTypes[91]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6587,7 +6665,7 @@ type GetVersionsResponse_Version struct {
 
 func (x *GetVersionsResponse_Version) Reset() {
 	*x = GetVersionsResponse_Version{}
-	mi := &file_agent_v1_agent_proto_msgTypes[91]
+	mi := &file_agent_v1_agent_proto_msgTypes[92]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6599,7 +6677,7 @@ func (x *GetVersionsResponse_Version) String() string {
 func (*GetVersionsResponse_Version) ProtoMessage() {}
 
 func (x *GetVersionsResponse_Version) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_v1_agent_proto_msgTypes[91]
+	mi := &file_agent_v1_agent_proto_msgTypes[92]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6726,7 +6804,7 @@ const file_agent_v1_agent_proto_rawDesc = "" +
 	"\x11QueryActionResult\x12\x18\n" +
 	"\acolumns\x18\x01 \x03(\tR\acolumns\x12.\n" +
 	"\x04rows\x18\x02 \x03(\v2\x1a.agent.v1.QueryActionSliceR\x04rows\x12,\n" +
-	"\x04docs\x18\x03 \x03(\v2\x18.agent.v1.QueryActionMapR\x04docs\"\x9d-\n" +
+	"\x04docs\x18\x03 \x03(\v2\x18.agent.v1.QueryActionMapR\x04docs\"\xfd.\n" +
 	"\x12StartActionRequest\x12\x1b\n" +
 	"\taction_id\x18\x01 \x01(\tR\bactionId\x123\n" +
 	"\atimeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\atimeout\x12c\n" +
@@ -6737,7 +6815,8 @@ const file_agent_v1_agent_proto_rawDesc = "" +
 	"\x17mysql_show_index_params\x18\r \x01(\v21.agent.v1.StartActionRequest.MySQLShowIndexParamsH\x00R\x14mysqlShowIndexParams\x12\x8c\x01\n" +
 	"#postgresql_show_create_table_params\x18\x0e \x01(\v2<.agent.v1.StartActionRequest.PostgreSQLShowCreateTableParamsH\x00R\x1fpostgresqlShowCreateTableParams\x12y\n" +
 	"\x1cpostgresql_show_index_params\x18\x0f \x01(\v26.agent.v1.StartActionRequest.PostgreSQLShowIndexParamsH\x00R\x19postgresqlShowIndexParams\x12i\n" +
-	"\x16mongodb_explain_params\x18\x10 \x01(\v21.agent.v1.StartActionRequest.MongoDBExplainParamsH\x00R\x14mongodbExplainParams\x12Z\n" +
+	"\x16mongodb_explain_params\x18\x10 \x01(\v21.agent.v1.StartActionRequest.MongoDBExplainParamsH\x00R\x14mongodbExplainParams\x12r\n" +
+	"\x19clickhouse_explain_params\x18\x1e \x01(\v24.agent.v1.StartActionRequest.ClickHouseExplainParamsH\x00R\x17clickhouseExplainParams\x12Z\n" +
 	"\x11pt_summary_params\x18\x11 \x01(\v2,.agent.v1.StartActionRequest.PTSummaryParamsH\x00R\x0fptSummaryParams\x12a\n" +
 	"\x14pt_pg_summary_params\x18\x12 \x01(\v2..agent.v1.StartActionRequest.PTPgSummaryParamsH\x00R\x11ptPgSummaryParams\x12p\n" +
 	"\x19pt_mongodb_summary_params\x18\x13 \x01(\v23.agent.v1.StartActionRequest.PTMongoDBSummaryParamsH\x00R\x16ptMongodbSummaryParams\x12j\n" +
@@ -6789,7 +6868,11 @@ const file_agent_v1_agent_proto_rawDesc = "" +
 	"\x03dsn\x18\x01 \x01(\tB\x04\x88\xb5\x18\x03R\x03dsn\x12\x14\n" +
 	"\x05query\x18\x02 \x01(\tR\x05query\x122\n" +
 	"\n" +
-	"text_files\x18\x03 \x01(\v2\x13.agent.v1.TextFilesR\ttextFiles\x1a\x11\n" +
+	"text_files\x18\x03 \x01(\v2\x13.agent.v1.TextFilesR\ttextFiles\x1aj\n" +
+	"\x17ClickHouseExplainParams\x12\x16\n" +
+	"\x03dsn\x18\x01 \x01(\tB\x04\x88\xb5\x18\x03R\x03dsn\x12\x14\n" +
+	"\x05query\x18\x02 \x01(\tR\x05query\x12!\n" +
+	"\fexplain_type\x18\x03 \x01(\tR\vexplainType\x1a\x11\n" +
 	"\x0fPTSummaryParams\x1a\x7f\n" +
 	"\x11PTPgSummaryParams\x12\x12\n" +
 	"\x04host\x18\x01 \x01(\tR\x04host\x12\x12\n" +
@@ -7110,126 +7193,124 @@ func file_agent_v1_agent_proto_rawDescGZIP() []byte {
 	return file_agent_v1_agent_proto_rawDescData
 }
 
-var (
-	file_agent_v1_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-	file_agent_v1_agent_proto_msgTypes  = make([]protoimpl.MessageInfo, 92)
-	file_agent_v1_agent_proto_goTypes   = []any{
-		MysqlExplainOutputFormat(0),                                    // 0: agent.v1.MysqlExplainOutputFormat
-		StartActionRequest_RestartSystemServiceParams_SystemService(0), // 1: agent.v1.StartActionRequest.RestartSystemServiceParams.SystemService
-		(*TextFiles)(nil),                                              // 2: agent.v1.TextFiles
-		(*Ping)(nil),                                                   // 3: agent.v1.Ping
-		(*Pong)(nil),                                                   // 4: agent.v1.Pong
-		(*QANCollectRequest)(nil),                                      // 5: agent.v1.QANCollectRequest
-		(*QANCollectResponse)(nil),                                     // 6: agent.v1.QANCollectResponse
-		(*StateChangedRequest)(nil),                                    // 7: agent.v1.StateChangedRequest
-		(*StateChangedResponse)(nil),                                   // 8: agent.v1.StateChangedResponse
-		(*SetStateRequest)(nil),                                        // 9: agent.v1.SetStateRequest
-		(*SetStateResponse)(nil),                                       // 10: agent.v1.SetStateResponse
-		(*QueryActionValue)(nil),                                       // 11: agent.v1.QueryActionValue
-		(*QueryActionSlice)(nil),                                       // 12: agent.v1.QueryActionSlice
-		(*QueryActionMap)(nil),                                         // 13: agent.v1.QueryActionMap
-		(*QueryActionBinary)(nil),                                      // 14: agent.v1.QueryActionBinary
-		(*QueryActionResult)(nil),                                      // 15: agent.v1.QueryActionResult
-		(*StartActionRequest)(nil),                                     // 16: agent.v1.StartActionRequest
-		(*StartActionResponse)(nil),                                    // 17: agent.v1.StartActionResponse
-		(*StopActionRequest)(nil),                                      // 18: agent.v1.StopActionRequest
-		(*StopActionResponse)(nil),                                     // 19: agent.v1.StopActionResponse
-		(*ActionResultRequest)(nil),                                    // 20: agent.v1.ActionResultRequest
-		(*ActionResultResponse)(nil),                                   // 21: agent.v1.ActionResultResponse
-		(*PBMSwitchPITRRequest)(nil),                                   // 22: agent.v1.PBMSwitchPITRRequest
-		(*PBMSwitchPITRResponse)(nil),                                  // 23: agent.v1.PBMSwitchPITRResponse
-		(*AgentLogsRequest)(nil),                                       // 24: agent.v1.AgentLogsRequest
-		(*AgentLogsResponse)(nil),                                      // 25: agent.v1.AgentLogsResponse
-		(*CheckConnectionRequest)(nil),                                 // 26: agent.v1.CheckConnectionRequest
-		(*CheckConnectionResponse)(nil),                                // 27: agent.v1.CheckConnectionResponse
-		(*ServiceInfoRequest)(nil),                                     // 28: agent.v1.ServiceInfoRequest
-		(*ServiceInfoResponse)(nil),                                    // 29: agent.v1.ServiceInfoResponse
-		(*JobStatusRequest)(nil),                                       // 30: agent.v1.JobStatusRequest
-		(*JobStatusResponse)(nil),                                      // 31: agent.v1.JobStatusResponse
-		(*S3LocationConfig)(nil),                                       // 32: agent.v1.S3LocationConfig
-		(*FilesystemLocationConfig)(nil),                               // 33: agent.v1.FilesystemLocationConfig
-		(*StartJobRequest)(nil),                                        // 34: agent.v1.StartJobRequest
-		(*StartJobResponse)(nil),                                       // 35: agent.v1.StartJobResponse
-		(*StopJobRequest)(nil),                                         // 36: agent.v1.StopJobRequest
-		(*StopJobResponse)(nil),                                        // 37: agent.v1.StopJobResponse
-		(*JobResult)(nil),                                              // 38: agent.v1.JobResult
-		(*JobProgress)(nil),                                            // 39: agent.v1.JobProgress
-		(*GetVersionsRequest)(nil),                                     // 40: agent.v1.GetVersionsRequest
-		(*GetVersionsResponse)(nil),                                    // 41: agent.v1.GetVersionsResponse
-		(*AgentMessage)(nil),                                           // 42: agent.v1.AgentMessage
-		(*ServerMessage)(nil),                                          // 43: agent.v1.ServerMessage
-		nil,                                                            // 44: agent.v1.TextFiles.FilesEntry
-		(*SetStateRequest_AgentProcess)(nil),                           // 45: agent.v1.SetStateRequest.AgentProcess
-		nil,                                                            // 46: agent.v1.SetStateRequest.AgentProcessesEntry
-		(*SetStateRequest_BuiltinAgent)(nil),                           // 47: agent.v1.SetStateRequest.BuiltinAgent
-		nil,                                                            // 48: agent.v1.SetStateRequest.BuiltinAgentsEntry
-		nil,                                                            // 49: agent.v1.SetStateRequest.AgentProcess.TextFilesEntry
-		nil,                                                            // 50: agent.v1.SetStateRequest.BuiltinAgent.EnvEntry
-		nil,                                                            // 51: agent.v1.QueryActionMap.MapEntry
-		(*StartActionRequest_MySQLExplainParams)(nil),                  // 52: agent.v1.StartActionRequest.MySQLExplainParams
-		(*StartActionRequest_MySQLShowCreateTableParams)(nil),          // 53: agent.v1.StartActionRequest.MySQLShowCreateTableParams
-		(*StartActionRequest_MySQLShowTableStatusParams)(nil),          // 54: agent.v1.StartActionRequest.MySQLShowTableStatusParams
-		(*StartActionRequest_MySQLShowIndexParams)(nil),                // 55: agent.v1.StartActionRequest.MySQLShowIndexParams
-		(*StartActionRequest_PostgreSQLShowCreateTableParams)(nil),     // 56: agent.v1.StartActionRequest.PostgreSQLShowCreateTableParams
-		(*StartActionRequest_PostgreSQLShowIndexParams)(nil),           // 57: agent.v1.StartActionRequest.PostgreSQLShowIndexParams
-		(*StartActionRequest_MongoDBExplainParams)(nil),                // 58: agent.v1.StartActionRequest.MongoDBExplainParams
-		(*StartActionRequest_PTSummaryParams)(nil),                     // 59: agent.v1.StartActionRequest.PTSummaryParams
-		(*StartActionRequest_PTPgSummaryParams)(nil),                   // 60: agent.v1.StartActionRequest.PTPgSummaryParams
-		(*StartActionRequest_PTMongoDBSummaryParams)(nil),              // 61: agent.v1.StartActionRequest.PTMongoDBSummaryParams
-		(*StartActionRequest_PTMySQLSummaryParams)(nil),                // 62: agent.v1.StartActionRequest.PTMySQLSummaryParams
-		(*StartActionRequest_MySQLQueryShowParams)(nil),                // 63: agent.v1.StartActionRequest.MySQLQueryShowParams
-		(*StartActionRequest_MySQLQuerySelectParams)(nil),              // 64: agent.v1.StartActionRequest.MySQLQuerySelectParams
-		(*StartActionRequest_PostgreSQLQueryShowParams)(nil),           // 65: agent.v1.StartActionRequest.PostgreSQLQueryShowParams
-		(*StartActionRequest_PostgreSQLQuerySelectParams)(nil),         // 66: agent.v1.StartActionRequest.PostgreSQLQuerySelectParams
-		(*StartActionRequest_MongoDBQueryGetParameterParams)(nil),      // 67: agent.v1.StartActionRequest.MongoDBQueryGetParameterParams
-		(*StartActionRequest_MongoDBQueryBuildInfoParams)(nil),         // 68: agent.v1.StartActionRequest.MongoDBQueryBuildInfoParams
-		(*StartActionRequest_MongoDBQueryGetCmdLineOptsParams)(nil),    // 69: agent.v1.StartActionRequest.MongoDBQueryGetCmdLineOptsParams
-		(*StartActionRequest_MongoDBQueryReplSetGetStatusParams)(nil),  // 70: agent.v1.StartActionRequest.MongoDBQueryReplSetGetStatusParams
-		(*StartActionRequest_MongoDBQueryGetDiagnosticDataParams)(nil), // 71: agent.v1.StartActionRequest.MongoDBQueryGetDiagnosticDataParams
-		(*StartActionRequest_RestartSystemServiceParams)(nil),          // 72: agent.v1.StartActionRequest.RestartSystemServiceParams
-		(*CheckConnectionResponse_Stats)(nil),                          // 73: agent.v1.CheckConnectionResponse.Stats
-		(*StartJobRequest_MySQLBackup)(nil),                            // 74: agent.v1.StartJobRequest.MySQLBackup
-		(*StartJobRequest_MySQLRestoreBackup)(nil),                     // 75: agent.v1.StartJobRequest.MySQLRestoreBackup
-		(*StartJobRequest_MongoDBBackup)(nil),                          // 76: agent.v1.StartJobRequest.MongoDBBackup
-		(*StartJobRequest_MongoDBRestoreBackup)(nil),                   // 77: agent.v1.StartJobRequest.MongoDBRestoreBackup
-		(*JobResult_Error)(nil),                                        // 78: agent.v1.JobResult.Error
-		(*JobResult_MongoDBBackup)(nil),                                // 79: agent.v1.JobResult.MongoDBBackup
-		(*JobResult_MySQLBackup)(nil),                                  // 80: agent.v1.JobResult.MySQLBackup
-		(*JobResult_MySQLRestoreBackup)(nil),                           // 81: agent.v1.JobResult.MySQLRestoreBackup
-		(*JobResult_MongoDBRestoreBackup)(nil),                         // 82: agent.v1.JobResult.MongoDBRestoreBackup
-		(*JobProgress_MySQLBackup)(nil),                                // 83: agent.v1.JobProgress.MySQLBackup
-		(*JobProgress_MySQLRestoreBackup)(nil),                         // 84: agent.v1.JobProgress.MySQLRestoreBackup
-		(*JobProgress_Logs)(nil),                                       // 85: agent.v1.JobProgress.Logs
-		(*GetVersionsRequest_MySQLd)(nil),                              // 86: agent.v1.GetVersionsRequest.MySQLd
-		(*GetVersionsRequest_Xtrabackup)(nil),                          // 87: agent.v1.GetVersionsRequest.Xtrabackup
-		(*GetVersionsRequest_Xbcloud)(nil),                             // 88: agent.v1.GetVersionsRequest.Xbcloud
-		(*GetVersionsRequest_Qpress)(nil),                              // 89: agent.v1.GetVersionsRequest.Qpress
-		(*GetVersionsRequest_MongoDB)(nil),                             // 90: agent.v1.GetVersionsRequest.MongoDB
-		(*GetVersionsRequest_PBM)(nil),                                 // 91: agent.v1.GetVersionsRequest.PBM
-		(*GetVersionsRequest_Software)(nil),                            // 92: agent.v1.GetVersionsRequest.Software
-		(*GetVersionsResponse_Version)(nil),                            // 93: agent.v1.GetVersionsResponse.Version
-		(*timestamppb.Timestamp)(nil),                                  // 94: google.protobuf.Timestamp
-		(*MetricsBucket)(nil),                                          // 95: agent.v1.MetricsBucket
-		v1.AgentStatus(0),                                              // 96: inventory.v1.AgentStatus
-		(*durationpb.Duration)(nil),                                    // 97: google.protobuf.Duration
-		v1.ServiceType(0),                                              // 98: inventory.v1.ServiceType
-		(*status.Status)(nil),                                          // 99: google.rpc.Status
-		v1.AgentType(0),                                                // 100: inventory.v1.AgentType
-		(*v1.RTAOptions)(nil),                                          // 101: inventory.v1.RTAOptions
-		v11.DataModel(0),                                               // 102: backup.v1.DataModel
-		(*v11.PbmMetadata)(nil),                                        // 103: backup.v1.PbmMetadata
-		(*v11.Metadata)(nil),                                           // 104: backup.v1.Metadata
-	}
-)
-
+var file_agent_v1_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_agent_v1_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 93)
+var file_agent_v1_agent_proto_goTypes = []any{
+	(MysqlExplainOutputFormat)(0),                                    // 0: agent.v1.MysqlExplainOutputFormat
+	(StartActionRequest_RestartSystemServiceParams_SystemService)(0), // 1: agent.v1.StartActionRequest.RestartSystemServiceParams.SystemService
+	(*TextFiles)(nil),                             // 2: agent.v1.TextFiles
+	(*Ping)(nil),                                  // 3: agent.v1.Ping
+	(*Pong)(nil),                                  // 4: agent.v1.Pong
+	(*QANCollectRequest)(nil),                     // 5: agent.v1.QANCollectRequest
+	(*QANCollectResponse)(nil),                    // 6: agent.v1.QANCollectResponse
+	(*StateChangedRequest)(nil),                   // 7: agent.v1.StateChangedRequest
+	(*StateChangedResponse)(nil),                  // 8: agent.v1.StateChangedResponse
+	(*SetStateRequest)(nil),                       // 9: agent.v1.SetStateRequest
+	(*SetStateResponse)(nil),                      // 10: agent.v1.SetStateResponse
+	(*QueryActionValue)(nil),                      // 11: agent.v1.QueryActionValue
+	(*QueryActionSlice)(nil),                      // 12: agent.v1.QueryActionSlice
+	(*QueryActionMap)(nil),                        // 13: agent.v1.QueryActionMap
+	(*QueryActionBinary)(nil),                     // 14: agent.v1.QueryActionBinary
+	(*QueryActionResult)(nil),                     // 15: agent.v1.QueryActionResult
+	(*StartActionRequest)(nil),                    // 16: agent.v1.StartActionRequest
+	(*StartActionResponse)(nil),                   // 17: agent.v1.StartActionResponse
+	(*StopActionRequest)(nil),                     // 18: agent.v1.StopActionRequest
+	(*StopActionResponse)(nil),                    // 19: agent.v1.StopActionResponse
+	(*ActionResultRequest)(nil),                   // 20: agent.v1.ActionResultRequest
+	(*ActionResultResponse)(nil),                  // 21: agent.v1.ActionResultResponse
+	(*PBMSwitchPITRRequest)(nil),                  // 22: agent.v1.PBMSwitchPITRRequest
+	(*PBMSwitchPITRResponse)(nil),                 // 23: agent.v1.PBMSwitchPITRResponse
+	(*AgentLogsRequest)(nil),                      // 24: agent.v1.AgentLogsRequest
+	(*AgentLogsResponse)(nil),                     // 25: agent.v1.AgentLogsResponse
+	(*CheckConnectionRequest)(nil),                // 26: agent.v1.CheckConnectionRequest
+	(*CheckConnectionResponse)(nil),               // 27: agent.v1.CheckConnectionResponse
+	(*ServiceInfoRequest)(nil),                    // 28: agent.v1.ServiceInfoRequest
+	(*ServiceInfoResponse)(nil),                   // 29: agent.v1.ServiceInfoResponse
+	(*JobStatusRequest)(nil),                      // 30: agent.v1.JobStatusRequest
+	(*JobStatusResponse)(nil),                     // 31: agent.v1.JobStatusResponse
+	(*S3LocationConfig)(nil),                      // 32: agent.v1.S3LocationConfig
+	(*FilesystemLocationConfig)(nil),              // 33: agent.v1.FilesystemLocationConfig
+	(*StartJobRequest)(nil),                       // 34: agent.v1.StartJobRequest
+	(*StartJobResponse)(nil),                      // 35: agent.v1.StartJobResponse
+	(*StopJobRequest)(nil),                        // 36: agent.v1.StopJobRequest
+	(*StopJobResponse)(nil),                       // 37: agent.v1.StopJobResponse
+	(*JobResult)(nil),                             // 38: agent.v1.JobResult
+	(*JobProgress)(nil),                           // 39: agent.v1.JobProgress
+	(*GetVersionsRequest)(nil),                    // 40: agent.v1.GetVersionsRequest
+	(*GetVersionsResponse)(nil),                   // 41: agent.v1.GetVersionsResponse
+	(*AgentMessage)(nil),                          // 42: agent.v1.AgentMessage
+	(*ServerMessage)(nil),                         // 43: agent.v1.ServerMessage
+	nil,                                           // 44: agent.v1.TextFiles.FilesEntry
+	(*SetStateRequest_AgentProcess)(nil),          // 45: agent.v1.SetStateRequest.AgentProcess
+	nil,                                           // 46: agent.v1.SetStateRequest.AgentProcessesEntry
+	(*SetStateRequest_BuiltinAgent)(nil),          // 47: agent.v1.SetStateRequest.BuiltinAgent
+	nil,                                           // 48: agent.v1.SetStateRequest.BuiltinAgentsEntry
+	nil,                                           // 49: agent.v1.SetStateRequest.AgentProcess.TextFilesEntry
+	nil,                                           // 50: agent.v1.SetStateRequest.BuiltinAgent.EnvEntry
+	nil,                                           // 51: agent.v1.QueryActionMap.MapEntry
+	(*StartActionRequest_MySQLExplainParams)(nil), // 52: agent.v1.StartActionRequest.MySQLExplainParams
+	(*StartActionRequest_MySQLShowCreateTableParams)(nil),          // 53: agent.v1.StartActionRequest.MySQLShowCreateTableParams
+	(*StartActionRequest_MySQLShowTableStatusParams)(nil),          // 54: agent.v1.StartActionRequest.MySQLShowTableStatusParams
+	(*StartActionRequest_MySQLShowIndexParams)(nil),                // 55: agent.v1.StartActionRequest.MySQLShowIndexParams
+	(*StartActionRequest_PostgreSQLShowCreateTableParams)(nil),     // 56: agent.v1.StartActionRequest.PostgreSQLShowCreateTableParams
+	(*StartActionRequest_PostgreSQLShowIndexParams)(nil),           // 57: agent.v1.StartActionRequest.PostgreSQLShowIndexParams
+	(*StartActionRequest_MongoDBExplainParams)(nil),                // 58: agent.v1.StartActionRequest.MongoDBExplainParams
+	(*StartActionRequest_ClickHouseExplainParams)(nil),             // 59: agent.v1.StartActionRequest.ClickHouseExplainParams
+	(*StartActionRequest_PTSummaryParams)(nil),                     // 60: agent.v1.StartActionRequest.PTSummaryParams
+	(*StartActionRequest_PTPgSummaryParams)(nil),                   // 61: agent.v1.StartActionRequest.PTPgSummaryParams
+	(*StartActionRequest_PTMongoDBSummaryParams)(nil),              // 62: agent.v1.StartActionRequest.PTMongoDBSummaryParams
+	(*StartActionRequest_PTMySQLSummaryParams)(nil),                // 63: agent.v1.StartActionRequest.PTMySQLSummaryParams
+	(*StartActionRequest_MySQLQueryShowParams)(nil),                // 64: agent.v1.StartActionRequest.MySQLQueryShowParams
+	(*StartActionRequest_MySQLQuerySelectParams)(nil),              // 65: agent.v1.StartActionRequest.MySQLQuerySelectParams
+	(*StartActionRequest_PostgreSQLQueryShowParams)(nil),           // 66: agent.v1.StartActionRequest.PostgreSQLQueryShowParams
+	(*StartActionRequest_PostgreSQLQuerySelectParams)(nil),         // 67: agent.v1.StartActionRequest.PostgreSQLQuerySelectParams
+	(*StartActionRequest_MongoDBQueryGetParameterParams)(nil),      // 68: agent.v1.StartActionRequest.MongoDBQueryGetParameterParams
+	(*StartActionRequest_MongoDBQueryBuildInfoParams)(nil),         // 69: agent.v1.StartActionRequest.MongoDBQueryBuildInfoParams
+	(*StartActionRequest_MongoDBQueryGetCmdLineOptsParams)(nil),    // 70: agent.v1.StartActionRequest.MongoDBQueryGetCmdLineOptsParams
+	(*StartActionRequest_MongoDBQueryReplSetGetStatusParams)(nil),  // 71: agent.v1.StartActionRequest.MongoDBQueryReplSetGetStatusParams
+	(*StartActionRequest_MongoDBQueryGetDiagnosticDataParams)(nil), // 72: agent.v1.StartActionRequest.MongoDBQueryGetDiagnosticDataParams
+	(*StartActionRequest_RestartSystemServiceParams)(nil),          // 73: agent.v1.StartActionRequest.RestartSystemServiceParams
+	(*CheckConnectionResponse_Stats)(nil),                          // 74: agent.v1.CheckConnectionResponse.Stats
+	(*StartJobRequest_MySQLBackup)(nil),                            // 75: agent.v1.StartJobRequest.MySQLBackup
+	(*StartJobRequest_MySQLRestoreBackup)(nil),                     // 76: agent.v1.StartJobRequest.MySQLRestoreBackup
+	(*StartJobRequest_MongoDBBackup)(nil),                          // 77: agent.v1.StartJobRequest.MongoDBBackup
+	(*StartJobRequest_MongoDBRestoreBackup)(nil),                   // 78: agent.v1.StartJobRequest.MongoDBRestoreBackup
+	(*JobResult_Error)(nil),                                        // 79: agent.v1.JobResult.Error
+	(*JobResult_MongoDBBackup)(nil),                                // 80: agent.v1.JobResult.MongoDBBackup
+	(*JobResult_MySQLBackup)(nil),                                  // 81: agent.v1.JobResult.MySQLBackup
+	(*JobResult_MySQLRestoreBackup)(nil),                           // 82: agent.v1.JobResult.MySQLRestoreBackup
+	(*JobResult_MongoDBRestoreBackup)(nil),                         // 83: agent.v1.JobResult.MongoDBRestoreBackup
+	(*JobProgress_MySQLBackup)(nil),                                // 84: agent.v1.JobProgress.MySQLBackup
+	(*JobProgress_MySQLRestoreBackup)(nil),                         // 85: agent.v1.JobProgress.MySQLRestoreBackup
+	(*JobProgress_Logs)(nil),                                       // 86: agent.v1.JobProgress.Logs
+	(*GetVersionsRequest_MySQLd)(nil),                              // 87: agent.v1.GetVersionsRequest.MySQLd
+	(*GetVersionsRequest_Xtrabackup)(nil),                          // 88: agent.v1.GetVersionsRequest.Xtrabackup
+	(*GetVersionsRequest_Xbcloud)(nil),                             // 89: agent.v1.GetVersionsRequest.Xbcloud
+	(*GetVersionsRequest_Qpress)(nil),                              // 90: agent.v1.GetVersionsRequest.Qpress
+	(*GetVersionsRequest_MongoDB)(nil),                             // 91: agent.v1.GetVersionsRequest.MongoDB
+	(*GetVersionsRequest_PBM)(nil),                                 // 92: agent.v1.GetVersionsRequest.PBM
+	(*GetVersionsRequest_Software)(nil),                            // 93: agent.v1.GetVersionsRequest.Software
+	(*GetVersionsResponse_Version)(nil),                            // 94: agent.v1.GetVersionsResponse.Version
+	(*timestamppb.Timestamp)(nil),                                  // 95: google.protobuf.Timestamp
+	(*MetricsBucket)(nil),                                          // 96: agent.v1.MetricsBucket
+	(v1.AgentStatus)(0),                                            // 97: inventory.v1.AgentStatus
+	(*durationpb.Duration)(nil),                                    // 98: google.protobuf.Duration
+	(v1.ServiceType)(0),                                            // 99: inventory.v1.ServiceType
+	(*status.Status)(nil),                                          // 100: google.rpc.Status
+	(v1.AgentType)(0),                                              // 101: inventory.v1.AgentType
+	(*v1.RTAOptions)(nil),                                          // 102: inventory.v1.RTAOptions
+	(v11.DataModel)(0),                                             // 103: backup.v1.DataModel
+	(*v11.PbmMetadata)(nil),                                        // 104: backup.v1.PbmMetadata
+	(*v11.Metadata)(nil),                                           // 105: backup.v1.Metadata
+}
 var file_agent_v1_agent_proto_depIdxs = []int32{
 	44,  // 0: agent.v1.TextFiles.files:type_name -> agent.v1.TextFiles.FilesEntry
-	94,  // 1: agent.v1.Pong.current_time:type_name -> google.protobuf.Timestamp
-	95,  // 2: agent.v1.QANCollectRequest.metrics_bucket:type_name -> agent.v1.MetricsBucket
-	96,  // 3: agent.v1.StateChangedRequest.status:type_name -> inventory.v1.AgentStatus
+	95,  // 1: agent.v1.Pong.current_time:type_name -> google.protobuf.Timestamp
+	96,  // 2: agent.v1.QANCollectRequest.metrics_bucket:type_name -> agent.v1.MetricsBucket
+	97,  // 3: agent.v1.StateChangedRequest.status:type_name -> inventory.v1.AgentStatus
 	46,  // 4: agent.v1.SetStateRequest.agent_processes:type_name -> agent.v1.SetStateRequest.AgentProcessesEntry
 	48,  // 5: agent.v1.SetStateRequest.builtin_agents:type_name -> agent.v1.SetStateRequest.BuiltinAgentsEntry
-	94,  // 6: agent.v1.QueryActionValue.timestamp:type_name -> google.protobuf.Timestamp
+	95,  // 6: agent.v1.QueryActionValue.timestamp:type_name -> google.protobuf.Timestamp
 	12,  // 7: agent.v1.QueryActionValue.slice:type_name -> agent.v1.QueryActionSlice
 	13,  // 8: agent.v1.QueryActionValue.map:type_name -> agent.v1.QueryActionMap
 	14,  // 9: agent.v1.QueryActionValue.binary:type_name -> agent.v1.QueryActionBinary
@@ -7237,7 +7318,7 @@ var file_agent_v1_agent_proto_depIdxs = []int32{
 	51,  // 11: agent.v1.QueryActionMap.map:type_name -> agent.v1.QueryActionMap.MapEntry
 	12,  // 12: agent.v1.QueryActionResult.rows:type_name -> agent.v1.QueryActionSlice
 	13,  // 13: agent.v1.QueryActionResult.docs:type_name -> agent.v1.QueryActionMap
-	97,  // 14: agent.v1.StartActionRequest.timeout:type_name -> google.protobuf.Duration
+	98,  // 14: agent.v1.StartActionRequest.timeout:type_name -> google.protobuf.Duration
 	52,  // 15: agent.v1.StartActionRequest.mysql_explain_params:type_name -> agent.v1.StartActionRequest.MySQLExplainParams
 	53,  // 16: agent.v1.StartActionRequest.mysql_show_create_table_params:type_name -> agent.v1.StartActionRequest.MySQLShowCreateTableParams
 	54,  // 17: agent.v1.StartActionRequest.mysql_show_table_status_params:type_name -> agent.v1.StartActionRequest.MySQLShowTableStatusParams
@@ -7245,133 +7326,134 @@ var file_agent_v1_agent_proto_depIdxs = []int32{
 	56,  // 19: agent.v1.StartActionRequest.postgresql_show_create_table_params:type_name -> agent.v1.StartActionRequest.PostgreSQLShowCreateTableParams
 	57,  // 20: agent.v1.StartActionRequest.postgresql_show_index_params:type_name -> agent.v1.StartActionRequest.PostgreSQLShowIndexParams
 	58,  // 21: agent.v1.StartActionRequest.mongodb_explain_params:type_name -> agent.v1.StartActionRequest.MongoDBExplainParams
-	59,  // 22: agent.v1.StartActionRequest.pt_summary_params:type_name -> agent.v1.StartActionRequest.PTSummaryParams
-	60,  // 23: agent.v1.StartActionRequest.pt_pg_summary_params:type_name -> agent.v1.StartActionRequest.PTPgSummaryParams
-	61,  // 24: agent.v1.StartActionRequest.pt_mongodb_summary_params:type_name -> agent.v1.StartActionRequest.PTMongoDBSummaryParams
-	62,  // 25: agent.v1.StartActionRequest.pt_mysql_summary_params:type_name -> agent.v1.StartActionRequest.PTMySQLSummaryParams
-	63,  // 26: agent.v1.StartActionRequest.mysql_query_show_params:type_name -> agent.v1.StartActionRequest.MySQLQueryShowParams
-	64,  // 27: agent.v1.StartActionRequest.mysql_query_select_params:type_name -> agent.v1.StartActionRequest.MySQLQuerySelectParams
-	65,  // 28: agent.v1.StartActionRequest.postgresql_query_show_params:type_name -> agent.v1.StartActionRequest.PostgreSQLQueryShowParams
-	66,  // 29: agent.v1.StartActionRequest.postgresql_query_select_params:type_name -> agent.v1.StartActionRequest.PostgreSQLQuerySelectParams
-	67,  // 30: agent.v1.StartActionRequest.mongodb_query_getparameter_params:type_name -> agent.v1.StartActionRequest.MongoDBQueryGetParameterParams
-	68,  // 31: agent.v1.StartActionRequest.mongodb_query_buildinfo_params:type_name -> agent.v1.StartActionRequest.MongoDBQueryBuildInfoParams
-	69,  // 32: agent.v1.StartActionRequest.mongodb_query_getcmdlineopts_params:type_name -> agent.v1.StartActionRequest.MongoDBQueryGetCmdLineOptsParams
-	70,  // 33: agent.v1.StartActionRequest.mongodb_query_replsetgetstatus_params:type_name -> agent.v1.StartActionRequest.MongoDBQueryReplSetGetStatusParams
-	71,  // 34: agent.v1.StartActionRequest.mongodb_query_getdiagnosticdata_params:type_name -> agent.v1.StartActionRequest.MongoDBQueryGetDiagnosticDataParams
-	72,  // 35: agent.v1.StartActionRequest.restart_sys_service_params:type_name -> agent.v1.StartActionRequest.RestartSystemServiceParams
-	2,   // 36: agent.v1.PBMSwitchPITRRequest.text_files:type_name -> agent.v1.TextFiles
-	98,  // 37: agent.v1.CheckConnectionRequest.type:type_name -> inventory.v1.ServiceType
-	97,  // 38: agent.v1.CheckConnectionRequest.timeout:type_name -> google.protobuf.Duration
-	2,   // 39: agent.v1.CheckConnectionRequest.text_files:type_name -> agent.v1.TextFiles
-	98,  // 40: agent.v1.ServiceInfoRequest.type:type_name -> inventory.v1.ServiceType
-	97,  // 41: agent.v1.ServiceInfoRequest.timeout:type_name -> google.protobuf.Duration
-	2,   // 42: agent.v1.ServiceInfoRequest.text_files:type_name -> agent.v1.TextFiles
-	97,  // 43: agent.v1.StartJobRequest.timeout:type_name -> google.protobuf.Duration
-	74,  // 44: agent.v1.StartJobRequest.mysql_backup:type_name -> agent.v1.StartJobRequest.MySQLBackup
-	75,  // 45: agent.v1.StartJobRequest.mysql_restore_backup:type_name -> agent.v1.StartJobRequest.MySQLRestoreBackup
-	76,  // 46: agent.v1.StartJobRequest.mongodb_backup:type_name -> agent.v1.StartJobRequest.MongoDBBackup
-	77,  // 47: agent.v1.StartJobRequest.mongodb_restore_backup:type_name -> agent.v1.StartJobRequest.MongoDBRestoreBackup
-	94,  // 48: agent.v1.JobResult.timestamp:type_name -> google.protobuf.Timestamp
-	78,  // 49: agent.v1.JobResult.error:type_name -> agent.v1.JobResult.Error
-	80,  // 50: agent.v1.JobResult.mysql_backup:type_name -> agent.v1.JobResult.MySQLBackup
-	81,  // 51: agent.v1.JobResult.mysql_restore_backup:type_name -> agent.v1.JobResult.MySQLRestoreBackup
-	79,  // 52: agent.v1.JobResult.mongodb_backup:type_name -> agent.v1.JobResult.MongoDBBackup
-	82,  // 53: agent.v1.JobResult.mongodb_restore_backup:type_name -> agent.v1.JobResult.MongoDBRestoreBackup
-	94,  // 54: agent.v1.JobProgress.timestamp:type_name -> google.protobuf.Timestamp
-	83,  // 55: agent.v1.JobProgress.mysql_backup:type_name -> agent.v1.JobProgress.MySQLBackup
-	84,  // 56: agent.v1.JobProgress.mysql_restore_backup:type_name -> agent.v1.JobProgress.MySQLRestoreBackup
-	85,  // 57: agent.v1.JobProgress.logs:type_name -> agent.v1.JobProgress.Logs
-	92,  // 58: agent.v1.GetVersionsRequest.softwares:type_name -> agent.v1.GetVersionsRequest.Software
-	93,  // 59: agent.v1.GetVersionsResponse.versions:type_name -> agent.v1.GetVersionsResponse.Version
-	99,  // 60: agent.v1.AgentMessage.status:type_name -> google.rpc.Status
-	3,   // 61: agent.v1.AgentMessage.ping:type_name -> agent.v1.Ping
-	7,   // 62: agent.v1.AgentMessage.state_changed:type_name -> agent.v1.StateChangedRequest
-	5,   // 63: agent.v1.AgentMessage.qan_collect:type_name -> agent.v1.QANCollectRequest
-	20,  // 64: agent.v1.AgentMessage.action_result:type_name -> agent.v1.ActionResultRequest
-	38,  // 65: agent.v1.AgentMessage.job_result:type_name -> agent.v1.JobResult
-	39,  // 66: agent.v1.AgentMessage.job_progress:type_name -> agent.v1.JobProgress
-	4,   // 67: agent.v1.AgentMessage.pong:type_name -> agent.v1.Pong
-	10,  // 68: agent.v1.AgentMessage.set_state:type_name -> agent.v1.SetStateResponse
-	17,  // 69: agent.v1.AgentMessage.start_action:type_name -> agent.v1.StartActionResponse
-	19,  // 70: agent.v1.AgentMessage.stop_action:type_name -> agent.v1.StopActionResponse
-	27,  // 71: agent.v1.AgentMessage.check_connection:type_name -> agent.v1.CheckConnectionResponse
-	35,  // 72: agent.v1.AgentMessage.start_job:type_name -> agent.v1.StartJobResponse
-	37,  // 73: agent.v1.AgentMessage.stop_job:type_name -> agent.v1.StopJobResponse
-	31,  // 74: agent.v1.AgentMessage.job_status:type_name -> agent.v1.JobStatusResponse
-	41,  // 75: agent.v1.AgentMessage.get_versions:type_name -> agent.v1.GetVersionsResponse
-	23,  // 76: agent.v1.AgentMessage.pbm_switch_pitr:type_name -> agent.v1.PBMSwitchPITRResponse
-	25,  // 77: agent.v1.AgentMessage.agent_logs:type_name -> agent.v1.AgentLogsResponse
-	29,  // 78: agent.v1.AgentMessage.service_info:type_name -> agent.v1.ServiceInfoResponse
-	99,  // 79: agent.v1.ServerMessage.status:type_name -> google.rpc.Status
-	4,   // 80: agent.v1.ServerMessage.pong:type_name -> agent.v1.Pong
-	8,   // 81: agent.v1.ServerMessage.state_changed:type_name -> agent.v1.StateChangedResponse
-	6,   // 82: agent.v1.ServerMessage.qan_collect:type_name -> agent.v1.QANCollectResponse
-	21,  // 83: agent.v1.ServerMessage.action_result:type_name -> agent.v1.ActionResultResponse
-	3,   // 84: agent.v1.ServerMessage.ping:type_name -> agent.v1.Ping
-	9,   // 85: agent.v1.ServerMessage.set_state:type_name -> agent.v1.SetStateRequest
-	16,  // 86: agent.v1.ServerMessage.start_action:type_name -> agent.v1.StartActionRequest
-	18,  // 87: agent.v1.ServerMessage.stop_action:type_name -> agent.v1.StopActionRequest
-	26,  // 88: agent.v1.ServerMessage.check_connection:type_name -> agent.v1.CheckConnectionRequest
-	34,  // 89: agent.v1.ServerMessage.start_job:type_name -> agent.v1.StartJobRequest
-	36,  // 90: agent.v1.ServerMessage.stop_job:type_name -> agent.v1.StopJobRequest
-	30,  // 91: agent.v1.ServerMessage.job_status:type_name -> agent.v1.JobStatusRequest
-	40,  // 92: agent.v1.ServerMessage.get_versions:type_name -> agent.v1.GetVersionsRequest
-	22,  // 93: agent.v1.ServerMessage.pbm_switch_pitr:type_name -> agent.v1.PBMSwitchPITRRequest
-	24,  // 94: agent.v1.ServerMessage.agent_logs:type_name -> agent.v1.AgentLogsRequest
-	28,  // 95: agent.v1.ServerMessage.service_info:type_name -> agent.v1.ServiceInfoRequest
-	100, // 96: agent.v1.SetStateRequest.AgentProcess.type:type_name -> inventory.v1.AgentType
-	49,  // 97: agent.v1.SetStateRequest.AgentProcess.text_files:type_name -> agent.v1.SetStateRequest.AgentProcess.TextFilesEntry
-	45,  // 98: agent.v1.SetStateRequest.AgentProcessesEntry.value:type_name -> agent.v1.SetStateRequest.AgentProcess
-	100, // 99: agent.v1.SetStateRequest.BuiltinAgent.type:type_name -> inventory.v1.AgentType
-	2,   // 100: agent.v1.SetStateRequest.BuiltinAgent.text_files:type_name -> agent.v1.TextFiles
-	50,  // 101: agent.v1.SetStateRequest.BuiltinAgent.env:type_name -> agent.v1.SetStateRequest.BuiltinAgent.EnvEntry
-	101, // 102: agent.v1.SetStateRequest.BuiltinAgent.rta_options:type_name -> inventory.v1.RTAOptions
-	47,  // 103: agent.v1.SetStateRequest.BuiltinAgentsEntry.value:type_name -> agent.v1.SetStateRequest.BuiltinAgent
-	11,  // 104: agent.v1.QueryActionMap.MapEntry.value:type_name -> agent.v1.QueryActionValue
-	0,   // 105: agent.v1.StartActionRequest.MySQLExplainParams.output_format:type_name -> agent.v1.MysqlExplainOutputFormat
-	2,   // 106: agent.v1.StartActionRequest.MySQLExplainParams.tls_files:type_name -> agent.v1.TextFiles
-	2,   // 107: agent.v1.StartActionRequest.MySQLShowCreateTableParams.tls_files:type_name -> agent.v1.TextFiles
-	2,   // 108: agent.v1.StartActionRequest.MySQLShowTableStatusParams.tls_files:type_name -> agent.v1.TextFiles
-	2,   // 109: agent.v1.StartActionRequest.MySQLShowIndexParams.tls_files:type_name -> agent.v1.TextFiles
-	2,   // 110: agent.v1.StartActionRequest.PostgreSQLShowCreateTableParams.tls_files:type_name -> agent.v1.TextFiles
-	2,   // 111: agent.v1.StartActionRequest.PostgreSQLShowIndexParams.tls_files:type_name -> agent.v1.TextFiles
-	2,   // 112: agent.v1.StartActionRequest.MongoDBExplainParams.text_files:type_name -> agent.v1.TextFiles
-	2,   // 113: agent.v1.StartActionRequest.MySQLQueryShowParams.tls_files:type_name -> agent.v1.TextFiles
-	2,   // 114: agent.v1.StartActionRequest.MySQLQuerySelectParams.tls_files:type_name -> agent.v1.TextFiles
-	2,   // 115: agent.v1.StartActionRequest.PostgreSQLQueryShowParams.tls_files:type_name -> agent.v1.TextFiles
-	2,   // 116: agent.v1.StartActionRequest.PostgreSQLQuerySelectParams.tls_files:type_name -> agent.v1.TextFiles
-	2,   // 117: agent.v1.StartActionRequest.MongoDBQueryGetParameterParams.text_files:type_name -> agent.v1.TextFiles
-	2,   // 118: agent.v1.StartActionRequest.MongoDBQueryBuildInfoParams.text_files:type_name -> agent.v1.TextFiles
-	2,   // 119: agent.v1.StartActionRequest.MongoDBQueryGetCmdLineOptsParams.text_files:type_name -> agent.v1.TextFiles
-	2,   // 120: agent.v1.StartActionRequest.MongoDBQueryReplSetGetStatusParams.text_files:type_name -> agent.v1.TextFiles
-	2,   // 121: agent.v1.StartActionRequest.MongoDBQueryGetDiagnosticDataParams.text_files:type_name -> agent.v1.TextFiles
-	1,   // 122: agent.v1.StartActionRequest.RestartSystemServiceParams.system_service:type_name -> agent.v1.StartActionRequest.RestartSystemServiceParams.SystemService
-	32,  // 123: agent.v1.StartJobRequest.MySQLBackup.s3_config:type_name -> agent.v1.S3LocationConfig
-	32,  // 124: agent.v1.StartJobRequest.MySQLRestoreBackup.s3_config:type_name -> agent.v1.S3LocationConfig
-	2,   // 125: agent.v1.StartJobRequest.MongoDBBackup.text_files:type_name -> agent.v1.TextFiles
-	102, // 126: agent.v1.StartJobRequest.MongoDBBackup.data_model:type_name -> backup.v1.DataModel
-	32,  // 127: agent.v1.StartJobRequest.MongoDBBackup.s3_config:type_name -> agent.v1.S3LocationConfig
-	33,  // 128: agent.v1.StartJobRequest.MongoDBBackup.filesystem_config:type_name -> agent.v1.FilesystemLocationConfig
-	2,   // 129: agent.v1.StartJobRequest.MongoDBRestoreBackup.text_files:type_name -> agent.v1.TextFiles
-	103, // 130: agent.v1.StartJobRequest.MongoDBRestoreBackup.pbm_metadata:type_name -> backup.v1.PbmMetadata
-	94,  // 131: agent.v1.StartJobRequest.MongoDBRestoreBackup.pitr_timestamp:type_name -> google.protobuf.Timestamp
-	32,  // 132: agent.v1.StartJobRequest.MongoDBRestoreBackup.s3_config:type_name -> agent.v1.S3LocationConfig
-	33,  // 133: agent.v1.StartJobRequest.MongoDBRestoreBackup.filesystem_config:type_name -> agent.v1.FilesystemLocationConfig
-	104, // 134: agent.v1.JobResult.MongoDBBackup.metadata:type_name -> backup.v1.Metadata
-	104, // 135: agent.v1.JobResult.MySQLBackup.metadata:type_name -> backup.v1.Metadata
-	86,  // 136: agent.v1.GetVersionsRequest.Software.mysqld:type_name -> agent.v1.GetVersionsRequest.MySQLd
-	87,  // 137: agent.v1.GetVersionsRequest.Software.xtrabackup:type_name -> agent.v1.GetVersionsRequest.Xtrabackup
-	88,  // 138: agent.v1.GetVersionsRequest.Software.xbcloud:type_name -> agent.v1.GetVersionsRequest.Xbcloud
-	89,  // 139: agent.v1.GetVersionsRequest.Software.qpress:type_name -> agent.v1.GetVersionsRequest.Qpress
-	90,  // 140: agent.v1.GetVersionsRequest.Software.mongod:type_name -> agent.v1.GetVersionsRequest.MongoDB
-	91,  // 141: agent.v1.GetVersionsRequest.Software.pbm:type_name -> agent.v1.GetVersionsRequest.PBM
-	42,  // 142: agent.v1.AgentService.Connect:input_type -> agent.v1.AgentMessage
-	43,  // 143: agent.v1.AgentService.Connect:output_type -> agent.v1.ServerMessage
-	143, // [143:144] is the sub-list for method output_type
-	142, // [142:143] is the sub-list for method input_type
-	142, // [142:142] is the sub-list for extension type_name
-	142, // [142:142] is the sub-list for extension extendee
-	0,   // [0:142] is the sub-list for field type_name
+	59,  // 22: agent.v1.StartActionRequest.clickhouse_explain_params:type_name -> agent.v1.StartActionRequest.ClickHouseExplainParams
+	60,  // 23: agent.v1.StartActionRequest.pt_summary_params:type_name -> agent.v1.StartActionRequest.PTSummaryParams
+	61,  // 24: agent.v1.StartActionRequest.pt_pg_summary_params:type_name -> agent.v1.StartActionRequest.PTPgSummaryParams
+	62,  // 25: agent.v1.StartActionRequest.pt_mongodb_summary_params:type_name -> agent.v1.StartActionRequest.PTMongoDBSummaryParams
+	63,  // 26: agent.v1.StartActionRequest.pt_mysql_summary_params:type_name -> agent.v1.StartActionRequest.PTMySQLSummaryParams
+	64,  // 27: agent.v1.StartActionRequest.mysql_query_show_params:type_name -> agent.v1.StartActionRequest.MySQLQueryShowParams
+	65,  // 28: agent.v1.StartActionRequest.mysql_query_select_params:type_name -> agent.v1.StartActionRequest.MySQLQuerySelectParams
+	66,  // 29: agent.v1.StartActionRequest.postgresql_query_show_params:type_name -> agent.v1.StartActionRequest.PostgreSQLQueryShowParams
+	67,  // 30: agent.v1.StartActionRequest.postgresql_query_select_params:type_name -> agent.v1.StartActionRequest.PostgreSQLQuerySelectParams
+	68,  // 31: agent.v1.StartActionRequest.mongodb_query_getparameter_params:type_name -> agent.v1.StartActionRequest.MongoDBQueryGetParameterParams
+	69,  // 32: agent.v1.StartActionRequest.mongodb_query_buildinfo_params:type_name -> agent.v1.StartActionRequest.MongoDBQueryBuildInfoParams
+	70,  // 33: agent.v1.StartActionRequest.mongodb_query_getcmdlineopts_params:type_name -> agent.v1.StartActionRequest.MongoDBQueryGetCmdLineOptsParams
+	71,  // 34: agent.v1.StartActionRequest.mongodb_query_replsetgetstatus_params:type_name -> agent.v1.StartActionRequest.MongoDBQueryReplSetGetStatusParams
+	72,  // 35: agent.v1.StartActionRequest.mongodb_query_getdiagnosticdata_params:type_name -> agent.v1.StartActionRequest.MongoDBQueryGetDiagnosticDataParams
+	73,  // 36: agent.v1.StartActionRequest.restart_sys_service_params:type_name -> agent.v1.StartActionRequest.RestartSystemServiceParams
+	2,   // 37: agent.v1.PBMSwitchPITRRequest.text_files:type_name -> agent.v1.TextFiles
+	99,  // 38: agent.v1.CheckConnectionRequest.type:type_name -> inventory.v1.ServiceType
+	98,  // 39: agent.v1.CheckConnectionRequest.timeout:type_name -> google.protobuf.Duration
+	2,   // 40: agent.v1.CheckConnectionRequest.text_files:type_name -> agent.v1.TextFiles
+	99,  // 41: agent.v1.ServiceInfoRequest.type:type_name -> inventory.v1.ServiceType
+	98,  // 42: agent.v1.ServiceInfoRequest.timeout:type_name -> google.protobuf.Duration
+	2,   // 43: agent.v1.ServiceInfoRequest.text_files:type_name -> agent.v1.TextFiles
+	98,  // 44: agent.v1.StartJobRequest.timeout:type_name -> google.protobuf.Duration
+	75,  // 45: agent.v1.StartJobRequest.mysql_backup:type_name -> agent.v1.StartJobRequest.MySQLBackup
+	76,  // 46: agent.v1.StartJobRequest.mysql_restore_backup:type_name -> agent.v1.StartJobRequest.MySQLRestoreBackup
+	77,  // 47: agent.v1.StartJobRequest.mongodb_backup:type_name -> agent.v1.StartJobRequest.MongoDBBackup
+	78,  // 48: agent.v1.StartJobRequest.mongodb_restore_backup:type_name -> agent.v1.StartJobRequest.MongoDBRestoreBackup
+	95,  // 49: agent.v1.JobResult.timestamp:type_name -> google.protobuf.Timestamp
+	79,  // 50: agent.v1.JobResult.error:type_name -> agent.v1.JobResult.Error
+	81,  // 51: agent.v1.JobResult.mysql_backup:type_name -> agent.v1.JobResult.MySQLBackup
+	82,  // 52: agent.v1.JobResult.mysql_restore_backup:type_name -> agent.v1.JobResult.MySQLRestoreBackup
+	80,  // 53: agent.v1.JobResult.mongodb_backup:type_name -> agent.v1.JobResult.MongoDBBackup
+	83,  // 54: agent.v1.JobResult.mongodb_restore_backup:type_name -> agent.v1.JobResult.MongoDBRestoreBackup
+	95,  // 55: agent.v1.JobProgress.timestamp:type_name -> google.protobuf.Timestamp
+	84,  // 56: agent.v1.JobProgress.mysql_backup:type_name -> agent.v1.JobProgress.MySQLBackup
+	85,  // 57: agent.v1.JobProgress.mysql_restore_backup:type_name -> agent.v1.JobProgress.MySQLRestoreBackup
+	86,  // 58: agent.v1.JobProgress.logs:type_name -> agent.v1.JobProgress.Logs
+	93,  // 59: agent.v1.GetVersionsRequest.softwares:type_name -> agent.v1.GetVersionsRequest.Software
+	94,  // 60: agent.v1.GetVersionsResponse.versions:type_name -> agent.v1.GetVersionsResponse.Version
+	100, // 61: agent.v1.AgentMessage.status:type_name -> google.rpc.Status
+	3,   // 62: agent.v1.AgentMessage.ping:type_name -> agent.v1.Ping
+	7,   // 63: agent.v1.AgentMessage.state_changed:type_name -> agent.v1.StateChangedRequest
+	5,   // 64: agent.v1.AgentMessage.qan_collect:type_name -> agent.v1.QANCollectRequest
+	20,  // 65: agent.v1.AgentMessage.action_result:type_name -> agent.v1.ActionResultRequest
+	38,  // 66: agent.v1.AgentMessage.job_result:type_name -> agent.v1.JobResult
+	39,  // 67: agent.v1.AgentMessage.job_progress:type_name -> agent.v1.JobProgress
+	4,   // 68: agent.v1.AgentMessage.pong:type_name -> agent.v1.Pong
+	10,  // 69: agent.v1.AgentMessage.set_state:type_name -> agent.v1.SetStateResponse
+	17,  // 70: agent.v1.AgentMessage.start_action:type_name -> agent.v1.StartActionResponse
+	19,  // 71: agent.v1.AgentMessage.stop_action:type_name -> agent.v1.StopActionResponse
+	27,  // 72: agent.v1.AgentMessage.check_connection:type_name -> agent.v1.CheckConnectionResponse
+	35,  // 73: agent.v1.AgentMessage.start_job:type_name -> agent.v1.StartJobResponse
+	37,  // 74: agent.v1.AgentMessage.stop_job:type_name -> agent.v1.StopJobResponse
+	31,  // 75: agent.v1.AgentMessage.job_status:type_name -> agent.v1.JobStatusResponse
+	41,  // 76: agent.v1.AgentMessage.get_versions:type_name -> agent.v1.GetVersionsResponse
+	23,  // 77: agent.v1.AgentMessage.pbm_switch_pitr:type_name -> agent.v1.PBMSwitchPITRResponse
+	25,  // 78: agent.v1.AgentMessage.agent_logs:type_name -> agent.v1.AgentLogsResponse
+	29,  // 79: agent.v1.AgentMessage.service_info:type_name -> agent.v1.ServiceInfoResponse
+	100, // 80: agent.v1.ServerMessage.status:type_name -> google.rpc.Status
+	4,   // 81: agent.v1.ServerMessage.pong:type_name -> agent.v1.Pong
+	8,   // 82: agent.v1.ServerMessage.state_changed:type_name -> agent.v1.StateChangedResponse
+	6,   // 83: agent.v1.ServerMessage.qan_collect:type_name -> agent.v1.QANCollectResponse
+	21,  // 84: agent.v1.ServerMessage.action_result:type_name -> agent.v1.ActionResultResponse
+	3,   // 85: agent.v1.ServerMessage.ping:type_name -> agent.v1.Ping
+	9,   // 86: agent.v1.ServerMessage.set_state:type_name -> agent.v1.SetStateRequest
+	16,  // 87: agent.v1.ServerMessage.start_action:type_name -> agent.v1.StartActionRequest
+	18,  // 88: agent.v1.ServerMessage.stop_action:type_name -> agent.v1.StopActionRequest
+	26,  // 89: agent.v1.ServerMessage.check_connection:type_name -> agent.v1.CheckConnectionRequest
+	34,  // 90: agent.v1.ServerMessage.start_job:type_name -> agent.v1.StartJobRequest
+	36,  // 91: agent.v1.ServerMessage.stop_job:type_name -> agent.v1.StopJobRequest
+	30,  // 92: agent.v1.ServerMessage.job_status:type_name -> agent.v1.JobStatusRequest
+	40,  // 93: agent.v1.ServerMessage.get_versions:type_name -> agent.v1.GetVersionsRequest
+	22,  // 94: agent.v1.ServerMessage.pbm_switch_pitr:type_name -> agent.v1.PBMSwitchPITRRequest
+	24,  // 95: agent.v1.ServerMessage.agent_logs:type_name -> agent.v1.AgentLogsRequest
+	28,  // 96: agent.v1.ServerMessage.service_info:type_name -> agent.v1.ServiceInfoRequest
+	101, // 97: agent.v1.SetStateRequest.AgentProcess.type:type_name -> inventory.v1.AgentType
+	49,  // 98: agent.v1.SetStateRequest.AgentProcess.text_files:type_name -> agent.v1.SetStateRequest.AgentProcess.TextFilesEntry
+	45,  // 99: agent.v1.SetStateRequest.AgentProcessesEntry.value:type_name -> agent.v1.SetStateRequest.AgentProcess
+	101, // 100: agent.v1.SetStateRequest.BuiltinAgent.type:type_name -> inventory.v1.AgentType
+	2,   // 101: agent.v1.SetStateRequest.BuiltinAgent.text_files:type_name -> agent.v1.TextFiles
+	50,  // 102: agent.v1.SetStateRequest.BuiltinAgent.env:type_name -> agent.v1.SetStateRequest.BuiltinAgent.EnvEntry
+	102, // 103: agent.v1.SetStateRequest.BuiltinAgent.rta_options:type_name -> inventory.v1.RTAOptions
+	47,  // 104: agent.v1.SetStateRequest.BuiltinAgentsEntry.value:type_name -> agent.v1.SetStateRequest.BuiltinAgent
+	11,  // 105: agent.v1.QueryActionMap.MapEntry.value:type_name -> agent.v1.QueryActionValue
+	0,   // 106: agent.v1.StartActionRequest.MySQLExplainParams.output_format:type_name -> agent.v1.MysqlExplainOutputFormat
+	2,   // 107: agent.v1.StartActionRequest.MySQLExplainParams.tls_files:type_name -> agent.v1.TextFiles
+	2,   // 108: agent.v1.StartActionRequest.MySQLShowCreateTableParams.tls_files:type_name -> agent.v1.TextFiles
+	2,   // 109: agent.v1.StartActionRequest.MySQLShowTableStatusParams.tls_files:type_name -> agent.v1.TextFiles
+	2,   // 110: agent.v1.StartActionRequest.MySQLShowIndexParams.tls_files:type_name -> agent.v1.TextFiles
+	2,   // 111: agent.v1.StartActionRequest.PostgreSQLShowCreateTableParams.tls_files:type_name -> agent.v1.TextFiles
+	2,   // 112: agent.v1.StartActionRequest.PostgreSQLShowIndexParams.tls_files:type_name -> agent.v1.TextFiles
+	2,   // 113: agent.v1.StartActionRequest.MongoDBExplainParams.text_files:type_name -> agent.v1.TextFiles
+	2,   // 114: agent.v1.StartActionRequest.MySQLQueryShowParams.tls_files:type_name -> agent.v1.TextFiles
+	2,   // 115: agent.v1.StartActionRequest.MySQLQuerySelectParams.tls_files:type_name -> agent.v1.TextFiles
+	2,   // 116: agent.v1.StartActionRequest.PostgreSQLQueryShowParams.tls_files:type_name -> agent.v1.TextFiles
+	2,   // 117: agent.v1.StartActionRequest.PostgreSQLQuerySelectParams.tls_files:type_name -> agent.v1.TextFiles
+	2,   // 118: agent.v1.StartActionRequest.MongoDBQueryGetParameterParams.text_files:type_name -> agent.v1.TextFiles
+	2,   // 119: agent.v1.StartActionRequest.MongoDBQueryBuildInfoParams.text_files:type_name -> agent.v1.TextFiles
+	2,   // 120: agent.v1.StartActionRequest.MongoDBQueryGetCmdLineOptsParams.text_files:type_name -> agent.v1.TextFiles
+	2,   // 121: agent.v1.StartActionRequest.MongoDBQueryReplSetGetStatusParams.text_files:type_name -> agent.v1.TextFiles
+	2,   // 122: agent.v1.StartActionRequest.MongoDBQueryGetDiagnosticDataParams.text_files:type_name -> agent.v1.TextFiles
+	1,   // 123: agent.v1.StartActionRequest.RestartSystemServiceParams.system_service:type_name -> agent.v1.StartActionRequest.RestartSystemServiceParams.SystemService
+	32,  // 124: agent.v1.StartJobRequest.MySQLBackup.s3_config:type_name -> agent.v1.S3LocationConfig
+	32,  // 125: agent.v1.StartJobRequest.MySQLRestoreBackup.s3_config:type_name -> agent.v1.S3LocationConfig
+	2,   // 126: agent.v1.StartJobRequest.MongoDBBackup.text_files:type_name -> agent.v1.TextFiles
+	103, // 127: agent.v1.StartJobRequest.MongoDBBackup.data_model:type_name -> backup.v1.DataModel
+	32,  // 128: agent.v1.StartJobRequest.MongoDBBackup.s3_config:type_name -> agent.v1.S3LocationConfig
+	33,  // 129: agent.v1.StartJobRequest.MongoDBBackup.filesystem_config:type_name -> agent.v1.FilesystemLocationConfig
+	2,   // 130: agent.v1.StartJobRequest.MongoDBRestoreBackup.text_files:type_name -> agent.v1.TextFiles
+	104, // 131: agent.v1.StartJobRequest.MongoDBRestoreBackup.pbm_metadata:type_name -> backup.v1.PbmMetadata
+	95,  // 132: agent.v1.StartJobRequest.MongoDBRestoreBackup.pitr_timestamp:type_name -> google.protobuf.Timestamp
+	32,  // 133: agent.v1.StartJobRequest.MongoDBRestoreBackup.s3_config:type_name -> agent.v1.S3LocationConfig
+	33,  // 134: agent.v1.StartJobRequest.MongoDBRestoreBackup.filesystem_config:type_name -> agent.v1.FilesystemLocationConfig
+	105, // 135: agent.v1.JobResult.MongoDBBackup.metadata:type_name -> backup.v1.Metadata
+	105, // 136: agent.v1.JobResult.MySQLBackup.metadata:type_name -> backup.v1.Metadata
+	87,  // 137: agent.v1.GetVersionsRequest.Software.mysqld:type_name -> agent.v1.GetVersionsRequest.MySQLd
+	88,  // 138: agent.v1.GetVersionsRequest.Software.xtrabackup:type_name -> agent.v1.GetVersionsRequest.Xtrabackup
+	89,  // 139: agent.v1.GetVersionsRequest.Software.xbcloud:type_name -> agent.v1.GetVersionsRequest.Xbcloud
+	90,  // 140: agent.v1.GetVersionsRequest.Software.qpress:type_name -> agent.v1.GetVersionsRequest.Qpress
+	91,  // 141: agent.v1.GetVersionsRequest.Software.mongod:type_name -> agent.v1.GetVersionsRequest.MongoDB
+	92,  // 142: agent.v1.GetVersionsRequest.Software.pbm:type_name -> agent.v1.GetVersionsRequest.PBM
+	42,  // 143: agent.v1.AgentService.Connect:input_type -> agent.v1.AgentMessage
+	43,  // 144: agent.v1.AgentService.Connect:output_type -> agent.v1.ServerMessage
+	144, // [144:145] is the sub-list for method output_type
+	143, // [143:144] is the sub-list for method input_type
+	143, // [143:143] is the sub-list for extension type_name
+	143, // [143:143] is the sub-list for extension extendee
+	0,   // [0:143] is the sub-list for field type_name
 }
 
 func init() { file_agent_v1_agent_proto_init() }
@@ -7400,6 +7482,7 @@ func file_agent_v1_agent_proto_init() {
 		(*StartActionRequest_PostgresqlShowCreateTableParams)(nil),
 		(*StartActionRequest_PostgresqlShowIndexParams)(nil),
 		(*StartActionRequest_MongodbExplainParams)(nil),
+		(*StartActionRequest_ClickhouseExplainParams)(nil),
 		(*StartActionRequest_PtSummaryParams)(nil),
 		(*StartActionRequest_PtPgSummaryParams)(nil),
 		(*StartActionRequest_PtMongodbSummaryParams)(nil),
@@ -7472,21 +7555,21 @@ func file_agent_v1_agent_proto_init() {
 		(*ServerMessage_AgentLogs)(nil),
 		(*ServerMessage_ServiceInfo)(nil),
 	}
-	file_agent_v1_agent_proto_msgTypes[72].OneofWrappers = []any{
+	file_agent_v1_agent_proto_msgTypes[73].OneofWrappers = []any{
 		(*StartJobRequest_MySQLBackup_S3Config)(nil),
 	}
-	file_agent_v1_agent_proto_msgTypes[73].OneofWrappers = []any{
+	file_agent_v1_agent_proto_msgTypes[74].OneofWrappers = []any{
 		(*StartJobRequest_MySQLRestoreBackup_S3Config)(nil),
 	}
-	file_agent_v1_agent_proto_msgTypes[74].OneofWrappers = []any{
+	file_agent_v1_agent_proto_msgTypes[75].OneofWrappers = []any{
 		(*StartJobRequest_MongoDBBackup_S3Config)(nil),
 		(*StartJobRequest_MongoDBBackup_FilesystemConfig)(nil),
 	}
-	file_agent_v1_agent_proto_msgTypes[75].OneofWrappers = []any{
+	file_agent_v1_agent_proto_msgTypes[76].OneofWrappers = []any{
 		(*StartJobRequest_MongoDBRestoreBackup_S3Config)(nil),
 		(*StartJobRequest_MongoDBRestoreBackup_FilesystemConfig)(nil),
 	}
-	file_agent_v1_agent_proto_msgTypes[90].OneofWrappers = []any{
+	file_agent_v1_agent_proto_msgTypes[91].OneofWrappers = []any{
 		(*GetVersionsRequest_Software_Mysqld)(nil),
 		(*GetVersionsRequest_Software_Xtrabackup)(nil),
 		(*GetVersionsRequest_Software_Xbcloud)(nil),
@@ -7500,7 +7583,7 @@ func file_agent_v1_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_v1_agent_proto_rawDesc), len(file_agent_v1_agent_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   92,
+			NumMessages:   93,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

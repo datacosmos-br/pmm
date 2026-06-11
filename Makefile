@@ -2,6 +2,7 @@
 
 include Makefile.include
 -include documentation/Makefile
+-include build/Makefile.clickhouse
 
 ifeq ($(PROFILES),)
 PROFILES := 'pmm'
@@ -35,14 +36,19 @@ env-remove:
 	docker compose -f ./docker-compose.dev.yml down --volumes --remove-orphans
 
 TARGET ?= _bash
+DEVCONTAINER_NAME ?= $(or $(shell docker ps --filter 'name=^/devcontainer-cosmos-dev-1$$' --format '{{.Names}}'),pmm-server)
+DEVCONTAINER_WORKDIR ?= $(if $(filter devcontainer-cosmos-dev-1,$(DEVCONTAINER_NAME)),/workspace/cosmos-main/apps/pmm,/root/go/src/github.com/percona/pmm)
+DEVCONTAINER_USER_FLAG ?= $(if $(filter devcontainer-cosmos-dev-1,$(DEVCONTAINER_NAME)),--user codespace,)
 
 env:								## Run `make TARGET` in devcontainer (`make env TARGET=help`); TARGET defaults to bash
 	COMPOSE_PROFILES=$(PROFILES) \
-	docker exec -it --workdir=/root/go/src/github.com/percona/pmm pmm-server make $(TARGET)
+	docker exec -it $(DEVCONTAINER_USER_FLAG) --workdir=$(DEVCONTAINER_WORKDIR) $(DEVCONTAINER_NAME) make $(TARGET)
 
 env-root:								## Run `make TARGET` in devcontainer (`make env-root TARGET=help`); TARGET defaults to bash
 	COMPOSE_PROFILES=$(PROFILES) \
-	docker exec -it --workdir=/root/go/src/github.com/percona/pmm --user root pmm-server make $(TARGET)
+	docker exec -it --workdir=$(DEVCONTAINER_WORKDIR) --user root $(DEVCONTAINER_NAME) make $(TARGET)
 
 rotate-encryption: 							## Rotate encryption key
 	go run ./encryption-rotation/main.go
+
+include Makefile.datacosmos

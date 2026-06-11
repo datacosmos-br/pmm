@@ -1,9 +1,8 @@
 import { css } from '@emotion/css';
 
-import { stylesFactory } from '@grafana/ui';
 import { GrafanaTheme } from '@grafana/data';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme) => {
+export const getStyles = (theme: GrafanaTheme) => {
   const metricTextColor = theme.isLight ? '#202226' : 'rgba(32, 215, 255, 0.8)';
   const totalTextColor = theme.isLight ? 'red' : '#8AA4FF';
 
@@ -28,4 +27,4 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
       margin-left: auto;
     `,
   };
-});
+};

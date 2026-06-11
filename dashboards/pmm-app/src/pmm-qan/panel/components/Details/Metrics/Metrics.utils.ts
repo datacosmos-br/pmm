@@ -1,5 +1,6 @@
 import { ChartData } from 'chart.js';
 import { GrafanaTheme2 } from '@grafana/data';
+import { getThemePrimaryBackgroundColor } from 'shared/components/helpers/getPmmTheme';
 import { HistogramAPI } from './Metrics.types';
 
 export const getChartDataFromHistogramItems = (histogram_items: HistogramAPI[], theme: GrafanaTheme2): ChartData<'bar'>| undefined => {
@@ -18,7 +19,7 @@ export const getChartDataFromHistogramItems = (histogram_items: HistogramAPI[], 
 
     const dataSet = {
       data: frequencies,
-      backgroundColor: theme?.v1.colors.bg3,
+      backgroundColor: getThemePrimaryBackgroundColor(theme),
       dataInPersent,
     };
 

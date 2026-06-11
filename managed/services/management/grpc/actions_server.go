@@ -88,6 +88,16 @@ func (s *actionsServer) StartServiceAction(ctx context.Context, req *actionsv1.S
 		return s.StartPostgreSQLShowIndexAction(ctx, req.GetPostgresShowIndex())
 	case *actionsv1.StartServiceActionRequest_MongodbExplain:
 		return s.StartMongoDBExplainAction(ctx, req.GetMongodbExplain())
+	case *actionsv1.StartServiceActionRequest_ClickhouseExplain:
+		res, err := s.StartClickHouseExplainAction(ctx, req.GetClickhouseExplain())
+		if err != nil {
+			return nil, err
+		}
+		return &actionsv1.StartServiceActionResponse{
+			Action: &actionsv1.StartServiceActionResponse_ClickhouseExplain{
+				ClickhouseExplain: res,
+			},
+		}, nil
 	case *actionsv1.StartServiceActionRequest_PtMongodbSummary:
 		return s.StartPTMongoDBSummaryAction(ctx, req.GetPtMongodbSummary())
 	case *actionsv1.StartServiceActionRequest_PtMysqlSummary:
@@ -362,6 +372,26 @@ func (s *actionsServer) StartMongoDBExplainAction(ctx context.Context, req *acti
 				ActionId:   res.ID,
 			},
 		},
+	}, nil
+}
+
+// StartClickHouseExplainAction starts ClickHouse EXPLAIN action.
+func (s *actionsServer) StartClickHouseExplainAction(ctx context.Context, req *actionsv1.StartClickHouseExplainActionRequest) (
+	*actionsv1.StartClickHouseExplainActionResponse, error,
+) {
+	res, dsn, err := s.prepareServiceAction(req.ServiceId, req.PmmAgentId, "")
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.a.StartClickHouseExplainAction(ctx, res.ID, res.PMMAgentID, dsn, req.Query, req.ExplainType)
+	if err != nil {
+		return nil, err
+	}
+
+	return &actionsv1.StartClickHouseExplainActionResponse{
+		PmmAgentId: req.PmmAgentId,
+		ActionId:   res.ID,
 	}, nil
 }
 

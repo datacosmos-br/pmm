@@ -1,0 +1,132 @@
+name: datacosmos release
+
+# The only build/publish workflow on the datacosmos fork. Triggered by a
+# datacosmos version tag, it builds the PMM packages and Docker images
+# from source for linux/amd64, pushes the images, and creates a GitHub Release.
+on:
+  push:
+    tags:
+      - "v*-dc*"    # semver-dcN scheme: v3.8.0-dc2
+      - "v3-*"      # upstream/v3 head scheme: v3-<date>-dcN
+  workflow_dispatch:
+    inputs:
+      dc_version:
+        description: "datacosmos version tag (e.g. v3.8.0-dc2 or v3-2026-06-11-dc1)"
+        required: true
+
+permissions:
+  contents: write   # create the GitHub Release
+  packages: write   # push images to ghcr.io/datacosmos-br
+
+jobs:
+  build:
+    name: build amd64 and release
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DC_INPUT: ${{ github.event.inputs.dc_version }}
+      # Collect artifacts inside the workspace: actions/upload-artifact@v4
+      # rejects '..' in its path, so ARTIFACT_DIR cannot be the Makefile
+      # default (../pmm-artifacts). ROOT_DIR (the heavy build tree) stays out.
+      ARTIFACT_DIR: ${{ github.workspace }}/pmm-artifacts
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Derive datacosmos version
+        id: ver
+        run: |
+          # A v3-<date>-<count> tag is the version string verbatim; a
+          # semver-dcN tag (v3.8.0-dc2) drops its leading 'v' so the image tag
+          # reads 3.8.0-dc2. v3-<date>-dcN stays verbatim.
+          dc="${DC_INPUT:-${GITHUB_REF_NAME}}"
+          case "$dc" in v*.*.*-dc*) dc="${dc#v}" ;; esac
+          echo "dc_version=${dc}" >> "$GITHUB_OUTPUT"
+          echo "tag=${DC_INPUT:-${GITHUB_REF_NAME}}" >> "$GITHUB_OUTPUT"
+
+      - name: Free up runner disk space
+        run: |
+          echo "Disk before cleanup:"
+          df -h
+          for path in \
+            /usr/share/dotnet \
+            /usr/local/lib/android \
+            /usr/local/share/boost \
+            /usr/share/swift \
+            /usr/local/.ghcup \
+            /opt/az \
+            /opt/ghc \
+            /opt/hostedtoolcache \
+            /opt/microsoft \
+            /opt/pipx; do
+            if [ -e "$path" ]; then
+              sudo du -sh "$path"
+              sudo rm -rf "$path"
+            fi
+          done
+          sudo apt-get clean
+          docker system prune -af
+          docker builder prune -af
+          echo "Disk after cleanup:"
+          df -h
+
+      # Pre-pull the rpmbuild image with retries. public.ecr.aws is
+      # anonymous-rate-limited ('toomanyrequests'); an in-build `docker run`
+      # that trips the limit aborts the whole build. Pulling it up front,
+      # retried with backoff, lands it in the local cache so the build
+      # itself never pulls.
+      - name: Pull the rpmbuild image
+        run: |
+          image=public.ecr.aws/e7j3v3n0/rpmbuild:3
+          for i in 1 2 3 4 5; do
+            docker pull "$image" && exit 0
+            echo "::warning::pull attempt $i for $image failed; retrying in $((i * 30))s"
+            sleep $((i * 30))
+          done
+          echo "::error::could not pull $image after 5 attempts"
+          exit 1
+
+      # build/scripts/vars uses the rpmbuild image pre-pulled above, and
+      # build-server-rpm's is_build_needed reuses upstream's public RPM cache
+      # (s3://pmm-build-cache) -- Grafana et al. come down prebuilt.
+      - name: Build pmm-client and pmm-server (native)
+        env:
+          DC_VERSION: ${{ steps.ver.outputs.dc_version }}
+        run: |
+          make dc-build dc-publish DC_VERSION="${DC_VERSION}" IMAGE_ARCH=amd64
+
+      - name: Create the GitHub Release
+        env:
+          DC_VERSION: ${{ steps.ver.outputs.dc_version }}
+          TAG_NAME: ${{ steps.ver.outputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p dist
+          test -d pmm-artifacts
+          asset_count=0
+          while IFS= read -r f; do
+            cp -f "$f" "dist/amd64-$(basename "$f")"
+            asset_count=$((asset_count + 1))
+          done < <(find pmm-artifacts -type f \
+            \( -name '*.tar.gz' -o -name '*.rpm' -o -name '*.deb' \))
+          if [ "$asset_count" -eq 0 ]; then
+            echo "::error::no release assets found under pmm-artifacts"
+            exit 1
+          fi
+          ls -la dist
+          notes="datacosmos PMM ${DC_VERSION} -- linux/amd64, built from source and aligned to upstream Percona PMM.
+
+          Images:
+          - ghcr.io/datacosmos-br/pmm-server:${DC_VERSION}-amd64
+          - ghcr.io/datacosmos-br/pmm-client:${DC_VERSION}-amd64
+
+          Release assets: pmm-client tarballs and every generated RPM
+          (pmm-client, pmm-managed, percona-qan-api2, vmproxy, pmm-dump,
+          percona-dashboards, grafana, victoriametrics), each prefixed amd64-."
+          gh release create "${TAG_NAME}" dist/* \
+            --repo "${REPO}" \
+            --title "PMM ${DC_VERSION}" \
+            --notes "${notes}"

@@ -16,6 +16,8 @@ main() {
 
         export pmm_version=$pmm_version
         export pmm_release=$pmm_release
+        export PMM_SUBMODULES_REPO=${PMM_SUBMODULES_REPO:-https://github.com/datacosmos-br/pmm-submodules.git}
+        export PMM_SUBMODULES_BRANCH=${PMM_SUBMODULES_BRANCH:-v3}
         export sudo_path=\$(ls /usr/bin/sudo)
 
         mkdir -p /tmp/pmm

@@ -133,8 +133,7 @@ func (e GetActionRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetActionRequestValidationError{}
@@ -246,8 +245,7 @@ func (e GetActionResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetActionResponseValidationError{}
@@ -367,8 +365,7 @@ func (e StartMySQLExplainActionParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLExplainActionParamsValidationError{}
@@ -475,8 +472,7 @@ func (e StartMySQLExplainActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLExplainActionResultValidationError{}
@@ -598,8 +594,7 @@ func (e StartMySQLExplainJSONActionParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLExplainJSONActionParamsValidationError{}
@@ -708,8 +703,7 @@ func (e StartMySQLExplainJSONActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLExplainJSONActionResultValidationError{}
@@ -833,8 +827,7 @@ func (e StartMySQLExplainTraditionalJSONActionParamsValidationError) Error() str
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLExplainTraditionalJSONActionParamsValidationError{}
@@ -945,8 +938,7 @@ func (e StartMySQLExplainTraditionalJSONActionResultValidationError) Error() str
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLExplainTraditionalJSONActionResultValidationError{}
@@ -1077,8 +1069,7 @@ func (e StartMySQLShowCreateTableActionParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLShowCreateTableActionParamsValidationError{}
@@ -1187,8 +1178,7 @@ func (e StartMySQLShowCreateTableActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLShowCreateTableActionResultValidationError{}
@@ -1319,8 +1309,7 @@ func (e StartMySQLShowTableStatusActionParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLShowTableStatusActionParamsValidationError{}
@@ -1429,8 +1418,7 @@ func (e StartMySQLShowTableStatusActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLShowTableStatusActionResultValidationError{}
@@ -1559,8 +1547,7 @@ func (e StartMySQLShowIndexActionParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLShowIndexActionParamsValidationError{}
@@ -1667,8 +1654,7 @@ func (e StartMySQLShowIndexActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMySQLShowIndexActionResultValidationError{}
@@ -1800,8 +1786,7 @@ func (e StartPostgreSQLShowCreateTableActionParamsValidationError) Error() strin
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPostgreSQLShowCreateTableActionParamsValidationError{}
@@ -1911,8 +1896,7 @@ func (e StartPostgreSQLShowCreateTableActionResultValidationError) Error() strin
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPostgreSQLShowCreateTableActionResultValidationError{}
@@ -2043,8 +2027,7 @@ func (e StartPostgreSQLShowIndexActionParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPostgreSQLShowIndexActionParamsValidationError{}
@@ -2153,8 +2136,7 @@ func (e StartPostgreSQLShowIndexActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPostgreSQLShowIndexActionResultValidationError{}
@@ -2281,8 +2263,7 @@ func (e StartMongoDBExplainActionParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMongoDBExplainActionParamsValidationError{}
@@ -2389,8 +2370,7 @@ func (e StartMongoDBExplainActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartMongoDBExplainActionResultValidationError{}
@@ -2402,6 +2382,246 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = StartMongoDBExplainActionResultValidationError{}
+
+// Validate checks the field values on StartClickHouseExplainActionRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *StartClickHouseExplainActionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StartClickHouseExplainActionRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// StartClickHouseExplainActionRequestMultiError, or nil if none found.
+func (m *StartClickHouseExplainActionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StartClickHouseExplainActionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PmmAgentId
+
+	if utf8.RuneCountInString(m.GetServiceId()) < 1 {
+		err := StartClickHouseExplainActionRequestValidationError{
+			field:  "ServiceId",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetQuery()) < 1 {
+		err := StartClickHouseExplainActionRequestValidationError{
+			field:  "Query",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for ExplainType
+
+	if len(errors) > 0 {
+		return StartClickHouseExplainActionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// StartClickHouseExplainActionRequestMultiError is an error wrapping multiple
+// validation errors returned by
+// StartClickHouseExplainActionRequest.ValidateAll() if the designated
+// constraints aren't met.
+type StartClickHouseExplainActionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StartClickHouseExplainActionRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StartClickHouseExplainActionRequestMultiError) AllErrors() []error { return m }
+
+// StartClickHouseExplainActionRequestValidationError is the validation error
+// returned by StartClickHouseExplainActionRequest.Validate if the designated
+// constraints aren't met.
+type StartClickHouseExplainActionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StartClickHouseExplainActionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StartClickHouseExplainActionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StartClickHouseExplainActionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StartClickHouseExplainActionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StartClickHouseExplainActionRequestValidationError) ErrorName() string {
+	return "StartClickHouseExplainActionRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StartClickHouseExplainActionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStartClickHouseExplainActionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StartClickHouseExplainActionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StartClickHouseExplainActionRequestValidationError{}
+
+// Validate checks the field values on StartClickHouseExplainActionResponse
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *StartClickHouseExplainActionResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StartClickHouseExplainActionResponse
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// StartClickHouseExplainActionResponseMultiError, or nil if none found.
+func (m *StartClickHouseExplainActionResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StartClickHouseExplainActionResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ActionId
+
+	// no validation rules for PmmAgentId
+
+	if len(errors) > 0 {
+		return StartClickHouseExplainActionResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// StartClickHouseExplainActionResponseMultiError is an error wrapping multiple
+// validation errors returned by
+// StartClickHouseExplainActionResponse.ValidateAll() if the designated
+// constraints aren't met.
+type StartClickHouseExplainActionResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StartClickHouseExplainActionResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StartClickHouseExplainActionResponseMultiError) AllErrors() []error { return m }
+
+// StartClickHouseExplainActionResponseValidationError is the validation error
+// returned by StartClickHouseExplainActionResponse.Validate if the designated
+// constraints aren't met.
+type StartClickHouseExplainActionResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StartClickHouseExplainActionResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StartClickHouseExplainActionResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StartClickHouseExplainActionResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StartClickHouseExplainActionResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StartClickHouseExplainActionResponseValidationError) ErrorName() string {
+	return "StartClickHouseExplainActionResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StartClickHouseExplainActionResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStartClickHouseExplainActionResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StartClickHouseExplainActionResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StartClickHouseExplainActionResponseValidationError{}
 
 // Validate checks the field values on StartPTPgSummaryActionParams with the
 // rules defined in the proto definition for this message. If any rules are
@@ -2497,8 +2717,7 @@ func (e StartPTPgSummaryActionParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPTPgSummaryActionParamsValidationError{}
@@ -2605,8 +2824,7 @@ func (e StartPTPgSummaryActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPTPgSummaryActionResultValidationError{}
@@ -2715,8 +2933,7 @@ func (e StartPTMongoDBSummaryActionParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPTMongoDBSummaryActionParamsValidationError{}
@@ -2825,8 +3042,7 @@ func (e StartPTMongoDBSummaryActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPTMongoDBSummaryActionResultValidationError{}
@@ -2933,8 +3149,7 @@ func (e StartPTMySQLSummaryActionParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPTMySQLSummaryActionParamsValidationError{}
@@ -3041,8 +3256,7 @@ func (e StartPTMySQLSummaryActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPTMySQLSummaryActionResultValidationError{}
@@ -3149,8 +3363,7 @@ func (e StartPTSummaryActionRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPTSummaryActionRequestValidationError{}
@@ -3257,8 +3470,7 @@ func (e StartPTSummaryActionResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartPTSummaryActionResponseValidationError{}
@@ -3371,8 +3583,7 @@ func (e CancelActionRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = CancelActionRequestValidationError{}
@@ -3474,8 +3685,7 @@ func (e CancelActionResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = CancelActionResponseValidationError{}
@@ -4003,6 +4213,47 @@ func (m *StartServiceActionRequest) validate(all bool) error {
 			}
 		}
 
+	case *StartServiceActionRequest_ClickhouseExplain:
+		if v == nil {
+			err := StartServiceActionRequestValidationError{
+				field:  "Action",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExplain()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StartServiceActionRequestValidationError{
+						field:  "ClickhouseExplain",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StartServiceActionRequestValidationError{
+						field:  "ClickhouseExplain",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExplain()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StartServiceActionRequestValidationError{
+					field:  "ClickhouseExplain",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -4074,8 +4325,7 @@ func (e StartServiceActionRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartServiceActionRequestValidationError{}
@@ -4603,6 +4853,47 @@ func (m *StartServiceActionResponse) validate(all bool) error {
 			}
 		}
 
+	case *StartServiceActionResponse_ClickhouseExplain:
+		if v == nil {
+			err := StartServiceActionResponseValidationError{
+				field:  "Action",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExplain()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StartServiceActionResponseValidationError{
+						field:  "ClickhouseExplain",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StartServiceActionResponseValidationError{
+						field:  "ClickhouseExplain",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExplain()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StartServiceActionResponseValidationError{
+					field:  "ClickhouseExplain",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -4674,8 +4965,7 @@ func (e StartServiceActionResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartServiceActionResponseValidationError{}

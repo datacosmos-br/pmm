@@ -134,8 +134,7 @@ func (e PMMAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = PMMAgentValidationError{}
@@ -243,8 +242,7 @@ func (e VMAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = VMAgentValidationError{}
@@ -355,8 +353,7 @@ func (e NomadAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = NomadAgentValidationError{}
@@ -504,8 +501,7 @@ func (e NodeExporterValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = NodeExporterValidationError{}
@@ -705,8 +701,7 @@ func (e MySQLdExporterValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = MySQLdExporterValidationError{}
@@ -896,8 +891,7 @@ func (e MongoDBExporterValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = MongoDBExporterValidationError{}
@@ -1087,8 +1081,7 @@ func (e PostgresExporterValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = PostgresExporterValidationError{}
@@ -1274,8 +1267,7 @@ func (e ProxySQLExporterValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ProxySQLExporterValidationError{}
@@ -1459,8 +1451,7 @@ func (e ValkeyExporterValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ValkeyExporterValidationError{}
@@ -1472,6 +1463,291 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ValkeyExporterValidationError{}
+
+// Validate checks the field values on ClickHouseExporter with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ClickHouseExporter) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ClickHouseExporter with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ClickHouseExporterMultiError, or nil if none found.
+func (m *ClickHouseExporter) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ClickHouseExporter) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for AgentId
+
+	// no validation rules for PmmAgentId
+
+	// no validation rules for Disabled
+
+	// no validation rules for ServiceId
+
+	// no validation rules for Username
+
+	// no validation rules for Tls
+
+	// no validation rules for TlsSkipVerify
+
+	// no validation rules for CustomLabels
+
+	// no validation rules for PushMetricsEnabled
+
+	// no validation rules for Status
+
+	// no validation rules for ListenPort
+
+	// no validation rules for ProcessExecPath
+
+	// no validation rules for ExposeExporter
+
+	if all {
+		switch v := interface{}(m.GetMetricsResolutions()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClickHouseExporterValidationError{
+					field:  "MetricsResolutions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClickHouseExporterValidationError{
+					field:  "MetricsResolutions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMetricsResolutions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClickHouseExporterValidationError{
+				field:  "MetricsResolutions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ClickHouseExporterMultiError(errors)
+	}
+
+	return nil
+}
+
+// ClickHouseExporterMultiError is an error wrapping multiple validation errors
+// returned by ClickHouseExporter.ValidateAll() if the designated constraints
+// aren't met.
+type ClickHouseExporterMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ClickHouseExporterMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ClickHouseExporterMultiError) AllErrors() []error { return m }
+
+// ClickHouseExporterValidationError is the validation error returned by
+// ClickHouseExporter.Validate if the designated constraints aren't met.
+type ClickHouseExporterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClickHouseExporterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClickHouseExporterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClickHouseExporterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClickHouseExporterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClickHouseExporterValidationError) ErrorName() string {
+	return "ClickHouseExporterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ClickHouseExporterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClickHouseExporter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClickHouseExporterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClickHouseExporterValidationError{}
+
+// Validate checks the field values on QANClickHouseQueryLogAgent with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *QANClickHouseQueryLogAgent) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on QANClickHouseQueryLogAgent with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// QANClickHouseQueryLogAgentMultiError, or nil if none found.
+func (m *QANClickHouseQueryLogAgent) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QANClickHouseQueryLogAgent) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for AgentId
+
+	// no validation rules for PmmAgentId
+
+	// no validation rules for Disabled
+
+	// no validation rules for ServiceId
+
+	// no validation rules for Username
+
+	// no validation rules for DisableCommentsParsing
+
+	// no validation rules for MaxQueryLength
+
+	// no validation rules for Tls
+
+	// no validation rules for TlsSkipVerify
+
+	// no validation rules for CustomLabels
+
+	// no validation rules for Status
+
+	// no validation rules for ProcessExecPath
+
+	// no validation rules for LogLevel
+
+	if len(errors) > 0 {
+		return QANClickHouseQueryLogAgentMultiError(errors)
+	}
+
+	return nil
+}
+
+// QANClickHouseQueryLogAgentMultiError is an error wrapping multiple
+// validation errors returned by QANClickHouseQueryLogAgent.ValidateAll() if
+// the designated constraints aren't met.
+type QANClickHouseQueryLogAgentMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QANClickHouseQueryLogAgentMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QANClickHouseQueryLogAgentMultiError) AllErrors() []error { return m }
+
+// QANClickHouseQueryLogAgentValidationError is the validation error returned
+// by QANClickHouseQueryLogAgent.Validate if the designated constraints aren't met.
+type QANClickHouseQueryLogAgentValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QANClickHouseQueryLogAgentValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QANClickHouseQueryLogAgentValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QANClickHouseQueryLogAgentValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QANClickHouseQueryLogAgentValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QANClickHouseQueryLogAgentValidationError) ErrorName() string {
+	return "QANClickHouseQueryLogAgentValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e QANClickHouseQueryLogAgentValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQANClickHouseQueryLogAgent.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QANClickHouseQueryLogAgentValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QANClickHouseQueryLogAgentValidationError{}
 
 // Validate checks the field values on QANMySQLPerfSchemaAgent with the rules
 // defined in the proto definition for this message. If any rules are
@@ -1598,8 +1874,7 @@ func (e QANMySQLPerfSchemaAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QANMySQLPerfSchemaAgentValidationError{}
@@ -1739,8 +2014,7 @@ func (e QANMySQLSlowlogAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QANMySQLSlowlogAgentValidationError{}
@@ -1866,8 +2140,7 @@ func (e QANMongoDBProfilerAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QANMongoDBProfilerAgentValidationError{}
@@ -1993,8 +2266,7 @@ func (e QANMongoDBMongologAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QANMongoDBMongologAgentValidationError{}
@@ -2123,8 +2395,7 @@ func (e RTAOptionsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = RTAOptionsValidationError{}
@@ -2273,8 +2544,7 @@ func (e RTAMongoDBAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = RTAMongoDBAgentValidationError{}
@@ -2403,8 +2673,7 @@ func (e QANPostgreSQLPgStatementsAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QANPostgreSQLPgStatementsAgentValidationError{}
@@ -2535,8 +2804,7 @@ func (e QANPostgreSQLPgStatMonitorAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QANPostgreSQLPgStatMonitorAgentValidationError{}
@@ -2692,8 +2960,7 @@ func (e RDSExporterValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = RDSExporterValidationError{}
@@ -2848,8 +3115,7 @@ func (e ExternalExporterValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ExternalExporterValidationError{}
@@ -3004,8 +3270,7 @@ func (e AzureDatabaseExporterValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AzureDatabaseExporterValidationError{}
@@ -3074,6 +3339,7 @@ func (m *ChangeCommonAgentParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -3102,6 +3368,7 @@ func (m *ChangeCommonAgentParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -3175,8 +3442,7 @@ func (e ChangeCommonAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeCommonAgentParamsValidationError{}
@@ -3286,8 +3552,7 @@ func (e ListAgentsRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ListAgentsRequestValidationError{}
@@ -3968,6 +4233,74 @@ func (m *ListAgentsResponse) validate(all bool) error {
 
 	}
 
+	for idx, item := range m.GetClickhouseExporter() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListAgentsResponseValidationError{
+						field:  fmt.Sprintf("ClickhouseExporter[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListAgentsResponseValidationError{
+						field:  fmt.Sprintf("ClickhouseExporter[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListAgentsResponseValidationError{
+					field:  fmt.Sprintf("ClickhouseExporter[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetQanClickhouseQuerylogAgent() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListAgentsResponseValidationError{
+						field:  fmt.Sprintf("QanClickhouseQuerylogAgent[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListAgentsResponseValidationError{
+						field:  fmt.Sprintf("QanClickhouseQuerylogAgent[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListAgentsResponseValidationError{
+					field:  fmt.Sprintf("QanClickhouseQuerylogAgent[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return ListAgentsResponseMultiError(errors)
 	}
@@ -4035,8 +4368,7 @@ func (e ListAgentsResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ListAgentsResponseValidationError{}
@@ -4147,8 +4479,7 @@ func (e GetAgentRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetAgentRequestValidationError{}
@@ -4963,6 +5294,88 @@ func (m *GetAgentResponse) validate(all bool) error {
 			}
 		}
 
+	case *GetAgentResponse_ClickhouseExporter:
+		if v == nil {
+			err := GetAgentResponseValidationError{
+				field:  "Agent",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExporter()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetAgentResponseValidationError{
+						field:  "ClickhouseExporter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetAgentResponseValidationError{
+						field:  "ClickhouseExporter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExporter()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetAgentResponseValidationError{
+					field:  "ClickhouseExporter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *GetAgentResponse_QanClickhouseQuerylogAgent:
+		if v == nil {
+			err := GetAgentResponseValidationError{
+				field:  "Agent",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetQanClickhouseQuerylogAgent()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetAgentResponseValidationError{
+						field:  "QanClickhouseQuerylogAgent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetAgentResponseValidationError{
+						field:  "QanClickhouseQuerylogAgent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetQanClickhouseQuerylogAgent()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetAgentResponseValidationError{
+					field:  "QanClickhouseQuerylogAgent",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -5032,8 +5445,7 @@ func (e GetAgentResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetAgentResponseValidationError{}
@@ -5148,8 +5560,7 @@ func (e GetAgentLogsRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetAgentLogsRequestValidationError{}
@@ -5253,8 +5664,7 @@ func (e GetAgentLogsResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetAgentLogsResponseValidationError{}
@@ -5987,6 +6397,88 @@ func (m *AddAgentRequest) validate(all bool) error {
 			}
 		}
 
+	case *AddAgentRequest_ClickhouseExporter:
+		if v == nil {
+			err := AddAgentRequestValidationError{
+				field:  "Agent",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExporter()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AddAgentRequestValidationError{
+						field:  "ClickhouseExporter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AddAgentRequestValidationError{
+						field:  "ClickhouseExporter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExporter()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AddAgentRequestValidationError{
+					field:  "ClickhouseExporter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *AddAgentRequest_QanClickhouseQuerylogAgent:
+		if v == nil {
+			err := AddAgentRequestValidationError{
+				field:  "Agent",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetQanClickhouseQuerylogAgent()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AddAgentRequestValidationError{
+						field:  "QanClickhouseQuerylogAgent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AddAgentRequestValidationError{
+						field:  "QanClickhouseQuerylogAgent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetQanClickhouseQuerylogAgent()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AddAgentRequestValidationError{
+					field:  "QanClickhouseQuerylogAgent",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -6056,8 +6548,7 @@ func (e AddAgentRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddAgentRequestValidationError{}
@@ -6790,6 +7281,88 @@ func (m *AddAgentResponse) validate(all bool) error {
 			}
 		}
 
+	case *AddAgentResponse_ClickhouseExporter:
+		if v == nil {
+			err := AddAgentResponseValidationError{
+				field:  "Agent",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExporter()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AddAgentResponseValidationError{
+						field:  "ClickhouseExporter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AddAgentResponseValidationError{
+						field:  "ClickhouseExporter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExporter()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AddAgentResponseValidationError{
+					field:  "ClickhouseExporter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *AddAgentResponse_QanClickhouseQuerylogAgent:
+		if v == nil {
+			err := AddAgentResponseValidationError{
+				field:  "Agent",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetQanClickhouseQuerylogAgent()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AddAgentResponseValidationError{
+						field:  "QanClickhouseQuerylogAgent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AddAgentResponseValidationError{
+						field:  "QanClickhouseQuerylogAgent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetQanClickhouseQuerylogAgent()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AddAgentResponseValidationError{
+					field:  "QanClickhouseQuerylogAgent",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -6859,8 +7432,7 @@ func (e AddAgentResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddAgentResponseValidationError{}
@@ -7604,6 +8176,88 @@ func (m *ChangeAgentRequest) validate(all bool) error {
 			}
 		}
 
+	case *ChangeAgentRequest_ClickhouseExporter:
+		if v == nil {
+			err := ChangeAgentRequestValidationError{
+				field:  "Agent",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExporter()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ChangeAgentRequestValidationError{
+						field:  "ClickhouseExporter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ChangeAgentRequestValidationError{
+						field:  "ClickhouseExporter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExporter()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ChangeAgentRequestValidationError{
+					field:  "ClickhouseExporter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ChangeAgentRequest_QanClickhouseQuerylogAgent:
+		if v == nil {
+			err := ChangeAgentRequestValidationError{
+				field:  "Agent",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetQanClickhouseQuerylogAgent()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ChangeAgentRequestValidationError{
+						field:  "QanClickhouseQuerylogAgent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ChangeAgentRequestValidationError{
+						field:  "QanClickhouseQuerylogAgent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetQanClickhouseQuerylogAgent()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ChangeAgentRequestValidationError{
+					field:  "QanClickhouseQuerylogAgent",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -7675,8 +8329,7 @@ func (e ChangeAgentRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeAgentRequestValidationError{}
@@ -8409,6 +9062,88 @@ func (m *ChangeAgentResponse) validate(all bool) error {
 			}
 		}
 
+	case *ChangeAgentResponse_ClickhouseExporter:
+		if v == nil {
+			err := ChangeAgentResponseValidationError{
+				field:  "Agent",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExporter()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ChangeAgentResponseValidationError{
+						field:  "ClickhouseExporter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ChangeAgentResponseValidationError{
+						field:  "ClickhouseExporter",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExporter()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ChangeAgentResponseValidationError{
+					field:  "ClickhouseExporter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ChangeAgentResponse_QanClickhouseQuerylogAgent:
+		if v == nil {
+			err := ChangeAgentResponseValidationError{
+				field:  "Agent",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetQanClickhouseQuerylogAgent()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ChangeAgentResponseValidationError{
+						field:  "QanClickhouseQuerylogAgent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ChangeAgentResponseValidationError{
+						field:  "QanClickhouseQuerylogAgent",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetQanClickhouseQuerylogAgent()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ChangeAgentResponseValidationError{
+					field:  "QanClickhouseQuerylogAgent",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -8480,8 +9215,7 @@ func (e ChangeAgentResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeAgentResponseValidationError{}
@@ -8596,8 +9330,7 @@ func (e AddPMMAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddPMMAgentParamsValidationError{}
@@ -8718,8 +9451,7 @@ func (e AddNodeExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddNodeExporterParamsValidationError{}
@@ -8788,6 +9520,7 @@ func (m *ChangeNodeExporterParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -8816,6 +9549,7 @@ func (m *ChangeNodeExporterParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -8897,8 +9631,7 @@ func (e ChangeNodeExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeNodeExporterParamsValidationError{}
@@ -9091,8 +9824,7 @@ func (e AddMySQLdExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddMySQLdExporterParamsValidationError{}
@@ -9191,6 +9923,7 @@ func (m *ChangeMySQLdExporterParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -9219,6 +9952,7 @@ func (m *ChangeMySQLdExporterParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -9340,8 +10074,7 @@ func (e ChangeMySQLdExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeMySQLdExporterParamsValidationError{}
@@ -9529,8 +10262,7 @@ func (e AddMongoDBExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddMongoDBExporterParamsValidationError{}
@@ -9629,6 +10361,7 @@ func (m *ChangeMongoDBExporterParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -9657,6 +10390,7 @@ func (m *ChangeMongoDBExporterParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -9791,8 +10525,7 @@ func (e ChangeMongoDBExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeMongoDBExporterParamsValidationError{}
@@ -9985,8 +10718,7 @@ func (e AddPostgresExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddPostgresExporterParamsValidationError{}
@@ -10085,6 +10817,7 @@ func (m *ChangePostgresExporterParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -10113,6 +10846,7 @@ func (m *ChangePostgresExporterParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -10239,8 +10973,7 @@ func (e ChangePostgresExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangePostgresExporterParamsValidationError{}
@@ -10423,8 +11156,7 @@ func (e AddProxySQLExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddProxySQLExporterParamsValidationError{}
@@ -10523,6 +11255,7 @@ func (m *ChangeProxySQLExporterParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -10551,6 +11284,7 @@ func (m *ChangeProxySQLExporterParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -10653,8 +11387,7 @@ func (e ChangeProxySQLExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeProxySQLExporterParamsValidationError{}
@@ -10818,8 +11551,7 @@ func (e AddQANMySQLPerfSchemaAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddQANMySQLPerfSchemaAgentParamsValidationError{}
@@ -10889,6 +11621,7 @@ func (m *ChangeQANMySQLPerfSchemaAgentParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -10917,6 +11650,7 @@ func (m *ChangeQANMySQLPerfSchemaAgentParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -11040,8 +11774,7 @@ func (e ChangeQANMySQLPerfSchemaAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeQANMySQLPerfSchemaAgentParamsValidationError{}
@@ -11205,8 +11938,7 @@ func (e AddQANMySQLSlowlogAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddQANMySQLSlowlogAgentParamsValidationError{}
@@ -11276,6 +12008,7 @@ func (m *ChangeQANMySQLSlowlogAgentParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -11304,6 +12037,7 @@ func (m *ChangeQANMySQLSlowlogAgentParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -11431,8 +12165,7 @@ func (e ChangeQANMySQLSlowlogAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeQANMySQLSlowlogAgentParamsValidationError{}
@@ -11585,8 +12318,7 @@ func (e AddQANMongoDBProfilerAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddQANMongoDBProfilerAgentParamsValidationError{}
@@ -11656,6 +12388,7 @@ func (m *ChangeQANMongoDBProfilerAgentParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -11684,6 +12417,7 @@ func (m *ChangeQANMongoDBProfilerAgentParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -11803,8 +12537,7 @@ func (e ChangeQANMongoDBProfilerAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeQANMongoDBProfilerAgentParamsValidationError{}
@@ -11957,8 +12690,7 @@ func (e AddQANMongoDBMongologAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddQANMongoDBMongologAgentParamsValidationError{}
@@ -12028,6 +12760,7 @@ func (m *ChangeQANMongoDBMongologAgentParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -12056,6 +12789,7 @@ func (m *ChangeQANMongoDBMongologAgentParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -12175,8 +12909,7 @@ func (e ChangeQANMongoDBMongologAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeQANMongoDBMongologAgentParamsValidationError{}
@@ -12337,8 +13070,7 @@ func (e AddQANPostgreSQLPgStatementsAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddQANPostgreSQLPgStatementsAgentParamsValidationError{}
@@ -12409,6 +13141,7 @@ func (m *ChangeQANPostgreSQLPgStatementsAgentParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -12437,6 +13170,7 @@ func (m *ChangeQANPostgreSQLPgStatementsAgentParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -12552,8 +13286,7 @@ func (e ChangeQANPostgreSQLPgStatementsAgentParamsValidationError) Error() strin
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeQANPostgreSQLPgStatementsAgentParamsValidationError{}
@@ -12716,8 +13449,7 @@ func (e AddQANPostgreSQLPgStatMonitorAgentParamsValidationError) Error() string 
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddQANPostgreSQLPgStatMonitorAgentParamsValidationError{}
@@ -12788,6 +13520,7 @@ func (m *ChangeQANPostgreSQLPgStatMonitorAgentParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -12816,6 +13549,7 @@ func (m *ChangeQANPostgreSQLPgStatMonitorAgentParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -12935,8 +13669,7 @@ func (e ChangeQANPostgreSQLPgStatMonitorAgentParamsValidationError) Error() stri
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeQANPostgreSQLPgStatMonitorAgentParamsValidationError{}
@@ -13076,8 +13809,7 @@ func (e AddRDSExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddRDSExporterParamsValidationError{}
@@ -13146,6 +13878,7 @@ func (m *ChangeRDSExporterParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -13174,6 +13907,7 @@ func (m *ChangeRDSExporterParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -13267,8 +14001,7 @@ func (e ChangeRDSExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeRDSExporterParamsValidationError{}
@@ -13408,8 +14141,7 @@ func (e AddExternalExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddExternalExporterParamsValidationError{}
@@ -13478,6 +14210,7 @@ func (m *ChangeExternalExporterParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -13506,6 +14239,7 @@ func (m *ChangeExternalExporterParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -13596,8 +14330,7 @@ func (e ChangeExternalExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeExternalExporterParamsValidationError{}
@@ -13751,8 +14484,7 @@ func (e AddAzureDatabaseExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddAzureDatabaseExporterParamsValidationError{}
@@ -13822,6 +14554,7 @@ func (m *ChangeAzureDatabaseExporterParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -13850,6 +14583,7 @@ func (m *ChangeAzureDatabaseExporterParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -13949,8 +14683,7 @@ func (e ChangeAzureDatabaseExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeAzureDatabaseExporterParamsValidationError{}
@@ -14056,8 +14789,7 @@ func (e ChangeNomadAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeNomadAgentParamsValidationError{}
@@ -14255,8 +14987,7 @@ func (e AddValkeyExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddValkeyExporterParamsValidationError{}
@@ -14355,6 +15086,7 @@ func (m *ChangeValkeyExporterParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -14383,6 +15115,7 @@ func (m *ChangeValkeyExporterParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.EnablePushMetrics != nil {
@@ -14390,6 +15123,7 @@ func (m *ChangeValkeyExporterParams) validate(all bool) error {
 	}
 
 	if m.Username != nil {
+
 		if utf8.RuneCountInString(m.GetUsername()) < 1 {
 			err := ChangeValkeyExporterParamsValidationError{
 				field:  "Username",
@@ -14400,6 +15134,7 @@ func (m *ChangeValkeyExporterParams) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
+
 	}
 
 	if m.Password != nil {
@@ -14505,8 +15240,7 @@ func (e ChangeValkeyExporterParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeValkeyExporterParamsValidationError{}
@@ -14518,6 +15252,748 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ChangeValkeyExporterParamsValidationError{}
+
+// Validate checks the field values on AddClickHouseExporterParams with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddClickHouseExporterParams) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddClickHouseExporterParams with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddClickHouseExporterParamsMultiError, or nil if none found.
+func (m *AddClickHouseExporterParams) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddClickHouseExporterParams) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetPmmAgentId()) < 1 {
+		err := AddClickHouseExporterParamsValidationError{
+			field:  "PmmAgentId",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if err := m._validateUuid(m.GetServiceId()); err != nil {
+		err = AddClickHouseExporterParamsValidationError{
+			field:  "ServiceId",
+			reason: "value must be a valid UUID",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for Username
+
+	// no validation rules for Password
+
+	// no validation rules for Tls
+
+	// no validation rules for TlsSkipVerify
+
+	// no validation rules for CustomLabels
+
+	// no validation rules for SkipConnectionCheck
+
+	// no validation rules for PushMetrics
+
+	// no validation rules for TlsCa
+
+	// no validation rules for TlsCert
+
+	// no validation rules for TlsKey
+
+	// no validation rules for AgentPassword
+
+	// no validation rules for ExposeExporter
+
+	// no validation rules for LogLevel
+
+	if len(errors) > 0 {
+		return AddClickHouseExporterParamsMultiError(errors)
+	}
+
+	return nil
+}
+
+func (m *AddClickHouseExporterParams) _validateUuid(uuid string) error {
+	if matched := _agents_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
+// AddClickHouseExporterParamsMultiError is an error wrapping multiple
+// validation errors returned by AddClickHouseExporterParams.ValidateAll() if
+// the designated constraints aren't met.
+type AddClickHouseExporterParamsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddClickHouseExporterParamsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddClickHouseExporterParamsMultiError) AllErrors() []error { return m }
+
+// AddClickHouseExporterParamsValidationError is the validation error returned
+// by AddClickHouseExporterParams.Validate if the designated constraints
+// aren't met.
+type AddClickHouseExporterParamsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddClickHouseExporterParamsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddClickHouseExporterParamsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddClickHouseExporterParamsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddClickHouseExporterParamsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddClickHouseExporterParamsValidationError) ErrorName() string {
+	return "AddClickHouseExporterParamsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddClickHouseExporterParamsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddClickHouseExporterParams.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddClickHouseExporterParamsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddClickHouseExporterParamsValidationError{}
+
+// Validate checks the field values on ChangeClickHouseExporterParams with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ChangeClickHouseExporterParams) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ChangeClickHouseExporterParams with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// ChangeClickHouseExporterParamsMultiError, or nil if none found.
+func (m *ChangeClickHouseExporterParams) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ChangeClickHouseExporterParams) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetMetricsResolutions()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ChangeClickHouseExporterParamsValidationError{
+					field:  "MetricsResolutions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ChangeClickHouseExporterParamsValidationError{
+					field:  "MetricsResolutions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMetricsResolutions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ChangeClickHouseExporterParamsValidationError{
+				field:  "MetricsResolutions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if m.Enable != nil {
+		// no validation rules for Enable
+	}
+
+	if m.CustomLabels != nil {
+
+		if all {
+			switch v := interface{}(m.GetCustomLabels()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ChangeClickHouseExporterParamsValidationError{
+						field:  "CustomLabels",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ChangeClickHouseExporterParamsValidationError{
+						field:  "CustomLabels",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetCustomLabels()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ChangeClickHouseExporterParamsValidationError{
+					field:  "CustomLabels",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if m.EnablePushMetrics != nil {
+		// no validation rules for EnablePushMetrics
+	}
+
+	if m.Username != nil {
+		// no validation rules for Username
+	}
+
+	if m.Password != nil {
+		// no validation rules for Password
+	}
+
+	if m.Tls != nil {
+		// no validation rules for Tls
+	}
+
+	if m.TlsSkipVerify != nil {
+		// no validation rules for TlsSkipVerify
+	}
+
+	if m.TlsCa != nil {
+		// no validation rules for TlsCa
+	}
+
+	if m.TlsCert != nil {
+		// no validation rules for TlsCert
+	}
+
+	if m.TlsKey != nil {
+		// no validation rules for TlsKey
+	}
+
+	if m.AgentPassword != nil {
+		// no validation rules for AgentPassword
+	}
+
+	if m.ExposeExporter != nil {
+		// no validation rules for ExposeExporter
+	}
+
+	if m.LogLevel != nil {
+		// no validation rules for LogLevel
+	}
+
+	if len(errors) > 0 {
+		return ChangeClickHouseExporterParamsMultiError(errors)
+	}
+
+	return nil
+}
+
+// ChangeClickHouseExporterParamsMultiError is an error wrapping multiple
+// validation errors returned by ChangeClickHouseExporterParams.ValidateAll()
+// if the designated constraints aren't met.
+type ChangeClickHouseExporterParamsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ChangeClickHouseExporterParamsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ChangeClickHouseExporterParamsMultiError) AllErrors() []error { return m }
+
+// ChangeClickHouseExporterParamsValidationError is the validation error
+// returned by ChangeClickHouseExporterParams.Validate if the designated
+// constraints aren't met.
+type ChangeClickHouseExporterParamsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ChangeClickHouseExporterParamsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ChangeClickHouseExporterParamsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ChangeClickHouseExporterParamsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ChangeClickHouseExporterParamsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ChangeClickHouseExporterParamsValidationError) ErrorName() string {
+	return "ChangeClickHouseExporterParamsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ChangeClickHouseExporterParamsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sChangeClickHouseExporterParams.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ChangeClickHouseExporterParamsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ChangeClickHouseExporterParamsValidationError{}
+
+// Validate checks the field values on AddQANClickHouseQueryLogAgentParams with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *AddQANClickHouseQueryLogAgentParams) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddQANClickHouseQueryLogAgentParams
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// AddQANClickHouseQueryLogAgentParamsMultiError, or nil if none found.
+func (m *AddQANClickHouseQueryLogAgentParams) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddQANClickHouseQueryLogAgentParams) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetPmmAgentId()) < 1 {
+		err := AddQANClickHouseQueryLogAgentParamsValidationError{
+			field:  "PmmAgentId",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetServiceId()) < 1 {
+		err := AddQANClickHouseQueryLogAgentParamsValidationError{
+			field:  "ServiceId",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for Username
+
+	// no validation rules for Password
+
+	// no validation rules for Tls
+
+	// no validation rules for TlsSkipVerify
+
+	// no validation rules for CustomLabels
+
+	// no validation rules for SkipConnectionCheck
+
+	// no validation rules for DisableCommentsParsing
+
+	// no validation rules for MaxQueryLength
+
+	// no validation rules for TlsCa
+
+	// no validation rules for TlsCert
+
+	// no validation rules for TlsKey
+
+	// no validation rules for LogLevel
+
+	// no validation rules for Protocol
+
+	if len(errors) > 0 {
+		return AddQANClickHouseQueryLogAgentParamsMultiError(errors)
+	}
+
+	return nil
+}
+
+// AddQANClickHouseQueryLogAgentParamsMultiError is an error wrapping multiple
+// validation errors returned by
+// AddQANClickHouseQueryLogAgentParams.ValidateAll() if the designated
+// constraints aren't met.
+type AddQANClickHouseQueryLogAgentParamsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddQANClickHouseQueryLogAgentParamsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddQANClickHouseQueryLogAgentParamsMultiError) AllErrors() []error { return m }
+
+// AddQANClickHouseQueryLogAgentParamsValidationError is the validation error
+// returned by AddQANClickHouseQueryLogAgentParams.Validate if the designated
+// constraints aren't met.
+type AddQANClickHouseQueryLogAgentParamsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddQANClickHouseQueryLogAgentParamsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddQANClickHouseQueryLogAgentParamsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddQANClickHouseQueryLogAgentParamsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddQANClickHouseQueryLogAgentParamsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddQANClickHouseQueryLogAgentParamsValidationError) ErrorName() string {
+	return "AddQANClickHouseQueryLogAgentParamsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddQANClickHouseQueryLogAgentParamsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddQANClickHouseQueryLogAgentParams.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddQANClickHouseQueryLogAgentParamsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddQANClickHouseQueryLogAgentParamsValidationError{}
+
+// Validate checks the field values on ChangeQANClickHouseQueryLogAgentParams
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *ChangeQANClickHouseQueryLogAgentParams) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// ChangeQANClickHouseQueryLogAgentParams with the rules defined in the proto
+// definition for this message. If any rules are violated, the result is a
+// list of violation errors wrapped in
+// ChangeQANClickHouseQueryLogAgentParamsMultiError, or nil if none found.
+func (m *ChangeQANClickHouseQueryLogAgentParams) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ChangeQANClickHouseQueryLogAgentParams) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetMetricsResolutions()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ChangeQANClickHouseQueryLogAgentParamsValidationError{
+					field:  "MetricsResolutions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ChangeQANClickHouseQueryLogAgentParamsValidationError{
+					field:  "MetricsResolutions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMetricsResolutions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ChangeQANClickHouseQueryLogAgentParamsValidationError{
+				field:  "MetricsResolutions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if m.Enable != nil {
+		// no validation rules for Enable
+	}
+
+	if m.CustomLabels != nil {
+
+		if all {
+			switch v := interface{}(m.GetCustomLabels()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ChangeQANClickHouseQueryLogAgentParamsValidationError{
+						field:  "CustomLabels",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ChangeQANClickHouseQueryLogAgentParamsValidationError{
+						field:  "CustomLabels",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetCustomLabels()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ChangeQANClickHouseQueryLogAgentParamsValidationError{
+					field:  "CustomLabels",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if m.EnablePushMetrics != nil {
+		// no validation rules for EnablePushMetrics
+	}
+
+	if m.Username != nil {
+		// no validation rules for Username
+	}
+
+	if m.Password != nil {
+		// no validation rules for Password
+	}
+
+	if m.Tls != nil {
+		// no validation rules for Tls
+	}
+
+	if m.TlsSkipVerify != nil {
+		// no validation rules for TlsSkipVerify
+	}
+
+	if m.DisableCommentsParsing != nil {
+		// no validation rules for DisableCommentsParsing
+	}
+
+	if m.MaxQueryLength != nil {
+		// no validation rules for MaxQueryLength
+	}
+
+	if m.TlsCa != nil {
+		// no validation rules for TlsCa
+	}
+
+	if m.TlsCert != nil {
+		// no validation rules for TlsCert
+	}
+
+	if m.TlsKey != nil {
+		// no validation rules for TlsKey
+	}
+
+	if m.LogLevel != nil {
+		// no validation rules for LogLevel
+	}
+
+	if len(errors) > 0 {
+		return ChangeQANClickHouseQueryLogAgentParamsMultiError(errors)
+	}
+
+	return nil
+}
+
+// ChangeQANClickHouseQueryLogAgentParamsMultiError is an error wrapping
+// multiple validation errors returned by
+// ChangeQANClickHouseQueryLogAgentParams.ValidateAll() if the designated
+// constraints aren't met.
+type ChangeQANClickHouseQueryLogAgentParamsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ChangeQANClickHouseQueryLogAgentParamsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ChangeQANClickHouseQueryLogAgentParamsMultiError) AllErrors() []error { return m }
+
+// ChangeQANClickHouseQueryLogAgentParamsValidationError is the validation
+// error returned by ChangeQANClickHouseQueryLogAgentParams.Validate if the
+// designated constraints aren't met.
+type ChangeQANClickHouseQueryLogAgentParamsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ChangeQANClickHouseQueryLogAgentParamsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ChangeQANClickHouseQueryLogAgentParamsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ChangeQANClickHouseQueryLogAgentParamsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ChangeQANClickHouseQueryLogAgentParamsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ChangeQANClickHouseQueryLogAgentParamsValidationError) ErrorName() string {
+	return "ChangeQANClickHouseQueryLogAgentParamsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ChangeQANClickHouseQueryLogAgentParamsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sChangeQANClickHouseQueryLogAgentParams.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ChangeQANClickHouseQueryLogAgentParamsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ChangeQANClickHouseQueryLogAgentParamsValidationError{}
 
 // Validate checks the field values on AddRTAMongoDBAgentParams with the rules
 // defined in the proto definition for this message. If any rules are
@@ -14681,8 +16157,7 @@ func (e AddRTAMongoDBAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddRTAMongoDBAgentParamsValidationError{}
@@ -14722,6 +16197,7 @@ func (m *ChangeRTAMongoDBAgentParams) validate(all bool) error {
 	}
 
 	if m.CustomLabels != nil {
+
 		if all {
 			switch v := interface{}(m.GetCustomLabels()).(type) {
 			case interface{ ValidateAll() error }:
@@ -14750,6 +16226,7 @@ func (m *ChangeRTAMongoDBAgentParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if m.LogLevel != nil {
@@ -14789,6 +16266,7 @@ func (m *ChangeRTAMongoDBAgentParams) validate(all bool) error {
 	}
 
 	if m.RtaOptions != nil {
+
 		if all {
 			switch v := interface{}(m.GetRtaOptions()).(type) {
 			case interface{ ValidateAll() error }:
@@ -14817,6 +16295,7 @@ func (m *ChangeRTAMongoDBAgentParams) validate(all bool) error {
 				}
 			}
 		}
+
 	}
 
 	if len(errors) > 0 {
@@ -14887,8 +16366,7 @@ func (e ChangeRTAMongoDBAgentParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ChangeRTAMongoDBAgentParamsValidationError{}
@@ -15003,8 +16481,7 @@ func (e RemoveAgentRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = RemoveAgentRequestValidationError{}
@@ -15106,8 +16583,7 @@ func (e RemoveAgentResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = RemoveAgentResponseValidationError{}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { css, cx } from '@emotion/css';
 import { GrafanaTheme } from '@grafana/data';
-import { stylesFactory, useTheme } from '@grafana/ui';
+import { useTheme } from '@grafana/ui';
 
 export interface FieldProps {
   children: React.ReactElement;
@@ -13,8 +13,9 @@ export interface FieldProps {
   className?: string;
 }
 
-export const getFieldStyles = stylesFactory((theme: GrafanaTheme) => ({
-  label: css`
+export const getFieldStyles = (theme: GrafanaTheme) => {
+  const styles = {
+    label: css`
       font-size: ${theme.typography.size.md};
       font-weight: ${theme.typography.weight.semibold};
       line-height: 1.25;
@@ -23,27 +24,30 @@ export const getFieldStyles = stylesFactory((theme: GrafanaTheme) => ({
       color: ${theme.colors.formLabel};
       max-width: 480px;
     `,
-  labelContent: css`
+    labelContent: css`
       display: flex;
       align-items: center;
     `,
-  field: css`
+    field: css`
       display: flex;
       flex-direction: column;
       margin-bottom: ${theme.spacing.formSpacingBase * 2}px;
     `,
-  fieldHorizontal: css`
+    fieldHorizontal: css`
       flex-direction: row;
       justify-content: space-between;
       flex-wrap: wrap;
     `,
-  fieldValidationWrapper: css`
+    fieldValidationWrapper: css`
       margin-top: ${theme.spacing.formSpacingBase / 2}px;
     `,
-  fieldValidationWrapperHorizontal: css`
+    fieldValidationWrapperHorizontal: css`
       flex: 1 1 100%;
     `,
-}));
+  };
+
+  return styles;
+};
 
 export const Field: React.FC<FieldProps> = ({
   label,

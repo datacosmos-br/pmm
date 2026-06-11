@@ -1,0 +1,4 @@
+[submodule "pmm-submodules"]
+	path = pmm-submodules
+	url = https://github.com/datacosmos-br/pmm-submodules.git
+	branch = feat/pmm-3.8.0-dc

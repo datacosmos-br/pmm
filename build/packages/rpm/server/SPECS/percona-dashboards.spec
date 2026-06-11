@@ -56,6 +56,7 @@ install -d %{buildroot}%{_datadir}/%{name}/panels/pmm-app
 cp -a ./dashboards/pmm-app/dist %{buildroot}%{_datadir}/%{name}/panels/pmm-app
 unzip -q %{SOURCE1} -d %{buildroot}%{_datadir}/%{name}/panels
 unzip -q %{SOURCE2} -d %{buildroot}%{_datadir}/%{name}/panels
+chmod 0644 %{buildroot}%{_datadir}/%{name}/panels/grafana-clickhouse-datasource/go_plugin_build_manifest
 echo %{version} > %{buildroot}%{_datadir}/%{name}/VERSION
 
 

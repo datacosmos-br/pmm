@@ -233,6 +233,23 @@ func (s *ActionsService) StartMongoDBExplainAction(_ context.Context, id, pmmAge
 	return s.sendActionRequest(pmmAgentID, aRequest)
 }
 
+// StartClickHouseExplainAction starts ClickHouse EXPLAIN Action on pmm-agent.
+func (s *ActionsService) StartClickHouseExplainAction(_ context.Context, id, pmmAgentID, dsn, query, explainType string) error {
+	aRequest := &agentv1.StartActionRequest{
+		ActionId: id,
+		Params: &agentv1.StartActionRequest_ClickhouseExplainParams{
+			ClickhouseExplainParams: &agentv1.StartActionRequest_ClickHouseExplainParams{
+				Dsn:         dsn,
+				Query:       query,
+				ExplainType: explainType,
+			},
+		},
+		Timeout: defaultActionTimeout,
+	}
+
+	return s.sendActionRequest(pmmAgentID, aRequest)
+}
+
 // StartMySQLQueryShowAction starts MySQL SHOW query action on pmm-agent.
 func (s *ActionsService) StartMySQLQueryShowAction(_ context.Context, id, pmmAgentID, dsn, query string, files map[string]string, tdp *models.DelimiterPair, tlsSkipVerify bool) error { //nolint:lll
 	aRequest := &agentv1.StartActionRequest{

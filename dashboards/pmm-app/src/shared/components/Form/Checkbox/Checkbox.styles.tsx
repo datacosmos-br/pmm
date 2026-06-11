@@ -1,9 +1,8 @@
-import { stylesFactory } from '@grafana/ui';
 import { GrafanaTheme } from '@grafana/data';
 import { css } from '@emotion/css';
 import { getPmmTheme } from 'shared/components/helpers/getPmmTheme';
 
-export const getCheckboxStyles = stylesFactory((theme: GrafanaTheme) => {
+export const getCheckboxStyles = (theme: GrafanaTheme) => {
   const parameters = getPmmTheme(theme);
 
   return {
@@ -110,4 +109,4 @@ export const getCheckboxStyles = stylesFactory((theme: GrafanaTheme) => {
       }
     `,
   };
-});
+};

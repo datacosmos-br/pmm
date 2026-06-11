@@ -1,4 +1,4 @@
-import { GrafanaTheme } from '@grafana/data';
+import { GrafanaTheme, GrafanaTheme2 } from '@grafana/data';
 
 interface TableTheme {
   backgroundColor: string;
@@ -30,9 +30,101 @@ interface Themes {
  * @param theme - The current Grafana theme
  * @returns Theme configuration object with colors for different UI elements
  */
-export const getPmmTheme = (theme: GrafanaTheme): Themes => {
+type PmmGrafanaTheme = GrafanaTheme | GrafanaTheme2 | undefined;
+
+type UnknownRecord = Record<string, unknown>;
+
+export interface ThemePrimaryColor {
+  main: string;
+  shade: string;
+  contrastText: string;
+}
+
+const isRecord = (value: unknown): value is UnknownRecord => typeof value === 'object' && value !== null;
+
+const getRequiredThemeValue = (theme: unknown, path: readonly string[], description: string): unknown => {
+  let value = theme;
+
+  path.forEach((key) => {
+    if (!isRecord(value)) {
+      throw new Error(`${description} is required`);
+    }
+
+    value = value[key];
+  });
+
+  return value;
+};
+
+const getRequiredThemeString = (theme: unknown, path: readonly string[], description: string): string => {
+  const value = getRequiredThemeValue(theme, path, description);
+
+  if (typeof value !== 'string') {
+    throw new Error(`${description} is required`);
+  }
+
+  return value;
+};
+
+export const getThemePrimaryBackgroundColor = (theme: unknown): string => (
+  getRequiredThemeString(theme, ['colors', 'background', 'primary'], 'Grafana theme colors.background.primary')
+);
+
+export const getThemeSecondaryBackgroundColor = (theme: unknown): string => (
+  getRequiredThemeString(theme, ['colors', 'background', 'secondary'], 'Grafana theme colors.background.secondary')
+);
+
+export const getThemeCanvasBackgroundColor = (theme: unknown): string => (
+  getRequiredThemeString(theme, ['colors', 'background', 'canvas'], 'Grafana theme colors.background.canvas')
+);
+
+export const getThemeActionFocusColor = (theme: unknown): string => (
+  getRequiredThemeString(theme, ['colors', 'action', 'focus'], 'Grafana theme colors.action.focus')
+);
+
+export const getThemePrimaryTextColor = (theme: unknown): string => (
+  getRequiredThemeString(theme, ['colors', 'text', 'primary'], 'Grafana theme colors.text.primary')
+);
+
+export const getThemePrimaryColor = (theme: unknown): ThemePrimaryColor => ({
+  main: getRequiredThemeString(theme, ['colors', 'primary', 'main'], 'Grafana theme colors.primary.main'),
+  shade: getRequiredThemeString(theme, ['colors', 'primary', 'shade'], 'Grafana theme colors.primary.shade'),
+  contrastText: getRequiredThemeString(
+    theme,
+    ['colors', 'primary', 'contrastText'],
+    'Grafana theme colors.primary.contrastText',
+  ),
+});
+
+const getLightMainTextColor = (theme: PmmGrafanaTheme): string => {
+  if (!theme) {
+    return '#000000';
+  }
+
+  const text = getRequiredThemeValue(theme, ['colors', 'text'], 'Grafana theme colors.text');
+
+  if (typeof text === 'string') {
+    return text;
+  }
+
+  return getRequiredThemeString(text, ['primary'], 'Grafana theme colors.text.primary');
+};
+
+const getMainTextColor = (theme: PmmGrafanaTheme, isLight: boolean): string => {
+  if (!isLight) {
+    return 'rgba(255, 255, 255, 0.8)';
+  }
+
+  if (!theme) {
+    return '#000000';
+  }
+
+  return getLightMainTextColor(theme);
+};
+
+export const getPmmTheme = (theme: PmmGrafanaTheme): Themes => {
   const isLight = theme?.isLight ?? true;
-  const mainTextColor = isLight ? (theme?.colors?.text ?? '#000000') : 'rgba(255, 255, 255, 0.8)';
+  const mainTextColor = getMainTextColor(theme, isLight);
 
   const backgroundColor = isLight ? '#f7f8fa' : '#0b0c0e';
   const borderColor = isLight ? mainTextColor : '#292929';
@@ -77,7 +169,7 @@ export const getPmmTheme = (theme: GrafanaTheme): Themes => {
  *
  * @param grafanaTheme - The current Grafana theme
  */
-export const applyPmmCssVariables = (grafanaTheme: GrafanaTheme): void => {
+export const applyPmmCssVariables = (grafanaTheme: PmmGrafanaTheme): void => {
   const pmmTheme = getPmmTheme(grafanaTheme);
 
   if (typeof document === 'undefined') {

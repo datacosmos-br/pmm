@@ -19,6 +19,7 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 
 	backupv1 "github.com/percona/pmm/api/backup/v1"
+
 	inventoryv1 "github.com/percona/pmm/api/inventory/v1"
 )
 
@@ -134,8 +135,7 @@ func (e TextFilesValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = TextFilesValidationError{}
@@ -233,8 +233,7 @@ func (e PingValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = PingValidationError{}
@@ -361,8 +360,7 @@ func (e PongValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = PongValidationError{}
@@ -498,8 +496,7 @@ func (e QANCollectRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QANCollectRequestValidationError{}
@@ -601,8 +598,7 @@ func (e QANCollectResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QANCollectResponseValidationError{}
@@ -714,8 +710,7 @@ func (e StateChangedRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StateChangedRequestValidationError{}
@@ -817,8 +812,7 @@ func (e StateChangedResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StateChangedResponseValidationError{}
@@ -1010,8 +1004,7 @@ func (e SetStateRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = SetStateRequestValidationError{}
@@ -1111,8 +1104,7 @@ func (e SetStateResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = SetStateResponseValidationError{}
@@ -1453,8 +1445,7 @@ func (e QueryActionValueValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QueryActionValueValidationError{}
@@ -1588,8 +1579,7 @@ func (e QueryActionSliceValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QueryActionSliceValidationError{}
@@ -1735,8 +1725,7 @@ func (e QueryActionMapValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QueryActionMapValidationError{}
@@ -1842,8 +1831,7 @@ func (e QueryActionBinaryValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QueryActionBinaryValidationError{}
@@ -2013,8 +2001,7 @@ func (e QueryActionResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = QueryActionResultValidationError{}
@@ -2362,6 +2349,47 @@ func (m *StartActionRequest) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return StartActionRequestValidationError{
 					field:  "MongodbExplainParams",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *StartActionRequest_ClickhouseExplainParams:
+		if v == nil {
+			err := StartActionRequestValidationError{
+				field:  "Params",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExplainParams()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StartActionRequestValidationError{
+						field:  "ClickhouseExplainParams",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StartActionRequestValidationError{
+						field:  "ClickhouseExplainParams",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExplainParams()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StartActionRequestValidationError{
+					field:  "ClickhouseExplainParams",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -3013,8 +3041,7 @@ func (e StartActionRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequestValidationError{}
@@ -3116,8 +3143,7 @@ func (e StartActionResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionResponseValidationError{}
@@ -3221,8 +3247,7 @@ func (e StopActionRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StopActionRequestValidationError{}
@@ -3324,8 +3349,7 @@ func (e StopActionResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StopActionResponseValidationError{}
@@ -3435,8 +3459,7 @@ func (e ActionResultRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ActionResultRequestValidationError{}
@@ -3538,8 +3561,7 @@ func (e ActionResultResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ActionResultResponseValidationError{}
@@ -3674,8 +3696,7 @@ func (e PBMSwitchPITRRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = PBMSwitchPITRRequestValidationError{}
@@ -3779,8 +3800,7 @@ func (e PBMSwitchPITRResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = PBMSwitchPITRResponseValidationError{}
@@ -3884,8 +3904,7 @@ func (e AgentLogsRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AgentLogsRequestValidationError{}
@@ -3989,8 +4008,7 @@ func (e AgentLogsResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AgentLogsResponseValidationError{}
@@ -4158,8 +4176,7 @@ func (e CheckConnectionRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = CheckConnectionRequestValidationError{}
@@ -4263,8 +4280,7 @@ func (e CheckConnectionResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = CheckConnectionResponseValidationError{}
@@ -4432,8 +4448,7 @@ func (e ServiceInfoRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ServiceInfoRequestValidationError{}
@@ -4545,8 +4560,7 @@ func (e ServiceInfoResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ServiceInfoResponseValidationError{}
@@ -4648,8 +4662,7 @@ func (e JobStatusRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobStatusRequestValidationError{}
@@ -4753,8 +4766,7 @@ func (e JobStatusResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobStatusResponseValidationError{}
@@ -4864,8 +4876,7 @@ func (e S3LocationConfigValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = S3LocationConfigValidationError{}
@@ -4969,8 +4980,7 @@ func (e FilesystemLocationConfigValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = FilesystemLocationConfigValidationError{}
@@ -5270,8 +5280,7 @@ func (e StartJobRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartJobRequestValidationError{}
@@ -5373,8 +5382,7 @@ func (e StartJobResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartJobResponseValidationError{}
@@ -5476,8 +5484,7 @@ func (e StopJobRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StopJobRequestValidationError{}
@@ -5577,8 +5584,7 @@ func (e StopJobResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StopJobResponseValidationError{}
@@ -5918,8 +5924,7 @@ func (e JobResultValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobResultValidationError{}
@@ -6177,8 +6182,7 @@ func (e JobProgressValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobProgressValidationError{}
@@ -6314,8 +6318,7 @@ func (e GetVersionsRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetVersionsRequestValidationError{}
@@ -6451,8 +6454,7 @@ func (e GetVersionsResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetVersionsResponseValidationError{}
@@ -7325,8 +7327,7 @@ func (e AgentMessageValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AgentMessageValidationError{}
@@ -8118,8 +8119,7 @@ func (e ServerMessageValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ServerMessageValidationError{}
@@ -8230,8 +8230,7 @@ func (e SetStateRequest_AgentProcessValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = SetStateRequest_AgentProcessValidationError{}
@@ -8414,8 +8413,7 @@ func (e SetStateRequest_BuiltinAgentValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = SetStateRequest_BuiltinAgentValidationError{}
@@ -8559,8 +8557,7 @@ func (e StartActionRequest_MySQLExplainParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MySQLExplainParamsValidationError{}
@@ -8704,8 +8701,7 @@ func (e StartActionRequest_MySQLShowCreateTableParamsValidationError) Error() st
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MySQLShowCreateTableParamsValidationError{}
@@ -8849,8 +8845,7 @@ func (e StartActionRequest_MySQLShowTableStatusParamsValidationError) Error() st
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MySQLShowTableStatusParamsValidationError{}
@@ -8991,8 +8986,7 @@ func (e StartActionRequest_MySQLShowIndexParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MySQLShowIndexParamsValidationError{}
@@ -9141,8 +9135,7 @@ func (e StartActionRequest_PostgreSQLShowCreateTableParamsValidationError) Error
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_PostgreSQLShowCreateTableParamsValidationError{}
@@ -9284,8 +9277,7 @@ func (e StartActionRequest_PostgreSQLShowIndexParamsValidationError) Error() str
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_PostgreSQLShowIndexParamsValidationError{}
@@ -9424,8 +9416,7 @@ func (e StartActionRequest_MongoDBExplainParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MongoDBExplainParamsValidationError{}
@@ -9437,6 +9428,118 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = StartActionRequest_MongoDBExplainParamsValidationError{}
+
+// Validate checks the field values on
+// StartActionRequest_ClickHouseExplainParams with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *StartActionRequest_ClickHouseExplainParams) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// StartActionRequest_ClickHouseExplainParams with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// StartActionRequest_ClickHouseExplainParamsMultiError, or nil if none found.
+func (m *StartActionRequest_ClickHouseExplainParams) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StartActionRequest_ClickHouseExplainParams) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Dsn
+
+	// no validation rules for Query
+
+	// no validation rules for ExplainType
+
+	if len(errors) > 0 {
+		return StartActionRequest_ClickHouseExplainParamsMultiError(errors)
+	}
+
+	return nil
+}
+
+// StartActionRequest_ClickHouseExplainParamsMultiError is an error wrapping
+// multiple validation errors returned by
+// StartActionRequest_ClickHouseExplainParams.ValidateAll() if the designated
+// constraints aren't met.
+type StartActionRequest_ClickHouseExplainParamsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StartActionRequest_ClickHouseExplainParamsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StartActionRequest_ClickHouseExplainParamsMultiError) AllErrors() []error { return m }
+
+// StartActionRequest_ClickHouseExplainParamsValidationError is the validation
+// error returned by StartActionRequest_ClickHouseExplainParams.Validate if
+// the designated constraints aren't met.
+type StartActionRequest_ClickHouseExplainParamsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) ErrorName() string {
+	return "StartActionRequest_ClickHouseExplainParamsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStartActionRequest_ClickHouseExplainParams.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StartActionRequest_ClickHouseExplainParamsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StartActionRequest_ClickHouseExplainParamsValidationError{}
 
 // Validate checks the field values on StartActionRequest_PTSummaryParams with
 // the rules defined in the proto definition for this message. If any rules
@@ -9530,8 +9633,7 @@ func (e StartActionRequest_PTSummaryParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_PTSummaryParamsValidationError{}
@@ -9644,8 +9746,7 @@ func (e StartActionRequest_PTPgSummaryParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_PTPgSummaryParamsValidationError{}
@@ -9759,8 +9860,7 @@ func (e StartActionRequest_PTMongoDBSummaryParamsValidationError) Error() string
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_PTMongoDBSummaryParamsValidationError{}
@@ -9876,8 +9976,7 @@ func (e StartActionRequest_PTMySQLSummaryParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_PTMySQLSummaryParamsValidationError{}
@@ -10018,8 +10117,7 @@ func (e StartActionRequest_MySQLQueryShowParamsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MySQLQueryShowParamsValidationError{}
@@ -10160,8 +10258,7 @@ func (e StartActionRequest_MySQLQuerySelectParamsValidationError) Error() string
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MySQLQuerySelectParamsValidationError{}
@@ -10301,8 +10398,7 @@ func (e StartActionRequest_PostgreSQLQueryShowParamsValidationError) Error() str
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_PostgreSQLQueryShowParamsValidationError{}
@@ -10446,8 +10542,7 @@ func (e StartActionRequest_PostgreSQLQuerySelectParamsValidationError) Error() s
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_PostgreSQLQuerySelectParamsValidationError{}
@@ -10591,8 +10686,7 @@ func (e StartActionRequest_MongoDBQueryGetParameterParamsValidationError) Error(
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MongoDBQueryGetParameterParamsValidationError{}
@@ -10732,8 +10826,7 @@ func (e StartActionRequest_MongoDBQueryBuildInfoParamsValidationError) Error() s
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MongoDBQueryBuildInfoParamsValidationError{}
@@ -10878,8 +10971,7 @@ func (e StartActionRequest_MongoDBQueryGetCmdLineOptsParamsValidationError) Erro
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MongoDBQueryGetCmdLineOptsParamsValidationError{}
@@ -11028,8 +11120,7 @@ func (e StartActionRequest_MongoDBQueryReplSetGetStatusParamsValidationError) Er
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MongoDBQueryReplSetGetStatusParamsValidationError{}
@@ -11178,8 +11269,7 @@ func (e StartActionRequest_MongoDBQueryGetDiagnosticDataParamsValidationError) E
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_MongoDBQueryGetDiagnosticDataParamsValidationError{}
@@ -11290,8 +11380,7 @@ func (e StartActionRequest_RestartSystemServiceParamsValidationError) Error() st
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartActionRequest_RestartSystemServiceParamsValidationError{}
@@ -11396,8 +11485,7 @@ func (e CheckConnectionResponse_StatsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = CheckConnectionResponse_StatsValidationError{}
@@ -11560,8 +11648,7 @@ func (e StartJobRequest_MySQLBackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartJobRequest_MySQLBackupValidationError{}
@@ -11718,8 +11805,7 @@ func (e StartJobRequest_MySQLRestoreBackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartJobRequest_MySQLRestoreBackupValidationError{}
@@ -11948,8 +12034,7 @@ func (e StartJobRequest_MongoDBBackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartJobRequest_MongoDBBackupValidationError{}
@@ -12234,8 +12319,7 @@ func (e StartJobRequest_MongoDBRestoreBackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = StartJobRequest_MongoDBRestoreBackupValidationError{}
@@ -12337,8 +12421,7 @@ func (e JobResult_ErrorValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobResult_ErrorValidationError{}
@@ -12471,8 +12554,7 @@ func (e JobResult_MongoDBBackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobResult_MongoDBBackupValidationError{}
@@ -12603,8 +12685,7 @@ func (e JobResult_MySQLBackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobResult_MySQLBackupValidationError{}
@@ -12707,8 +12788,7 @@ func (e JobResult_MySQLRestoreBackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobResult_MySQLRestoreBackupValidationError{}
@@ -12811,8 +12891,7 @@ func (e JobResult_MongoDBRestoreBackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobResult_MongoDBRestoreBackupValidationError{}
@@ -12914,8 +12993,7 @@ func (e JobProgress_MySQLBackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobProgress_MySQLBackupValidationError{}
@@ -13018,8 +13096,7 @@ func (e JobProgress_MySQLRestoreBackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobProgress_MySQLRestoreBackupValidationError{}
@@ -13125,8 +13202,7 @@ func (e JobProgress_LogsValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = JobProgress_LogsValidationError{}
@@ -13228,8 +13304,7 @@ func (e GetVersionsRequest_MySQLdValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetVersionsRequest_MySQLdValidationError{}
@@ -13332,8 +13407,7 @@ func (e GetVersionsRequest_XtrabackupValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetVersionsRequest_XtrabackupValidationError{}
@@ -13435,8 +13509,7 @@ func (e GetVersionsRequest_XbcloudValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetVersionsRequest_XbcloudValidationError{}
@@ -13538,8 +13611,7 @@ func (e GetVersionsRequest_QpressValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetVersionsRequest_QpressValidationError{}
@@ -13641,8 +13713,7 @@ func (e GetVersionsRequest_MongoDBValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetVersionsRequest_MongoDBValidationError{}
@@ -13744,8 +13815,7 @@ func (e GetVersionsRequest_PBMValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetVersionsRequest_PBMValidationError{}
@@ -14099,8 +14169,7 @@ func (e GetVersionsRequest_SoftwareValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetVersionsRequest_SoftwareValidationError{}
@@ -14207,8 +14276,7 @@ func (e GetVersionsResponse_VersionValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = GetVersionsResponse_VersionValidationError{}

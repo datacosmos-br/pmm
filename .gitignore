@@ -52,8 +52,23 @@ RTA-Jira-Tasks-Summary.md
 # PMM Demo backups (it would increase repository size significantly)
 dev/clickhouse-backups/
 
+# datacosmos build artifacts (kept outside the repo by Makefile.datacosmos)
+/build-root/
+/pmm-build-root/
+/pmm-artifacts/
+/artifacts/
+/sources
+/bin/
+
+# agent governance — local to the workspace, never committed
+/.agents/
+
 # Exclude AI skills to support fast local experimentation
 .claude/
+.codex/
 .cursor/
 .cursorrules/
+build/.cache/
+.serena/
+CLAUDE.md
 build/.cache/

@@ -124,6 +124,7 @@ export const TEST_SERVICES: ListServicesResponse = {
   haproxy: [],
   external: [],
   valkey: [],
+  clickhouse: [],
 };
 
 export const TEST_SERVICES_WITH_ONE_MYSQL: ListServicesResponse = {

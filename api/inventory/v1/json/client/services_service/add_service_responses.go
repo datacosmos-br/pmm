@@ -101,6 +101,7 @@ func (o *AddServiceOK) GetPayload() *AddServiceOKBody {
 }
 
 func (o *AddServiceOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(AddServiceOKBody)
 
 	// response payload
@@ -174,6 +175,7 @@ func (o *AddServiceDefault) GetPayload() *AddServiceDefaultBody {
 }
 
 func (o *AddServiceDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(AddServiceDefaultBody)
 
 	// response payload
@@ -189,6 +191,10 @@ AddServiceBody add service body
 swagger:model AddServiceBody
 */
 type AddServiceBody struct {
+
+	// clickhouse
+	Clickhouse *AddServiceParamsBodyClickhouse `json:"clickhouse,omitempty"`
+
 	// external
 	External *AddServiceParamsBodyExternal `json:"external,omitempty"`
 
@@ -214,6 +220,10 @@ type AddServiceBody struct {
 // Validate validates this add service body
 func (o *AddServiceBody) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := o.validateClickhouse(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := o.validateExternal(formats); err != nil {
 		res = append(res, err)
@@ -246,6 +256,29 @@ func (o *AddServiceBody) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *AddServiceBody) validateClickhouse(formats strfmt.Registry) error {
+	if swag.IsZero(o.Clickhouse) { // not required
+		return nil
+	}
+
+	if o.Clickhouse != nil {
+		if err := o.Clickhouse.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("body" + "." + "clickhouse")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("body" + "." + "clickhouse")
+			}
+
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -414,6 +447,10 @@ func (o *AddServiceBody) validateValkey(formats strfmt.Registry) error {
 func (o *AddServiceBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.contextValidateClickhouse(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.contextValidateExternal(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -448,7 +485,33 @@ func (o *AddServiceBody) ContextValidate(ctx context.Context, formats strfmt.Reg
 	return nil
 }
 
+func (o *AddServiceBody) contextValidateClickhouse(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Clickhouse != nil {
+
+		if swag.IsZero(o.Clickhouse) { // not required
+			return nil
+		}
+
+		if err := o.Clickhouse.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("body" + "." + "clickhouse")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("body" + "." + "clickhouse")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (o *AddServiceBody) contextValidateExternal(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.External != nil {
 
 		if swag.IsZero(o.External) { // not required
@@ -473,6 +536,7 @@ func (o *AddServiceBody) contextValidateExternal(ctx context.Context, formats st
 }
 
 func (o *AddServiceBody) contextValidateHaproxy(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Haproxy != nil {
 
 		if swag.IsZero(o.Haproxy) { // not required
@@ -497,6 +561,7 @@ func (o *AddServiceBody) contextValidateHaproxy(ctx context.Context, formats str
 }
 
 func (o *AddServiceBody) contextValidateMongodb(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Mongodb != nil {
 
 		if swag.IsZero(o.Mongodb) { // not required
@@ -521,6 +586,7 @@ func (o *AddServiceBody) contextValidateMongodb(ctx context.Context, formats str
 }
 
 func (o *AddServiceBody) contextValidateMysql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Mysql != nil {
 
 		if swag.IsZero(o.Mysql) { // not required
@@ -545,6 +611,7 @@ func (o *AddServiceBody) contextValidateMysql(ctx context.Context, formats strfm
 }
 
 func (o *AddServiceBody) contextValidatePostgresql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Postgresql != nil {
 
 		if swag.IsZero(o.Postgresql) { // not required
@@ -569,6 +636,7 @@ func (o *AddServiceBody) contextValidatePostgresql(ctx context.Context, formats 
 }
 
 func (o *AddServiceBody) contextValidateProxysql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Proxysql != nil {
 
 		if swag.IsZero(o.Proxysql) { // not required
@@ -593,6 +661,7 @@ func (o *AddServiceBody) contextValidateProxysql(ctx context.Context, formats st
 }
 
 func (o *AddServiceBody) contextValidateValkey(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Valkey != nil {
 
 		if swag.IsZero(o.Valkey) { // not required
@@ -639,6 +708,7 @@ AddServiceDefaultBody add service default body
 swagger:model AddServiceDefaultBody
 */
 type AddServiceDefaultBody struct {
+
 	// code
 	Code int32 `json:"code,omitempty"`
 
@@ -708,7 +778,9 @@ func (o *AddServiceDefaultBody) ContextValidate(ctx context.Context, formats str
 }
 
 func (o *AddServiceDefaultBody) contextValidateDetails(ctx context.Context, formats strfmt.Registry) error {
+
 	for i := 0; i < len(o.Details); i++ {
+
 		if o.Details[i] != nil {
 
 			if swag.IsZero(o.Details[i]) { // not required
@@ -728,6 +800,7 @@ func (o *AddServiceDefaultBody) contextValidateDetails(ctx context.Context, form
 				return err
 			}
 		}
+
 	}
 
 	return nil
@@ -756,6 +829,7 @@ AddServiceDefaultBodyDetailsItems0 add service default body details items0
 swagger:model AddServiceDefaultBodyDetailsItems0
 */
 type AddServiceDefaultBodyDetailsItems0 struct {
+
 	// at type
 	AtType string `json:"@type,omitempty"`
 
@@ -767,6 +841,7 @@ type AddServiceDefaultBodyDetailsItems0 struct {
 func (o *AddServiceDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 	// stage 1, bind the properties
 	var stage1 struct {
+
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -804,6 +879,7 @@ func (o *AddServiceDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 // MarshalJSON marshals this object with additional properties into a JSON object
 func (o AddServiceDefaultBodyDetailsItems0) MarshalJSON() ([]byte, error) {
 	var stage1 struct {
+
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -867,6 +943,10 @@ AddServiceOKBody add service OK body
 swagger:model AddServiceOKBody
 */
 type AddServiceOKBody struct {
+
+	// clickhouse
+	Clickhouse *AddServiceOKBodyClickhouse `json:"clickhouse,omitempty"`
+
 	// external
 	External *AddServiceOKBodyExternal `json:"external,omitempty"`
 
@@ -892,6 +972,10 @@ type AddServiceOKBody struct {
 // Validate validates this add service OK body
 func (o *AddServiceOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := o.validateClickhouse(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := o.validateExternal(formats); err != nil {
 		res = append(res, err)
@@ -924,6 +1008,29 @@ func (o *AddServiceOKBody) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *AddServiceOKBody) validateClickhouse(formats strfmt.Registry) error {
+	if swag.IsZero(o.Clickhouse) { // not required
+		return nil
+	}
+
+	if o.Clickhouse != nil {
+		if err := o.Clickhouse.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse")
+			}
+
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -1092,6 +1199,10 @@ func (o *AddServiceOKBody) validateValkey(formats strfmt.Registry) error {
 func (o *AddServiceOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.contextValidateClickhouse(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.contextValidateExternal(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1126,7 +1237,33 @@ func (o *AddServiceOKBody) ContextValidate(ctx context.Context, formats strfmt.R
 	return nil
 }
 
+func (o *AddServiceOKBody) contextValidateClickhouse(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Clickhouse != nil {
+
+		if swag.IsZero(o.Clickhouse) { // not required
+			return nil
+		}
+
+		if err := o.Clickhouse.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (o *AddServiceOKBody) contextValidateExternal(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.External != nil {
 
 		if swag.IsZero(o.External) { // not required
@@ -1151,6 +1288,7 @@ func (o *AddServiceOKBody) contextValidateExternal(ctx context.Context, formats 
 }
 
 func (o *AddServiceOKBody) contextValidateHaproxy(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Haproxy != nil {
 
 		if swag.IsZero(o.Haproxy) { // not required
@@ -1175,6 +1313,7 @@ func (o *AddServiceOKBody) contextValidateHaproxy(ctx context.Context, formats s
 }
 
 func (o *AddServiceOKBody) contextValidateMongodb(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Mongodb != nil {
 
 		if swag.IsZero(o.Mongodb) { // not required
@@ -1199,6 +1338,7 @@ func (o *AddServiceOKBody) contextValidateMongodb(ctx context.Context, formats s
 }
 
 func (o *AddServiceOKBody) contextValidateMysql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Mysql != nil {
 
 		if swag.IsZero(o.Mysql) { // not required
@@ -1223,6 +1363,7 @@ func (o *AddServiceOKBody) contextValidateMysql(ctx context.Context, formats str
 }
 
 func (o *AddServiceOKBody) contextValidatePostgresql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Postgresql != nil {
 
 		if swag.IsZero(o.Postgresql) { // not required
@@ -1247,6 +1388,7 @@ func (o *AddServiceOKBody) contextValidatePostgresql(ctx context.Context, format
 }
 
 func (o *AddServiceOKBody) contextValidateProxysql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Proxysql != nil {
 
 		if swag.IsZero(o.Proxysql) { // not required
@@ -1271,6 +1413,7 @@ func (o *AddServiceOKBody) contextValidateProxysql(ctx context.Context, formats 
 }
 
 func (o *AddServiceOKBody) contextValidateValkey(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Valkey != nil {
 
 		if swag.IsZero(o.Valkey) { // not required
@@ -1313,10 +1456,85 @@ func (o *AddServiceOKBody) UnmarshalBinary(b []byte) error {
 }
 
 /*
+AddServiceOKBodyClickhouse ClickHouseService represents a generic ClickHouse instance.
+swagger:model AddServiceOKBodyClickhouse
+*/
+type AddServiceOKBodyClickhouse struct {
+
+	// Unique randomly generated instance identifier.
+	ServiceID string `json:"service_id,omitempty"`
+
+	// Unique across all Services user-defined name.
+	ServiceName string `json:"service_name,omitempty"`
+
+	// Node identifier where this instance runs.
+	NodeID string `json:"node_id,omitempty"`
+
+	// Access address (DNS name or IP).
+	// Address (and port) or socket is required.
+	Address string `json:"address,omitempty"`
+
+	// Access port.
+	// Port is required when the address present.
+	Port int64 `json:"port,omitempty"`
+
+	// Access unix socket.
+	// Address (and port) or socket is required.
+	Socket string `json:"socket,omitempty"`
+
+	// Environment name.
+	Environment string `json:"environment,omitempty"`
+
+	// Cluster name.
+	Cluster string `json:"cluster,omitempty"`
+
+	// Replication set name.
+	ReplicationSet string `json:"replication_set,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// ClickHouse version.
+	Version string `json:"version,omitempty"`
+
+	// Connection protocol: native (tcp), http, or https.
+	Protocol string `json:"protocol,omitempty"`
+}
+
+// Validate validates this add service OK body clickhouse
+func (o *AddServiceOKBodyClickhouse) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this add service OK body clickhouse based on context it is used
+func (o *AddServiceOKBodyClickhouse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouse) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouse) UnmarshalBinary(b []byte) error {
+	var res AddServiceOKBodyClickhouse
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
 AddServiceOKBodyExternal ExternalService represents a generic External service instance.
 swagger:model AddServiceOKBodyExternal
 */
 type AddServiceOKBodyExternal struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1381,6 +1599,7 @@ AddServiceOKBodyHaproxy HAProxyService represents a generic HAProxy service inst
 swagger:model AddServiceOKBodyHaproxy
 */
 type AddServiceOKBodyHaproxy struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1436,6 +1655,7 @@ AddServiceOKBodyMongodb MongoDBService represents a generic MongoDB instance.
 swagger:model AddServiceOKBodyMongodb
 */
 type AddServiceOKBodyMongodb struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1506,6 +1726,7 @@ AddServiceOKBodyMysql MySQLService represents a generic MySQL instance.
 swagger:model AddServiceOKBodyMysql
 */
 type AddServiceOKBodyMysql struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1579,6 +1800,7 @@ AddServiceOKBodyPostgresql PostgreSQLService represents a generic PostgreSQL ins
 swagger:model AddServiceOKBodyPostgresql
 */
 type AddServiceOKBodyPostgresql struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1655,6 +1877,7 @@ AddServiceOKBodyProxysql ProxySQLService represents a generic ProxySQL instance.
 swagger:model AddServiceOKBodyProxysql
 */
 type AddServiceOKBodyProxysql struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1725,6 +1948,7 @@ AddServiceOKBodyValkey ValkeyService represents a generic Valkey instance.
 swagger:model AddServiceOKBodyValkey
 */
 type AddServiceOKBodyValkey struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1791,10 +2015,76 @@ func (o *AddServiceOKBodyValkey) UnmarshalBinary(b []byte) error {
 }
 
 /*
+AddServiceParamsBodyClickhouse add service params body clickhouse
+swagger:model AddServiceParamsBodyClickhouse
+*/
+type AddServiceParamsBodyClickhouse struct {
+
+	// Unique across all Services user-defined name. Required.
+	ServiceName string `json:"service_name,omitempty"`
+
+	// Node identifier where this instance runs. Required.
+	NodeID string `json:"node_id,omitempty"`
+
+	// Access address (DNS name or IP).
+	// Address (and port) or socket is required.
+	Address string `json:"address,omitempty"`
+
+	// Access port.
+	// Port is required when the address present.
+	Port int64 `json:"port,omitempty"`
+
+	// Access unix socket.
+	// Address (and port) or socket is required.
+	Socket string `json:"socket,omitempty"`
+
+	// Environment name.
+	Environment string `json:"environment,omitempty"`
+
+	// Cluster name.
+	Cluster string `json:"cluster,omitempty"`
+
+	// Replication set name.
+	ReplicationSet string `json:"replication_set,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+}
+
+// Validate validates this add service params body clickhouse
+func (o *AddServiceParamsBodyClickhouse) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this add service params body clickhouse based on context it is used
+func (o *AddServiceParamsBodyClickhouse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AddServiceParamsBodyClickhouse) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AddServiceParamsBodyClickhouse) UnmarshalBinary(b []byte) error {
+	var res AddServiceParamsBodyClickhouse
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
 AddServiceParamsBodyExternal add service params body external
 swagger:model AddServiceParamsBodyExternal
 */
 type AddServiceParamsBodyExternal struct {
+
 	// Unique across all Services user-defined name. Required.
 	ServiceName string `json:"service_name,omitempty"`
 
@@ -1850,6 +2140,7 @@ AddServiceParamsBodyHaproxy add service params body haproxy
 swagger:model AddServiceParamsBodyHaproxy
 */
 type AddServiceParamsBodyHaproxy struct {
+
 	// Unique across all Services user-defined name. Required.
 	ServiceName string `json:"service_name,omitempty"`
 
@@ -1902,6 +2193,7 @@ AddServiceParamsBodyMongodb add service params body mongodb
 swagger:model AddServiceParamsBodyMongodb
 */
 type AddServiceParamsBodyMongodb struct {
+
 	// Unique across all Services user-defined name. Required.
 	ServiceName string `json:"service_name,omitempty"`
 
@@ -1966,6 +2258,7 @@ AddServiceParamsBodyMysql add service params body mysql
 swagger:model AddServiceParamsBodyMysql
 */
 type AddServiceParamsBodyMysql struct {
+
 	// Unique across all Services user-defined name. Required.
 	ServiceName string `json:"service_name,omitempty"`
 
@@ -2033,6 +2326,7 @@ AddServiceParamsBodyPostgresql add service params body postgresql
 swagger:model AddServiceParamsBodyPostgresql
 */
 type AddServiceParamsBodyPostgresql struct {
+
 	// Unique across all Services user-defined name. Required.
 	ServiceName string `json:"service_name,omitempty"`
 
@@ -2100,6 +2394,7 @@ AddServiceParamsBodyProxysql add service params body proxysql
 swagger:model AddServiceParamsBodyProxysql
 */
 type AddServiceParamsBodyProxysql struct {
+
 	// Unique across all Services user-defined name. Required.
 	ServiceName string `json:"service_name,omitempty"`
 
@@ -2164,6 +2459,7 @@ AddServiceParamsBodyValkey add service params body valkey
 swagger:model AddServiceParamsBodyValkey
 */
 type AddServiceParamsBodyValkey struct {
+
 	// Unique across all Services user-defined name. Required.
 	ServiceName string `json:"service_name,omitempty"`
 

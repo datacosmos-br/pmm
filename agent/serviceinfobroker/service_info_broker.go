@@ -87,6 +87,8 @@ func (sib *ServiceInfoBroker) GetInfoFromService(ctx context.Context, msg *agent
 			msg.TlsSkipVerify,
 			id,
 		)
+	case inventoryv1.ServiceType_SERVICE_TYPE_CLICKHOUSE_SERVICE:
+		return sib.getClickHouseInfo(ctx, msg.Dsn)
 	// NOTE: these types may be implemented later.
 	case inventoryv1.ServiceType_SERVICE_TYPE_EXTERNAL_SERVICE, inventoryv1.ServiceType_SERVICE_TYPE_HAPROXY_SERVICE:
 		return &agentv1.ServiceInfoResponse{}

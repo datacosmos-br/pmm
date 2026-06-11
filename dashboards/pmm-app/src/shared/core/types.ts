@@ -4,6 +4,7 @@ export enum Databases {
   mysql = 'mysql',
   proxysql = 'proxysql',
   haproxy = 'haproxy',
+  clickhouse = 'clickhouse',
 }
 
 export interface Settings {

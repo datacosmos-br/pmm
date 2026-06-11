@@ -6,6 +6,7 @@ export enum ServiceType {
   proxysql = 'SERVICE_TYPE_PROXYSQL_SERVICE',
   haproxy = 'SERVICE_TYPE_HAPROXY_SERVICE',
   valkey = 'SERVICE_TYPE_VALKEY_SERVICE',
+  clickhouse = 'SERVICE_TYPE_CLICKHOUSE_SERVICE',
   external = 'SERVICE_TYPE_EXTERNAL_SERVICE',
 }
 
@@ -17,6 +18,7 @@ export enum ManagedServiceType {
   proxysql = 'proxysql',
   haproxy = 'haproxy',
   valkey = 'valkey',
+  clickhouse = 'clickhouse',
   external = 'external',
 }
 
@@ -70,6 +72,8 @@ export interface ExternalService extends BaseService {
 
 export interface ValkeyService extends VersionedService {}
 
+export interface ClickHouseService extends VersionedService {}
+
 // Service from /v1/management/services API
 export interface ManagedService {
   serviceId: string;
@@ -104,6 +108,7 @@ export interface ListServicesResponse {
   haproxy?: HaProxyService[];
   external?: ExternalService[];
   valkey?: ValkeyService[];
+  clickhouse?: ClickHouseService[];
 }
 
 export interface ListServicesParams {

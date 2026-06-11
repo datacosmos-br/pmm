@@ -101,6 +101,7 @@ func (o *StartServiceActionOK) GetPayload() *StartServiceActionOKBody {
 }
 
 func (o *StartServiceActionOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(StartServiceActionOKBody)
 
 	// response payload
@@ -174,6 +175,7 @@ func (o *StartServiceActionDefault) GetPayload() *StartServiceActionDefaultBody 
 }
 
 func (o *StartServiceActionDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(StartServiceActionDefaultBody)
 
 	// response payload
@@ -189,6 +191,10 @@ StartServiceActionBody start service action body
 swagger:model StartServiceActionBody
 */
 type StartServiceActionBody struct {
+
+	// clickhouse explain
+	ClickhouseExplain *StartServiceActionParamsBodyClickhouseExplain `json:"clickhouse_explain,omitempty"`
+
 	// mongodb explain
 	MongodbExplain *StartServiceActionParamsBodyMongodbExplain `json:"mongodb_explain,omitempty"`
 
@@ -229,6 +235,10 @@ type StartServiceActionBody struct {
 // Validate validates this start service action body
 func (o *StartServiceActionBody) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := o.validateClickhouseExplain(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := o.validateMongodbExplain(formats); err != nil {
 		res = append(res, err)
@@ -281,6 +291,29 @@ func (o *StartServiceActionBody) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *StartServiceActionBody) validateClickhouseExplain(formats strfmt.Registry) error {
+	if swag.IsZero(o.ClickhouseExplain) { // not required
+		return nil
+	}
+
+	if o.ClickhouseExplain != nil {
+		if err := o.ClickhouseExplain.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("body" + "." + "clickhouse_explain")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("body" + "." + "clickhouse_explain")
+			}
+
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -564,6 +597,10 @@ func (o *StartServiceActionBody) validatePTPostgresSummary(formats strfmt.Regist
 func (o *StartServiceActionBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.contextValidateClickhouseExplain(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.contextValidateMongodbExplain(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -618,7 +655,33 @@ func (o *StartServiceActionBody) ContextValidate(ctx context.Context, formats st
 	return nil
 }
 
+func (o *StartServiceActionBody) contextValidateClickhouseExplain(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.ClickhouseExplain != nil {
+
+		if swag.IsZero(o.ClickhouseExplain) { // not required
+			return nil
+		}
+
+		if err := o.ClickhouseExplain.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("body" + "." + "clickhouse_explain")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("body" + "." + "clickhouse_explain")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (o *StartServiceActionBody) contextValidateMongodbExplain(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MongodbExplain != nil {
 
 		if swag.IsZero(o.MongodbExplain) { // not required
@@ -643,6 +706,7 @@ func (o *StartServiceActionBody) contextValidateMongodbExplain(ctx context.Conte
 }
 
 func (o *StartServiceActionBody) contextValidateMysqlExplain(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlExplain != nil {
 
 		if swag.IsZero(o.MysqlExplain) { // not required
@@ -667,6 +731,7 @@ func (o *StartServiceActionBody) contextValidateMysqlExplain(ctx context.Context
 }
 
 func (o *StartServiceActionBody) contextValidateMysqlExplainJSON(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlExplainJSON != nil {
 
 		if swag.IsZero(o.MysqlExplainJSON) { // not required
@@ -691,6 +756,7 @@ func (o *StartServiceActionBody) contextValidateMysqlExplainJSON(ctx context.Con
 }
 
 func (o *StartServiceActionBody) contextValidateMysqlExplainTraditionalJSON(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlExplainTraditionalJSON != nil {
 
 		if swag.IsZero(o.MysqlExplainTraditionalJSON) { // not required
@@ -715,6 +781,7 @@ func (o *StartServiceActionBody) contextValidateMysqlExplainTraditionalJSON(ctx 
 }
 
 func (o *StartServiceActionBody) contextValidateMysqlShowCreateTable(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlShowCreateTable != nil {
 
 		if swag.IsZero(o.MysqlShowCreateTable) { // not required
@@ -739,6 +806,7 @@ func (o *StartServiceActionBody) contextValidateMysqlShowCreateTable(ctx context
 }
 
 func (o *StartServiceActionBody) contextValidateMysqlShowIndex(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlShowIndex != nil {
 
 		if swag.IsZero(o.MysqlShowIndex) { // not required
@@ -763,6 +831,7 @@ func (o *StartServiceActionBody) contextValidateMysqlShowIndex(ctx context.Conte
 }
 
 func (o *StartServiceActionBody) contextValidateMysqlShowTableStatus(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlShowTableStatus != nil {
 
 		if swag.IsZero(o.MysqlShowTableStatus) { // not required
@@ -787,6 +856,7 @@ func (o *StartServiceActionBody) contextValidateMysqlShowTableStatus(ctx context
 }
 
 func (o *StartServiceActionBody) contextValidatePostgresShowCreateTable(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PostgresShowCreateTable != nil {
 
 		if swag.IsZero(o.PostgresShowCreateTable) { // not required
@@ -811,6 +881,7 @@ func (o *StartServiceActionBody) contextValidatePostgresShowCreateTable(ctx cont
 }
 
 func (o *StartServiceActionBody) contextValidatePostgresShowIndex(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PostgresShowIndex != nil {
 
 		if swag.IsZero(o.PostgresShowIndex) { // not required
@@ -835,6 +906,7 @@ func (o *StartServiceActionBody) contextValidatePostgresShowIndex(ctx context.Co
 }
 
 func (o *StartServiceActionBody) contextValidatePTMongodbSummary(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PTMongodbSummary != nil {
 
 		if swag.IsZero(o.PTMongodbSummary) { // not required
@@ -859,6 +931,7 @@ func (o *StartServiceActionBody) contextValidatePTMongodbSummary(ctx context.Con
 }
 
 func (o *StartServiceActionBody) contextValidatePTMysqlSummary(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PTMysqlSummary != nil {
 
 		if swag.IsZero(o.PTMysqlSummary) { // not required
@@ -883,6 +956,7 @@ func (o *StartServiceActionBody) contextValidatePTMysqlSummary(ctx context.Conte
 }
 
 func (o *StartServiceActionBody) contextValidatePTPostgresSummary(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PTPostgresSummary != nil {
 
 		if swag.IsZero(o.PTPostgresSummary) { // not required
@@ -929,6 +1003,7 @@ StartServiceActionDefaultBody start service action default body
 swagger:model StartServiceActionDefaultBody
 */
 type StartServiceActionDefaultBody struct {
+
 	// code
 	Code int32 `json:"code,omitempty"`
 
@@ -998,7 +1073,9 @@ func (o *StartServiceActionDefaultBody) ContextValidate(ctx context.Context, for
 }
 
 func (o *StartServiceActionDefaultBody) contextValidateDetails(ctx context.Context, formats strfmt.Registry) error {
+
 	for i := 0; i < len(o.Details); i++ {
+
 		if o.Details[i] != nil {
 
 			if swag.IsZero(o.Details[i]) { // not required
@@ -1018,6 +1095,7 @@ func (o *StartServiceActionDefaultBody) contextValidateDetails(ctx context.Conte
 				return err
 			}
 		}
+
 	}
 
 	return nil
@@ -1046,6 +1124,7 @@ StartServiceActionDefaultBodyDetailsItems0 start service action default body det
 swagger:model StartServiceActionDefaultBodyDetailsItems0
 */
 type StartServiceActionDefaultBodyDetailsItems0 struct {
+
 	// at type
 	AtType string `json:"@type,omitempty"`
 
@@ -1057,6 +1136,7 @@ type StartServiceActionDefaultBodyDetailsItems0 struct {
 func (o *StartServiceActionDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 	// stage 1, bind the properties
 	var stage1 struct {
+
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -1094,6 +1174,7 @@ func (o *StartServiceActionDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) 
 // MarshalJSON marshals this object with additional properties into a JSON object
 func (o StartServiceActionDefaultBodyDetailsItems0) MarshalJSON() ([]byte, error) {
 	var stage1 struct {
+
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -1157,6 +1238,10 @@ StartServiceActionOKBody start service action OK body
 swagger:model StartServiceActionOKBody
 */
 type StartServiceActionOKBody struct {
+
+	// clickhouse explain
+	ClickhouseExplain *StartServiceActionOKBodyClickhouseExplain `json:"clickhouse_explain,omitempty"`
+
 	// mongodb explain
 	MongodbExplain *StartServiceActionOKBodyMongodbExplain `json:"mongodb_explain,omitempty"`
 
@@ -1197,6 +1282,10 @@ type StartServiceActionOKBody struct {
 // Validate validates this start service action OK body
 func (o *StartServiceActionOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := o.validateClickhouseExplain(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := o.validateMongodbExplain(formats); err != nil {
 		res = append(res, err)
@@ -1249,6 +1338,29 @@ func (o *StartServiceActionOKBody) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *StartServiceActionOKBody) validateClickhouseExplain(formats strfmt.Registry) error {
+	if swag.IsZero(o.ClickhouseExplain) { // not required
+		return nil
+	}
+
+	if o.ClickhouseExplain != nil {
+		if err := o.ClickhouseExplain.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("startServiceActionOk" + "." + "clickhouse_explain")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("startServiceActionOk" + "." + "clickhouse_explain")
+			}
+
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -1532,6 +1644,10 @@ func (o *StartServiceActionOKBody) validatePTPostgresSummary(formats strfmt.Regi
 func (o *StartServiceActionOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.contextValidateClickhouseExplain(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.contextValidateMongodbExplain(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1586,7 +1702,33 @@ func (o *StartServiceActionOKBody) ContextValidate(ctx context.Context, formats 
 	return nil
 }
 
+func (o *StartServiceActionOKBody) contextValidateClickhouseExplain(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.ClickhouseExplain != nil {
+
+		if swag.IsZero(o.ClickhouseExplain) { // not required
+			return nil
+		}
+
+		if err := o.ClickhouseExplain.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("startServiceActionOk" + "." + "clickhouse_explain")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("startServiceActionOk" + "." + "clickhouse_explain")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (o *StartServiceActionOKBody) contextValidateMongodbExplain(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MongodbExplain != nil {
 
 		if swag.IsZero(o.MongodbExplain) { // not required
@@ -1611,6 +1753,7 @@ func (o *StartServiceActionOKBody) contextValidateMongodbExplain(ctx context.Con
 }
 
 func (o *StartServiceActionOKBody) contextValidateMysqlExplain(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlExplain != nil {
 
 		if swag.IsZero(o.MysqlExplain) { // not required
@@ -1635,6 +1778,7 @@ func (o *StartServiceActionOKBody) contextValidateMysqlExplain(ctx context.Conte
 }
 
 func (o *StartServiceActionOKBody) contextValidateMysqlExplainJSON(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlExplainJSON != nil {
 
 		if swag.IsZero(o.MysqlExplainJSON) { // not required
@@ -1659,6 +1803,7 @@ func (o *StartServiceActionOKBody) contextValidateMysqlExplainJSON(ctx context.C
 }
 
 func (o *StartServiceActionOKBody) contextValidateMysqlExplainTraditionalJSON(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlExplainTraditionalJSON != nil {
 
 		if swag.IsZero(o.MysqlExplainTraditionalJSON) { // not required
@@ -1683,6 +1828,7 @@ func (o *StartServiceActionOKBody) contextValidateMysqlExplainTraditionalJSON(ct
 }
 
 func (o *StartServiceActionOKBody) contextValidateMysqlShowCreateTable(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlShowCreateTable != nil {
 
 		if swag.IsZero(o.MysqlShowCreateTable) { // not required
@@ -1707,6 +1853,7 @@ func (o *StartServiceActionOKBody) contextValidateMysqlShowCreateTable(ctx conte
 }
 
 func (o *StartServiceActionOKBody) contextValidateMysqlShowIndex(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlShowIndex != nil {
 
 		if swag.IsZero(o.MysqlShowIndex) { // not required
@@ -1731,6 +1878,7 @@ func (o *StartServiceActionOKBody) contextValidateMysqlShowIndex(ctx context.Con
 }
 
 func (o *StartServiceActionOKBody) contextValidateMysqlShowTableStatus(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqlShowTableStatus != nil {
 
 		if swag.IsZero(o.MysqlShowTableStatus) { // not required
@@ -1755,6 +1903,7 @@ func (o *StartServiceActionOKBody) contextValidateMysqlShowTableStatus(ctx conte
 }
 
 func (o *StartServiceActionOKBody) contextValidatePostgresqlShowCreateTable(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PostgresqlShowCreateTable != nil {
 
 		if swag.IsZero(o.PostgresqlShowCreateTable) { // not required
@@ -1779,6 +1928,7 @@ func (o *StartServiceActionOKBody) contextValidatePostgresqlShowCreateTable(ctx 
 }
 
 func (o *StartServiceActionOKBody) contextValidatePostgresqlShowIndex(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PostgresqlShowIndex != nil {
 
 		if swag.IsZero(o.PostgresqlShowIndex) { // not required
@@ -1803,6 +1953,7 @@ func (o *StartServiceActionOKBody) contextValidatePostgresqlShowIndex(ctx contex
 }
 
 func (o *StartServiceActionOKBody) contextValidatePTMongodbSummary(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PTMongodbSummary != nil {
 
 		if swag.IsZero(o.PTMongodbSummary) { // not required
@@ -1827,6 +1978,7 @@ func (o *StartServiceActionOKBody) contextValidatePTMongodbSummary(ctx context.C
 }
 
 func (o *StartServiceActionOKBody) contextValidatePTMysqlSummary(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PTMysqlSummary != nil {
 
 		if swag.IsZero(o.PTMysqlSummary) { // not required
@@ -1851,6 +2003,7 @@ func (o *StartServiceActionOKBody) contextValidatePTMysqlSummary(ctx context.Con
 }
 
 func (o *StartServiceActionOKBody) contextValidatePTPostgresSummary(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PTPostgresSummary != nil {
 
 		if swag.IsZero(o.PTPostgresSummary) { // not required
@@ -1893,10 +2046,52 @@ func (o *StartServiceActionOKBody) UnmarshalBinary(b []byte) error {
 }
 
 /*
+StartServiceActionOKBodyClickhouseExplain start service action OK body clickhouse explain
+swagger:model StartServiceActionOKBodyClickhouseExplain
+*/
+type StartServiceActionOKBodyClickhouseExplain struct {
+
+	// Unique Action ID.
+	ActionID string `json:"action_id,omitempty"`
+
+	// pmm-agent ID where to this Action was started.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+}
+
+// Validate validates this start service action OK body clickhouse explain
+func (o *StartServiceActionOKBodyClickhouseExplain) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this start service action OK body clickhouse explain based on context it is used
+func (o *StartServiceActionOKBodyClickhouseExplain) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *StartServiceActionOKBodyClickhouseExplain) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *StartServiceActionOKBodyClickhouseExplain) UnmarshalBinary(b []byte) error {
+	var res StartServiceActionOKBodyClickhouseExplain
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
 StartServiceActionOKBodyMongodbExplain start service action OK body mongodb explain
 swagger:model StartServiceActionOKBodyMongodbExplain
 */
 type StartServiceActionOKBodyMongodbExplain struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -1937,6 +2132,7 @@ StartServiceActionOKBodyMysqlExplain start service action OK body mysql explain
 swagger:model StartServiceActionOKBodyMysqlExplain
 */
 type StartServiceActionOKBodyMysqlExplain struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -1977,6 +2173,7 @@ StartServiceActionOKBodyMysqlExplainJSON start service action OK body mysql expl
 swagger:model StartServiceActionOKBodyMysqlExplainJSON
 */
 type StartServiceActionOKBodyMysqlExplainJSON struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -2017,6 +2214,7 @@ StartServiceActionOKBodyMysqlExplainTraditionalJSON start service action OK body
 swagger:model StartServiceActionOKBodyMysqlExplainTraditionalJSON
 */
 type StartServiceActionOKBodyMysqlExplainTraditionalJSON struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -2057,6 +2255,7 @@ StartServiceActionOKBodyMysqlShowCreateTable start service action OK body mysql 
 swagger:model StartServiceActionOKBodyMysqlShowCreateTable
 */
 type StartServiceActionOKBodyMysqlShowCreateTable struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -2097,6 +2296,7 @@ StartServiceActionOKBodyMysqlShowIndex start service action OK body mysql show i
 swagger:model StartServiceActionOKBodyMysqlShowIndex
 */
 type StartServiceActionOKBodyMysqlShowIndex struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -2137,6 +2337,7 @@ StartServiceActionOKBodyMysqlShowTableStatus start service action OK body mysql 
 swagger:model StartServiceActionOKBodyMysqlShowTableStatus
 */
 type StartServiceActionOKBodyMysqlShowTableStatus struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -2177,6 +2378,7 @@ StartServiceActionOKBodyPTMongodbSummary Message to retrieve the prepared pt-mon
 swagger:model StartServiceActionOKBodyPTMongodbSummary
 */
 type StartServiceActionOKBodyPTMongodbSummary struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -2217,6 +2419,7 @@ StartServiceActionOKBodyPTMysqlSummary Message to retrieve the prepared pt-mysql
 swagger:model StartServiceActionOKBodyPTMysqlSummary
 */
 type StartServiceActionOKBodyPTMysqlSummary struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -2257,6 +2460,7 @@ StartServiceActionOKBodyPTPostgresSummary Message to retrieve the prepared pt-pg
 swagger:model StartServiceActionOKBodyPTPostgresSummary
 */
 type StartServiceActionOKBodyPTPostgresSummary struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -2297,6 +2501,7 @@ StartServiceActionOKBodyPostgresqlShowCreateTable start service action OK body p
 swagger:model StartServiceActionOKBodyPostgresqlShowCreateTable
 */
 type StartServiceActionOKBodyPostgresqlShowCreateTable struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -2337,6 +2542,7 @@ StartServiceActionOKBodyPostgresqlShowIndex start service action OK body postgre
 swagger:model StartServiceActionOKBodyPostgresqlShowIndex
 */
 type StartServiceActionOKBodyPostgresqlShowIndex struct {
+
 	// Unique Action ID.
 	ActionID string `json:"action_id,omitempty"`
 
@@ -2373,10 +2579,58 @@ func (o *StartServiceActionOKBodyPostgresqlShowIndex) UnmarshalBinary(b []byte) 
 }
 
 /*
+StartServiceActionParamsBodyClickhouseExplain start service action params body clickhouse explain
+swagger:model StartServiceActionParamsBodyClickhouseExplain
+*/
+type StartServiceActionParamsBodyClickhouseExplain struct {
+
+	// pmm-agent ID where to run this Action.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Service ID for this Action. Required.
+	ServiceID string `json:"service_id,omitempty"`
+
+	// Query. Required.
+	Query string `json:"query,omitempty"`
+
+	// Explain type: PLAN, PIPELINE, AST, ESTIMATE. Defaults to PLAN.
+	ExplainType string `json:"explain_type,omitempty"`
+}
+
+// Validate validates this start service action params body clickhouse explain
+func (o *StartServiceActionParamsBodyClickhouseExplain) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this start service action params body clickhouse explain based on context it is used
+func (o *StartServiceActionParamsBodyClickhouseExplain) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *StartServiceActionParamsBodyClickhouseExplain) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *StartServiceActionParamsBodyClickhouseExplain) UnmarshalBinary(b []byte) error {
+	var res StartServiceActionParamsBodyClickhouseExplain
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
 StartServiceActionParamsBodyMongodbExplain start service action params body mongodb explain
 swagger:model StartServiceActionParamsBodyMongodbExplain
 */
 type StartServiceActionParamsBodyMongodbExplain struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2420,6 +2674,7 @@ StartServiceActionParamsBodyMysqlExplain start service action params body mysql 
 swagger:model StartServiceActionParamsBodyMysqlExplain
 */
 type StartServiceActionParamsBodyMysqlExplain struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2469,6 +2724,7 @@ StartServiceActionParamsBodyMysqlExplainJSON start service action params body my
 swagger:model StartServiceActionParamsBodyMysqlExplainJSON
 */
 type StartServiceActionParamsBodyMysqlExplainJSON struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2518,6 +2774,7 @@ StartServiceActionParamsBodyMysqlExplainTraditionalJSON start service action par
 swagger:model StartServiceActionParamsBodyMysqlExplainTraditionalJSON
 */
 type StartServiceActionParamsBodyMysqlExplainTraditionalJSON struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2567,6 +2824,7 @@ StartServiceActionParamsBodyMysqlShowCreateTable start service action params bod
 swagger:model StartServiceActionParamsBodyMysqlShowCreateTable
 */
 type StartServiceActionParamsBodyMysqlShowCreateTable struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2613,6 +2871,7 @@ StartServiceActionParamsBodyMysqlShowIndex start service action params body mysq
 swagger:model StartServiceActionParamsBodyMysqlShowIndex
 */
 type StartServiceActionParamsBodyMysqlShowIndex struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2659,6 +2918,7 @@ StartServiceActionParamsBodyMysqlShowTableStatus start service action params bod
 swagger:model StartServiceActionParamsBodyMysqlShowTableStatus
 */
 type StartServiceActionParamsBodyMysqlShowTableStatus struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2705,6 +2965,7 @@ StartServiceActionParamsBodyPTMongodbSummary Message to prepare pt-mongodb-summa
 swagger:model StartServiceActionParamsBodyPTMongodbSummary
 */
 type StartServiceActionParamsBodyPTMongodbSummary struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2745,6 +3006,7 @@ StartServiceActionParamsBodyPTMysqlSummary Message to prepare pt-mysql-summary d
 swagger:model StartServiceActionParamsBodyPTMysqlSummary
 */
 type StartServiceActionParamsBodyPTMysqlSummary struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2785,6 +3047,7 @@ StartServiceActionParamsBodyPTPostgresSummary Message to prepare pt-pg-summary d
 swagger:model StartServiceActionParamsBodyPTPostgresSummary
 */
 type StartServiceActionParamsBodyPTPostgresSummary struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2825,6 +3088,7 @@ StartServiceActionParamsBodyPostgresShowCreateTable start service action params 
 swagger:model StartServiceActionParamsBodyPostgresShowCreateTable
 */
 type StartServiceActionParamsBodyPostgresShowCreateTable struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 
@@ -2871,6 +3135,7 @@ StartServiceActionParamsBodyPostgresShowIndex start service action params body p
 swagger:model StartServiceActionParamsBodyPostgresShowIndex
 */
 type StartServiceActionParamsBodyPostgresShowIndex struct {
+
 	// pmm-agent ID where to run this Action.
 	PMMAgentID string `json:"pmm_agent_id,omitempty"`
 

@@ -1,10 +1,9 @@
 import { css } from '@emotion/css';
 import { GrafanaTheme } from '@grafana/data';
-import { stylesFactory } from '@grafana/ui';
 import { getPmmTheme } from 'shared/components/helpers/getPmmTheme';
 import { TABLE_HEIGHT, TABLE_HEIGHT_QUERY_SELECTED } from './components/Filters/Filters.constants';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme, querySelected: boolean) => {
+export const getStyles = (theme: GrafanaTheme, querySelected: boolean) => {
   const parameters = getPmmTheme(theme);
   const tableHeight = querySelected ? TABLE_HEIGHT_QUERY_SELECTED : TABLE_HEIGHT;
 
@@ -71,4 +70,4 @@ export const getStyles = stylesFactory((theme: GrafanaTheme, querySelected: bool
       }
     `,
   };
-});
+};

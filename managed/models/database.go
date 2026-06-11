@@ -1180,7 +1180,15 @@ var databaseSchema = [][]string{
 	117: {
 		`DROP TABLE IF EXISTS percona_sso_details`,
 	},
+	// NOTE(datacosmos-fork): Migration 118 is reserved for clickhouse_options (fork feature).
+	// The upstream v3 added dumps.encrypted as 118, but we renumber it to 119 here
+	// to avoid breaking existing deployments that already applied 118 (clickhouse_options).
+	// When proposing a PR upstream, discuss migration numbering strategy.
 	118: {
+		`ALTER TABLE agents ADD COLUMN clickhouse_options JSONB`,
+		`UPDATE agents SET clickhouse_options = '{}'::jsonb`,
+	},
+	119: {
 		`ALTER TABLE dumps ADD COLUMN encrypted boolean NOT NULL DEFAULT false`,
 		`UPDATE dumps SET encrypted = false`,
 	},

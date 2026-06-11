@@ -1,8 +1,6 @@
 import { css } from '@emotion/css';
 
-import { stylesFactory } from '@grafana/ui';
-
-export const getStyles = stylesFactory(() => ({
+export const getStyles = () => ({
   latencyTooltip: css`
     .ant-tooltip-content {
       box-sizing: border-box;
@@ -21,5 +19,5 @@ export const getStyles = stylesFactory(() => ({
     .ant-tooltip-arrow:before {
       background-color: #3274d9;
     }
-    `,
-}));
+  `,
+});
