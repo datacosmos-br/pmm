@@ -19,9 +19,13 @@ DIST ?= el9
 ROOT_DIR ?= $(abspath $(CURDIR)/../pmm-build-root)
 ARTIFACT_DIR ?= $(abspath $(CURDIR)/../pmm-artifacts)
 GHCR_NAMESPACE ?= ghcr.io/datacosmos-br
+GHCR_USER ?=
 DC_VERSION ?= $(PMM_VERSION)-dev
 IMAGE_ARCH ?= amd64
-DC_RELEASE_COMMIT_PATHS := Makefile.datacosmos .github/workflows/datacosmos-release.yml
+DC_PMM_SUBMODULES_REPO ?= https://github.com/datacosmos-br/pmm-submodules.git
+DC_PMM_DUMP_REPO ?= https://github.com/datacosmos-br/pmm-dump.git
+PMM_SUBMODULES_BRANCH ?= $(shell git config -f .gitmodules submodule.pmm-submodules.branch 2>/dev/null || echo v3)
+DC_RELEASE_COMMIT_PATHS := .gitmodules Makefile.datacosmos .github/workflows/datacosmos-release.yml build/scripts/dc-bump-forks build/scripts/dc-git-status build/scripts/build-client-packages build/scripts/build-client-rpm build/scripts/create-tags docs/datacosmos/BUILD.md
 
 FULL_VERSION := $(PMM_VERSION)-$(shell git rev-list --count HEAD 2>/dev/null || echo 1)
 CLIENT_IMAGE ?= pmm-local/pmm-client:$(FULL_VERSION)
@@ -31,6 +35,9 @@ SERVER_PUBLISH_IMAGE ?= $(GHCR_NAMESPACE)/pmm-server:$(DC_VERSION)-$(IMAGE_ARCH)
 
 export ROOT_DIR
 export RPMBUILD_DIST := $(DIST)
+export PMM_SUBMODULES_REPO := $(DC_PMM_SUBMODULES_REPO)
+export PMM_DUMP_REPO := $(DC_PMM_DUMP_REPO)
+export PMM_SUBMODULES_BRANCH
 unexport PUSH_DOCKER
 
 define DC_RESOLVE_TAG_SCRIPT
@@ -43,9 +50,23 @@ endef
 
 .PHONY: dc-upstream
 dc-upstream: ## Merge upstream/v3 head, or latest stable tag with UPSTREAM_TARGET=stable
-	@git fetch upstream --tags
-	@git fetch origin --tags
-	@ref="$(UPSTREAM_BRANCH)"; \
+	@set +e; \
+	current_branch=$$(git branch --show-current); \
+	if [ -n "$$current_branch" ]; then \
+		git pull --ff-only origin "$$current_branch"; \
+		pull_rc=$$?; \
+		if [ $$pull_rc -ne 0 ]; then \
+			bash build/scripts/dc-git-status; \
+			exit $$pull_rc; \
+		fi; \
+	fi; \
+	bash build/scripts/dc-git-status --sync; \
+	sync_rc=$$?; \
+	if [ $$sync_rc -ne 0 ]; then \
+		bash build/scripts/dc-git-status; \
+		exit $$sync_rc; \
+	fi; \
+	ref="$(UPSTREAM_BRANCH)"; \
 	if [ "$(UPSTREAM_TARGET)" = "stable" ]; then \
 		ref=$$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | head -1); \
 	fi; \
@@ -54,10 +75,37 @@ dc-upstream: ## Merge upstream/v3 head, or latest stable tag with UPSTREAM_TARGE
 		exit 1; \
 	fi; \
 	echo "Merging $$ref"; \
-	git merge --no-ff "$$ref"
+	git merge --no-ff "$$ref"; \
+	rc=$$?; \
+	bash build/scripts/dc-git-status; \
+	exit $$rc
 
 .PHONY: dc-sync
 dc-sync: dc-upstream
+
+.PHONY: dc-status
+dc-status: ## Show Git-derived upstream, tag, bump, and worktree status
+	@bash build/scripts/dc-git-status --sync
+
+.PHONY: dc-bump
+dc-bump: ## Update pmm-submodules/pmm-dump fork refs; set DC_BUMP_TARGET=stable|head
+	@set +e; \
+	DC_BUMP_TARGET="$${DC_BUMP_TARGET:-stable}" \
+	PMM_VERSION="$(PMM_VERSION)" \
+	DC_PMM_SUBMODULES_REPO="$(DC_PMM_SUBMODULES_REPO)" \
+	DC_PMM_DUMP_REPO="$(DC_PMM_DUMP_REPO)" \
+	bash build/scripts/dc-bump-forks; \
+	rc=$$?; \
+	bash build/scripts/dc-git-status; \
+	exit $$rc
+
+.PHONY: dc-bump-stable
+dc-bump-stable: ## Update fork refs for the latest stable PMM version
+	$(MAKE) dc-bump DC_BUMP_TARGET=stable
+
+.PHONY: dc-bump-head
+dc-bump-head: ## Update fork refs for datacosmos v3 head
+	$(MAKE) dc-bump DC_BUMP_TARGET=head
 
 .PHONY: dc-next
 dc-next: .dc-fetch-tags ## Print next release tag inferred from upstream sync position
@@ -74,16 +122,15 @@ dc-release: .dc-clean-worktree .dc-fetch-tags ## Create and push next release ta
 dc-tag: dc-release
 
 .PHONY: dc-build
-dc-build: .dc-prepare .dc-login ## Build/publish linux/amd64 images and collect artifacts
+dc-build: .dc-prepare ## Build linux/amd64 images and collect artifacts
 	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) \
 		$(CURDIR)/build/scripts/build-client
 	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) RPMBUILD_DIST=$(DIST) DOCKER_TAG=$(SERVER_IMAGE) \
 		$(CURDIR)/build/scripts/build-server
-	$(MAKE) .dc-push-images
 	$(MAKE) dc-artifacts
 
-.PHONY: .dc-push-images
-.dc-push-images:
+.PHONY: dc-publish
+dc-publish: .dc-login ## Publish images built by dc-build to ghcr.io/datacosmos-br
 	docker tag $(CLIENT_IMAGE) $(CLIENT_PUBLISH_IMAGE)
 	docker tag $(SERVER_IMAGE) $(SERVER_PUBLISH_IMAGE)
 	docker push $(CLIENT_PUBLISH_IMAGE)
@@ -128,13 +175,16 @@ dc-clean: ## Remove datacosmos external build and artifact dirs
 
 .PHONY: .dc-fetch-tags
 .dc-fetch-tags:
-	@git fetch origin --tags
-	@git fetch upstream --tags
+	@bash build/scripts/dc-git-status --sync-only --quiet
 
 .PHONY: .dc-login
 .dc-login:
 	@if [ -n "$$GITHUB_ACTIONS" ]; then \
 		echo "$$GH_TOKEN" | docker login ghcr.io -u "$$GITHUB_ACTOR" --password-stdin; \
+	elif [ -n "$$GHCR_TOKEN" ]; then \
+		: "$${GHCR_USER:?set GHCR_USER for local ghcr.io login}"; \
+		echo "$$GHCR_TOKEN" | docker login ghcr.io -u "$$GHCR_USER" --password-stdin; \
 	else \
-		gh auth token | docker login ghcr.io -u "$$(gh api user --jq .login)" --password-stdin; \
+		: "$${GHCR_USER:?set GHCR_USER for local ghcr.io login}"; \
+		gh auth token | docker login ghcr.io -u "$$GHCR_USER" --password-stdin; \
 	fi

@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+mode=
+quiet=0
+for arg in "$@"; do
+    case "${arg}" in
+        --sync|--sync-only)
+            mode=${arg}
+            ;;
+        --quiet)
+            quiet=1
+            ;;
+        *)
+            echo "dc-git-status: unknown argument ${arg}" >&2
+            exit 2
+            ;;
+    esac
+done
+repo_root=$(git rev-parse --show-toplevel)
+cd "${repo_root}"
+
+sync_rc=0
+
+fetch_remote() {
+    local remote=$1
+
+    if ! git remote get-url "${remote}" >/dev/null 2>&1; then
+        echo "DC_${remote}_REMOTE=missing"
+        return
+    fi
+
+    if [ "${quiet}" -eq 0 ]; then
+        echo "DC_FETCH_${remote}=start"
+    fi
+    fetch_args=(--prune "${remote}" --tags)
+    if [ "${quiet}" -eq 1 ]; then
+        fetch_args=(--quiet "${fetch_args[@]}")
+    fi
+
+    if ! git fetch "${fetch_args[@]}"; then
+        if [ "${quiet}" -eq 0 ]; then
+            echo "DC_FETCH_${remote}=failed"
+        fi
+        sync_rc=1
+    else
+        if [ "${quiet}" -eq 0 ]; then
+            echo "DC_FETCH_${remote}=ok"
+        fi
+    fi
+}
+
+if [ "${mode}" = "--sync" ] || [ "${mode}" = "--sync-only" ]; then
+    fetch_remote origin
+    fetch_remote upstream
+fi
+
+if [ "${mode}" = "--sync-only" ]; then
+    exit "${sync_rc}"
+fi
+
+current_branch=$(git branch --show-current || true)
+current_branch=${current_branch:-DETACHED}
+current_head=$(git rev-parse --short HEAD)
+latest_stable=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '1p' || true)
+latest_dc=$(git tag --list '*-dc[0-9]*' --sort=-v:refname | sed -n '1p' || true)
+tracking=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)
+
+if [ -n "${tracking}" ]; then
+    counts=$(git rev-list --left-right --count HEAD..."${tracking}")
+    ahead=${counts%%[[:space:]]*}
+    behind=${counts##*[[:space:]]}
+else
+    tracking=none
+    ahead=n/a
+    behind=n/a
+fi
+
+if git rev-parse -q --verify upstream/v3 >/dev/null; then
+    upstream_head=$(git rev-parse --short upstream/v3)
+    upstream_date=$(git show -s --format=%cs upstream/v3)
+    sync_ref=$(git merge-base HEAD upstream/v3 2>/dev/null || git rev-parse HEAD)
+else
+    upstream_head=missing
+    upstream_date=missing
+    sync_ref=$(git rev-parse HEAD)
+fi
+
+sync_short=$(git rev-parse --short "${sync_ref}")
+sync_date=$(git show -s --format=%cs "${sync_ref}")
+sync_stable=$(git tag --points-at "${sync_ref}" --list 'v[0-9]*.[0-9]*.[0-9]*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)
+sync_stable=${sync_stable:-none}
+
+if [ -n "${latest_stable}" ]; then
+    latest_stable_commit=$(git rev-parse --short "${latest_stable}^{commit}")
+    latest_stable_date=$(git show -s --format=%cs "${latest_stable}^{commit}")
+else
+    latest_stable_commit=none
+    latest_stable_date=none
+fi
+
+if [ "${sync_stable}" != none ]; then
+    next_base="${sync_stable}-dc"
+else
+    next_base="v3-${sync_date}-dc"
+fi
+last_for_base=$(git tag -l "${next_base}*" | sed -n "s/^${next_base}\([0-9][0-9]*\)$/\1/p" | sort -n | tail -1)
+next_dc_tag="${next_base}$(( ${last_for_base:-0} + 1 ))"
+
+submodules_repo=${DC_PMM_SUBMODULES_REPO:-https://github.com/datacosmos-br/pmm-submodules.git}
+submodules_branch=$(git config -f .gitmodules submodule.pmm-submodules.branch 2>/dev/null || echo v3)
+dump_repo=${DC_PMM_DUMP_REPO:-https://github.com/datacosmos-br/pmm-dump.git}
+
+echo "DC_GIT_BRANCH=${current_branch}"
+echo "DC_GIT_HEAD=${current_head}"
+echo "DC_GIT_TRACKING=${tracking}"
+echo "DC_GIT_AHEAD=${ahead}"
+echo "DC_GIT_BEHIND=${behind}"
+echo "DC_UPSTREAM_V3_HEAD=${upstream_head}"
+echo "DC_UPSTREAM_V3_DATE=${upstream_date}"
+echo "DC_LATEST_STABLE_TAG=${latest_stable:-none}"
+echo "DC_LATEST_STABLE_COMMIT=${latest_stable_commit}"
+echo "DC_LATEST_STABLE_DATE=${latest_stable_date}"
+echo "DC_LATEST_DATACOSMOS_TAG=${latest_dc:-none}"
+echo "DC_SYNC_COMMIT=${sync_short}"
+echo "DC_SYNC_DATE=${sync_date}"
+echo "DC_SYNC_STABLE_TAG=${sync_stable}"
+echo "DC_NEXT_DATACOSMOS_TAG=${next_dc_tag}"
+echo "DC_PMM_SUBMODULES_REPO=${submodules_repo}"
+echo "DC_PMM_SUBMODULES_BRANCH=${submodules_branch}"
+echo "DC_PMM_DUMP_REPO=${dump_repo}"
+
+if git rev-parse -q --verify MERGE_HEAD >/dev/null; then
+    echo "DC_MERGE_STATE=in_progress"
+else
+    echo "DC_MERGE_STATE=none"
+fi
+
+unmerged_paths=$(git diff --name-only --diff-filter=U || true)
+if [ -n "${unmerged_paths}" ]; then
+    echo "DC_CONFLICT_PATHS:"
+    printf '%s\n' "${unmerged_paths}" | sed 's/^/  /'
+else
+    echo "DC_CONFLICT_PATHS=none"
+fi
+
+if [ -d pmm-submodules ]; then
+    echo "DC_PMM_SUBMODULES_STATUS=$(git submodule status pmm-submodules | sed 's/^[[:space:]]*//')"
+    echo "DC_PMM_SUBMODULES_AVAILABLE:"
+    git -C pmm-submodules for-each-ref --count=12 --sort=-committerdate --format='  %(refname:short) %(objectname:short)' \
+        refs/remotes/origin/pmm-* refs/remotes/origin/v3 refs/remotes/datacosmos/pmm-* refs/remotes/datacosmos/v3 2>/dev/null || true
+
+    if [ -d pmm-submodules/sources/pmm-dump ]; then
+        echo "DC_PMM_DUMP_STATUS=$(git -C pmm-submodules submodule status sources/pmm-dump | sed 's/^[[:space:]]*//')"
+        echo "DC_PMM_DUMP_VERSION=$(git -C pmm-submodules/sources/pmm-dump describe --tags --always 2>/dev/null || true)"
+    else
+        echo "DC_PMM_DUMP_STATUS=missing"
+    fi
+else
+    echo "DC_PMM_SUBMODULES_STATUS=missing"
+fi
+
+echo "DC_GIT_STATUS:"
+git status --short --branch
+
+if [ -n "${unmerged_paths}" ]; then
+    echo "DC_NEXT_ACTION=resolve conflicts above, then run git status and the requested dc-* target again"
+elif [ -n "$(git status --short)" ]; then
+    echo "DC_NEXT_ACTION=review and record the dirty worktree before release"
+else
+    echo "DC_NEXT_ACTION=worktree clean"
+fi
+
+exit "${sync_rc}"

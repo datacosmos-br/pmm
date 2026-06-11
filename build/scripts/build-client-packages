@@ -62,7 +62,7 @@ parse_arguments() {
 get_branches() {
     COMPONENT=$1
     if [ ! -e ${WORKDIR}/pmm-submodules ]; then
-        git clone https://github.com/Percona-Lab/pmm-submodules.git ${WORKDIR}/pmm-submodules 1>&2
+        git clone "${PMM_SUBMODULES_REPO}" ${WORKDIR}/pmm-submodules 1>&2
     fi
     cd ${WORKDIR}/pmm-submodules
       git reset --hard > /dev/null 2>&1
@@ -76,7 +76,7 @@ get_branches() {
 get_repos() {
     COMPONENT=$1
     if [ ! -e ${WORKDIR}/pmm-submodules ]; then
-        git clone https://github.com/Percona-Lab/pmm-submodules.git ${WORKDIR}/pmm-submodules
+        git clone "${PMM_SUBMODULES_REPO}" ${WORKDIR}/pmm-submodules
     fi
     cd ${WORKDIR}/pmm-submodules
       git reset --hard > /dev/null 2>&1
@@ -452,7 +452,8 @@ TARBALL=0
 OS_NAME=
 ARCH=
 PACKAGE_MANAGER=
-SUBMODULE_BRANCH="v3"
+PMM_SUBMODULES_REPO=${PMM_SUBMODULES_REPO:-https://github.com/datacosmos-br/pmm-submodules.git}
+SUBMODULE_BRANCH="${PMM_SUBMODULES_BRANCH:-v3}"
 INSTALL=0
 RPM_RELEASE=1
 DEB_RELEASE=1
@@ -467,8 +468,8 @@ parse_arguments PICK-ARGS-FROM-ARGV "$@"
 get_system
 install_deps
 
-BRANCH="v3"
-REPO="https://github.com/Percona-Lab/pmm-submodules.git"
+BRANCH="${SUBMODULE_BRANCH}"
+REPO="${PMM_SUBMODULES_REPO}"
 
 if [ "$TARBALL" = '1' -o "$SOURCE" = '1' ]; then
     MongoExp_BRANCH_NAME=$(get_branches "mongodb_exporter")

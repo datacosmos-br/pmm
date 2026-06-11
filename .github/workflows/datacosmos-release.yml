@@ -75,7 +75,7 @@ jobs:
         env:
           DC_VERSION: ${{ steps.ver.outputs.dc_version }}
         run: |
-          make dc-build DC_VERSION="${DC_VERSION}" IMAGE_ARCH=amd64
+          make dc-build dc-publish DC_VERSION="${DC_VERSION}" IMAGE_ARCH=amd64
 
       - name: Create the GitHub Release
         env:

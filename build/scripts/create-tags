@@ -31,13 +31,14 @@ fi
 TAG="v${VERSION}"
 echo "We will be tagging repos with a tag: $TAG"
 
+PMM_SUBMODULES_REPO=${PMM_SUBMODULES_REPO:-https://github.com/datacosmos-br/pmm-submodules.git}
 REPO_DIR=pmm-submodules
 if [ -d "$REPO_DIR" ]; then
     echo "Error: the directory $REPO_DIR already exists, exiting..."
     exit 0 # this is on purpose, we don't want to fail the pipeline
 fi
 
-if ! git clone --branch "pmm-${VERSION}" --single-branch https://github.com/Percona-Lab/pmm-submodules "$REPO_DIR"; then
+if ! git clone --branch "pmm-${VERSION}" --single-branch "$PMM_SUBMODULES_REPO" "$REPO_DIR"; then
     echo "Fatal: failed to clone pmm-submodules, branch pmm-${VERSION}"
     exit 0
 fi

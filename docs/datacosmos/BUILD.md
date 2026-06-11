@@ -30,7 +30,17 @@ upstream  https://github.com/percona/pmm.git          # Percona
 ```bash
 make dc-upstream                         # merge upstream/v3 head
 make dc-upstream UPSTREAM_TARGET=stable  # merge the latest stable vX.Y.Z tag
+make dc-bump-head                        # pin datacosmos pmm-submodules v3 head
+make dc-bump-stable                      # pin datacosmos pmm-submodules pmm-X.Y.Z
+make dc-status                           # show Git-derived refs, tags, versions, and worktree status
 ```
+
+`dc-status` uses Git refs from `origin` and `upstream` only. It prints the
+current branch tracking state, upstream `v3` head, latest stable upstream tag,
+the upstream commit currently synced into the branch, the last/next datacosmos
+tag, forked submodule source settings, and the immediate `git status`.
+`dc-upstream` and `dc-bump-*` also print `git status` after they run so merge
+conflicts or submodule pointer changes are visible immediately.
 
 ## Releases
 
@@ -68,9 +78,13 @@ datacosmos-specific `dc-*` targets. Common targets such as `release`, `check`,
 `clean`, and `gen` stay owned by upstream Makefiles.
 
 ```bash
-make dc-build   # prepare + upstream client/server build + publish amd64 images + artifacts
-make dc-clean   # remove only datacosmos external build/artifact dirs
+make dc-build    # prepare + upstream client/server build + artifacts
+make dc-publish  # push the built amd64 images to ghcr.io/datacosmos-br
+make dc-clean    # remove only datacosmos external build/artifact dirs
 ```
+
+For local publishing, set `GHCR_USER` to the GitHub login that owns the token
+used for `ghcr.io`; CI uses `GITHUB_ACTOR`.
 
 ### Upstream-aligned default
 
@@ -83,8 +97,10 @@ fork can safely reuse public Percona infrastructure:
   `s3://pmm-build-cache` anonymously and avoid rebuilding Grafana and other
   heavy components.
 - The current datacosmos release workflow publishes linux/amd64 only.
-- Images are built locally first and published to `ghcr.io/datacosmos-br` as
-  part of `dc-build`.
+- Images are built locally first by `dc-build` and published to
+  `ghcr.io/datacosmos-br` only by the explicit `dc-publish` target.
+- Datacosmos source bumps use `https://github.com/datacosmos-br/pmm-submodules.git`;
+  that fork pins `pmm-dump` to `https://github.com/datacosmos-br/pmm-dump.git`.
 
 ### Local-only mode
 
