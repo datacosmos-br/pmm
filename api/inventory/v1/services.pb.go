@@ -703,7 +703,9 @@ type ClickHouseService struct {
 	// Custom user-assigned labels.
 	CustomLabels map[string]string `protobuf:"bytes,10,rep,name=custom_labels,json=customLabels,proto3" json:"custom_labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// ClickHouse version.
-	Version       string `protobuf:"bytes,11,opt,name=version,proto3" json:"version,omitempty"`
+	Version string `protobuf:"bytes,11,opt,name=version,proto3" json:"version,omitempty"`
+	// Connection protocol: native (tcp), http, or https.
+	Protocol      string `protobuf:"bytes,12,opt,name=protocol,proto3" json:"protocol,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -811,6 +813,13 @@ func (x *ClickHouseService) GetCustomLabels() map[string]string {
 func (x *ClickHouseService) GetVersion() string {
 	if x != nil {
 		return x.Version
+	}
+	return ""
+}
+
+func (x *ClickHouseService) GetProtocol() string {
+	if x != nil {
+		return x.Protocol
 	}
 	return ""
 }
@@ -3361,7 +3370,7 @@ const file_inventory_v1_services_proto_rawDesc = "" +
 	"\aversion\x18\v \x01(\tR\aversion\x1a?\n" +
 	"\x11CustomLabelsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xcc\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe8\x03\n" +
 	"\x11ClickHouseService\x12\x1d\n" +
 	"\n" +
 	"service_id\x18\x01 \x01(\tR\tserviceId\x12!\n" +
@@ -3375,7 +3384,8 @@ const file_inventory_v1_services_proto_rawDesc = "" +
 	"\x0freplication_set\x18\t \x01(\tR\x0ereplicationSet\x12V\n" +
 	"\rcustom_labels\x18\n" +
 	" \x03(\v21.inventory.v1.ClickHouseService.CustomLabelsEntryR\fcustomLabels\x12\x18\n" +
-	"\aversion\x18\v \x01(\tR\aversion\x1a?\n" +
+	"\aversion\x18\v \x01(\tR\aversion\x12\x1a\n" +
+	"\bprotocol\x18\f \x01(\tR\bprotocol\x1a?\n" +
 	"\x11CustomLabelsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc8\x03\n" +

@@ -83,6 +83,40 @@
         ]
       }
     },
+    "/v1/actions:clickhouseExplain": {
+      "post": {
+        "summary": "Start ClickHouse EXPLAIN Action",
+        "description": "Starts ClickHouse EXPLAIN Action.",
+        "operationId": "StartClickHouseExplainAction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1StartClickHouseExplainActionResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1StartClickHouseExplainActionParams"
+            }
+          }
+        ],
+        "tags": [
+          "ActionsService"
+        ]
+      }
+    },
     "/v1/actions:startNodeAction": {
       "post": {
         "summary": "Start 'PT Summary' Action",
@@ -215,6 +249,40 @@
         "error": {
           "type": "string",
           "description": "Error message if Action failed."
+        }
+      }
+    },
+    "v1StartClickHouseExplainActionParams": {
+      "type": "object",
+      "properties": {
+        "pmm_agent_id": {
+          "type": "string",
+          "description": "pmm-agent ID where to run this Action."
+        },
+        "service_id": {
+          "type": "string",
+          "description": "Service ID for this Action. Required."
+        },
+        "query": {
+          "type": "string",
+          "description": "Query. Required."
+        },
+        "explain_type": {
+          "type": "string",
+          "description": "Explain type: PLAN, PIPELINE, AST, ESTIMATE. Defaults to PLAN."
+        }
+      }
+    },
+    "v1StartClickHouseExplainActionResult": {
+      "type": "object",
+      "properties": {
+        "action_id": {
+          "type": "string",
+          "description": "Unique Action ID."
+        },
+        "pmm_agent_id": {
+          "type": "string",
+          "description": "pmm-agent ID where to this Action was started."
         }
       }
     },
@@ -689,6 +757,9 @@
         },
         "pt_postgres_summary": {
           "$ref": "#/definitions/v1StartPTPgSummaryActionParams"
+        },
+        "clickhouse_explain": {
+          "$ref": "#/definitions/v1StartClickHouseExplainActionParams"
         }
       }
     },
@@ -730,6 +801,9 @@
         },
         "pt_postgres_summary": {
           "$ref": "#/definitions/v1StartPTPgSummaryActionResult"
+        },
+        "clickhouse_explain": {
+          "$ref": "#/definitions/v1StartClickHouseExplainActionResult"
         }
       }
     }

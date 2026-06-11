@@ -232,6 +232,15 @@ message StartActionRequest {
     // Contains files and their contents which can be used in DSN.
     TextFiles text_files = 3;
   }
+  // ClickHouseExplainParams describes ClickHouse EXPLAIN action parameters.
+  message ClickHouseExplainParams {
+    // DSN for the service. May contain connection (dial) timeout.
+    string dsn = 1 [(extensions.v1.sensitive) = REDACT_TYPE_DSN];
+    // Query to explain.
+    string query = 2;
+    // Explain type: PLAN, PIPELINE, AST, ESTIMATE.
+    string explain_type = 3;
+  }
   // PTSummaryParams describes parameters for PT summary.
   message PTSummaryParams {}
 
@@ -362,6 +371,7 @@ message StartActionRequest {
     PostgreSQLShowCreateTableParams postgresql_show_create_table_params = 14;
     PostgreSQLShowIndexParams postgresql_show_index_params = 15;
     MongoDBExplainParams mongodb_explain_params = 16;
+    ClickHouseExplainParams clickhouse_explain_params = 30;
     PTSummaryParams pt_summary_params = 17;
     PTPgSummaryParams pt_pg_summary_params = 18;
     PTMongoDBSummaryParams pt_mongodb_summary_params = 19;

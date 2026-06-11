@@ -51,6 +51,7 @@ var serviceTypes = map[inventoryv1.ServiceType]models.ServiceType{
 	inventoryv1.ServiceType_SERVICE_TYPE_HAPROXY_SERVICE:    models.HAProxyServiceType,
 	inventoryv1.ServiceType_SERVICE_TYPE_EXTERNAL_SERVICE:   models.ExternalServiceType,
 	inventoryv1.ServiceType_SERVICE_TYPE_VALKEY_SERVICE:     models.ValkeyServiceType,
+	inventoryv1.ServiceType_SERVICE_TYPE_CLICKHOUSE_SERVICE: models.ClickHouseServiceType,
 }
 
 func serviceType(serviceType inventoryv1.ServiceType) *models.ServiceType {
@@ -157,6 +158,8 @@ func (s *servicesServer) AddService(ctx context.Context, req *inventoryv1.AddSer
 		return s.addPostgreSQLService(ctx, req.GetPostgresql())
 	case *inventoryv1.AddServiceRequest_Valkey:
 		return s.addValkeyService(ctx, req.GetValkey())
+	case *inventoryv1.AddServiceRequest_Clickhouse:
+		return s.addClickHouseService(ctx, req.GetClickhouse())
 	case *inventoryv1.AddServiceRequest_Proxysql:
 		return s.addProxySQLService(ctx, req.GetProxysql())
 	case *inventoryv1.AddServiceRequest_Haproxy:
@@ -213,6 +216,31 @@ func (s *servicesServer) addValkeyService(ctx context.Context, params *inventory
 	res := &inventoryv1.AddServiceResponse{
 		Service: &inventoryv1.AddServiceResponse_Valkey{
 			Valkey: service,
+		},
+	}
+	return res, nil
+}
+
+// addClickHouseService adds ClickHouse Service.
+func (s *servicesServer) addClickHouseService(ctx context.Context, params *inventoryv1.AddClickHouseServiceParams) (*inventoryv1.AddServiceResponse, error) {
+	service, err := s.s.AddClickHouse(ctx, &models.AddDBMSServiceParams{
+		ServiceName:    params.ServiceName,
+		NodeID:         params.NodeId,
+		Environment:    params.Environment,
+		Cluster:        params.Cluster,
+		ReplicationSet: params.ReplicationSet,
+		Address:        pointer.ToStringOrNil(params.Address),
+		Port:           pointer.ToUint16OrNil(uint16(params.Port)), //nolint:gosec // port is not expected to overflow uint16
+		Socket:         pointer.ToStringOrNil(params.Socket),
+		CustomLabels:   params.CustomLabels,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res := &inventoryv1.AddServiceResponse{
+		Service: &inventoryv1.AddServiceResponse_Clickhouse{
+			Clickhouse: service,
 		},
 	}
 	return res, nil
@@ -335,7 +363,8 @@ func (s *servicesServer) addExternalService(ctx context.Context, params *invento
 
 // RemoveService removes Service.
 func (s *servicesServer) RemoveService(ctx context.Context, req *inventoryv1.RemoveServiceRequest) (*inventoryv1.RemoveServiceResponse, error) {
-	if err := s.s.Remove(ctx, req.GetServiceId(), req.GetForce()); err != nil {
+	err := s.s.Remove(ctx, req.GetServiceId(), req.GetForce())
+	if err != nil {
 		return nil, err
 	}
 

@@ -132,6 +132,7 @@ func (s *ManagementService) ListServices(ctx context.Context, req *managementv1.
 	query := `pg_up{collector="exporter",job=~".*_hr$"}
 		or mysql_up{job=~".*_hr$"}
 		or mongodb_up{job=~".*_hr$"}
+		or clickhouse_up{job=~".*_hr$"}
 		or proxysql_up{job=~".*_hr$"}
 		or haproxy_backend_status{state="UP"}
 		or redis_up{job=~".*_hr$"}
@@ -333,7 +334,8 @@ func (s *ManagementService) RemoveService(ctx context.Context, req *managementv1
 			}
 
 			if len(pmmAgentIDs) <= 1 {
-				if err = models.RemoveNode(tx.Querier, node.NodeID, models.RemoveCascade); err != nil {
+				err = models.RemoveNode(tx.Querier, node.NodeID, models.RemoveCascade)
+				if err != nil {
 					return err
 				}
 			}

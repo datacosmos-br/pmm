@@ -93,6 +93,14 @@ var metricsNames = map[string]string{ // PMM-13793
 	"top_query":                    "Top query plain text",
 	"application_name":             "Name provided by pg_stat_monitor",
 	"planid":                       "Plan ID for query",
+	"read_rows":                    "Rows Read",
+	"read_bytes":                   "Bytes Read",
+	"result_rows":                  "Result Rows",
+	"result_bytes":                 "Result Bytes",
+	"memory_usage":                 "Memory Usage",
+	"written_rows":                 "Rows Written",
+	"written_bytes":                "Bytes Written",
+	"query_kind":                   "Query Kind",
 }
 
 // GetMetricsNames implements rpc to get list of available metrics.

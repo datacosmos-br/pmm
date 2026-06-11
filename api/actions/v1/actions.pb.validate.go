@@ -2383,6 +2383,246 @@ var _ interface {
 	ErrorName() string
 } = StartMongoDBExplainActionResultValidationError{}
 
+// Validate checks the field values on StartClickHouseExplainActionParams with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *StartClickHouseExplainActionParams) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StartClickHouseExplainActionParams
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// StartClickHouseExplainActionParamsMultiError, or nil if none found.
+func (m *StartClickHouseExplainActionParams) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StartClickHouseExplainActionParams) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PmmAgentId
+
+	if utf8.RuneCountInString(m.GetServiceId()) < 1 {
+		err := StartClickHouseExplainActionParamsValidationError{
+			field:  "ServiceId",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetQuery()) < 1 {
+		err := StartClickHouseExplainActionParamsValidationError{
+			field:  "Query",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for ExplainType
+
+	if len(errors) > 0 {
+		return StartClickHouseExplainActionParamsMultiError(errors)
+	}
+
+	return nil
+}
+
+// StartClickHouseExplainActionParamsMultiError is an error wrapping multiple
+// validation errors returned by
+// StartClickHouseExplainActionParams.ValidateAll() if the designated
+// constraints aren't met.
+type StartClickHouseExplainActionParamsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StartClickHouseExplainActionParamsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StartClickHouseExplainActionParamsMultiError) AllErrors() []error { return m }
+
+// StartClickHouseExplainActionParamsValidationError is the validation error
+// returned by StartClickHouseExplainActionParams.Validate if the designated
+// constraints aren't met.
+type StartClickHouseExplainActionParamsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StartClickHouseExplainActionParamsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StartClickHouseExplainActionParamsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StartClickHouseExplainActionParamsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StartClickHouseExplainActionParamsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StartClickHouseExplainActionParamsValidationError) ErrorName() string {
+	return "StartClickHouseExplainActionParamsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StartClickHouseExplainActionParamsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStartClickHouseExplainActionParams.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StartClickHouseExplainActionParamsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StartClickHouseExplainActionParamsValidationError{}
+
+// Validate checks the field values on StartClickHouseExplainActionResult with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *StartClickHouseExplainActionResult) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StartClickHouseExplainActionResult
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// StartClickHouseExplainActionResultMultiError, or nil if none found.
+func (m *StartClickHouseExplainActionResult) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StartClickHouseExplainActionResult) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ActionId
+
+	// no validation rules for PmmAgentId
+
+	if len(errors) > 0 {
+		return StartClickHouseExplainActionResultMultiError(errors)
+	}
+
+	return nil
+}
+
+// StartClickHouseExplainActionResultMultiError is an error wrapping multiple
+// validation errors returned by
+// StartClickHouseExplainActionResult.ValidateAll() if the designated
+// constraints aren't met.
+type StartClickHouseExplainActionResultMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StartClickHouseExplainActionResultMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StartClickHouseExplainActionResultMultiError) AllErrors() []error { return m }
+
+// StartClickHouseExplainActionResultValidationError is the validation error
+// returned by StartClickHouseExplainActionResult.Validate if the designated
+// constraints aren't met.
+type StartClickHouseExplainActionResultValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StartClickHouseExplainActionResultValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StartClickHouseExplainActionResultValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StartClickHouseExplainActionResultValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StartClickHouseExplainActionResultValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StartClickHouseExplainActionResultValidationError) ErrorName() string {
+	return "StartClickHouseExplainActionResultValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StartClickHouseExplainActionResultValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStartClickHouseExplainActionResult.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StartClickHouseExplainActionResultValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StartClickHouseExplainActionResultValidationError{}
+
 // Validate checks the field values on StartPTPgSummaryActionParams with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -3973,6 +4213,47 @@ func (m *StartServiceActionRequest) validate(all bool) error {
 			}
 		}
 
+	case *StartServiceActionRequest_ClickhouseExplain:
+		if v == nil {
+			err := StartServiceActionRequestValidationError{
+				field:  "Action",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExplain()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StartServiceActionRequestValidationError{
+						field:  "ClickhouseExplain",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StartServiceActionRequestValidationError{
+						field:  "ClickhouseExplain",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExplain()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StartServiceActionRequestValidationError{
+					field:  "ClickhouseExplain",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -4566,6 +4847,47 @@ func (m *StartServiceActionResponse) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return StartServiceActionResponseValidationError{
 					field:  "PtPostgresSummary",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *StartServiceActionResponse_ClickhouseExplain:
+		if v == nil {
+			err := StartServiceActionResponseValidationError{
+				field:  "Action",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExplain()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StartServiceActionResponseValidationError{
+						field:  "ClickhouseExplain",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StartServiceActionResponseValidationError{
+						field:  "ClickhouseExplain",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExplain()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StartServiceActionResponseValidationError{
+					field:  "ClickhouseExplain",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

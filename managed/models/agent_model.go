@@ -35,6 +35,7 @@ import (
 	"gopkg.in/reform.v1"
 
 	"github.com/percona/pmm/managed/utils/crypto/bcrypt"
+	"github.com/percona/pmm/utils/clickhouseconn"
 	"github.com/percona/pmm/version"
 )
 
@@ -122,7 +123,7 @@ type ExporterOptions struct {
 func (c ExporterOptions) Value() (driver.Value, error) { return jsonValue(c) }
 
 // Scan implements database/sql.Scanner interface. Should be defined on the pointer.
-func (c *ExporterOptions) Scan(src interface{}) error { return jsonScan(c, src) }
+func (c *ExporterOptions) Scan(src any) error { return jsonScan(c, src) }
 
 // IsEmpty returns true if all ExporterOptions fields are unset or have zero values, otherwise returns false.
 func (c ExporterOptions) IsEmpty() bool {
@@ -147,7 +148,7 @@ type QANOptions struct {
 func (c QANOptions) Value() (driver.Value, error) { return jsonValue(c) }
 
 // Scan implements database/sql.Scanner interface. Should be defined on the pointer.
-func (c *QANOptions) Scan(src interface{}) error { return jsonScan(c, src) }
+func (c *QANOptions) Scan(src any) error { return jsonScan(c, src) }
 
 // IsEmpty returns true if all QANOptions fields are unset or have zero values, otherwise returns false.
 func (c QANOptions) IsEmpty() bool {
@@ -169,7 +170,7 @@ type AWSOptions struct {
 func (c AWSOptions) Value() (driver.Value, error) { return jsonValue(c) }
 
 // Scan implements database/sql.Scanner interface. Should be defined on the pointer.
-func (c *AWSOptions) Scan(src interface{}) error { return jsonScan(c, src) }
+func (c *AWSOptions) Scan(src any) error { return jsonScan(c, src) }
 
 // IsEmpty returns true if all AWSOptions fields are unset or have zero values, otherwise returns false.
 func (c AWSOptions) IsEmpty() bool {
@@ -192,7 +193,7 @@ type AzureOptions struct {
 func (c AzureOptions) Value() (driver.Value, error) { return jsonValue(c) }
 
 // Scan implements database/sql.Scanner interface. Should be defined on the pointer.
-func (c *AzureOptions) Scan(src interface{}) error { return jsonScan(c, src) }
+func (c *AzureOptions) Scan(src any) error { return jsonScan(c, src) }
 
 // IsEmpty returns true if all AzureOptions fields are unset or have zero values, otherwise returns false.
 func (c AzureOptions) IsEmpty() bool {
@@ -219,7 +220,7 @@ type MongoDBOptions struct {
 func (c MongoDBOptions) Value() (driver.Value, error) { return jsonValue(c) }
 
 // Scan implements database/sql.Scanner interface. Should be defined on the pointer.
-func (c *MongoDBOptions) Scan(src interface{}) error { return jsonScan(c, src) }
+func (c *MongoDBOptions) Scan(src any) error { return jsonScan(c, src) }
 
 // IsEmpty returns true if all MongoDBOptions fields are unset or have zero values, otherwise returns false.
 func (c MongoDBOptions) IsEmpty() bool {
@@ -256,7 +257,7 @@ type MySQLOptions struct {
 func (c MySQLOptions) Value() (driver.Value, error) { return jsonValue(c) }
 
 // Scan implements database/sql.Scanner interface. Should be defined on the pointer.
-func (c *MySQLOptions) Scan(src interface{}) error { return jsonScan(c, src) }
+func (c *MySQLOptions) Scan(src any) error { return jsonScan(c, src) }
 
 // IsEmpty returns true if all MySQLOptions fields are unset or have zero values, otherwise returns false.
 func (c MySQLOptions) IsEmpty() bool {
@@ -282,7 +283,7 @@ type PostgreSQLOptions struct {
 func (c PostgreSQLOptions) Value() (driver.Value, error) { return jsonValue(c) }
 
 // Scan implements database/sql.Scanner interface. Should be defined on the pointer.
-func (c *PostgreSQLOptions) Scan(src interface{}) error { return jsonScan(c, src) }
+func (c *PostgreSQLOptions) Scan(src any) error { return jsonScan(c, src) }
 
 // IsEmpty returns true if all PostgreSQLOptions fields are unset or have zero values, otherwise returns false.
 func (c PostgreSQLOptions) IsEmpty() bool {
@@ -318,10 +319,11 @@ func (c ValkeyOptions) IsEmpty() bool {
 
 // ClickHouseOptions represents a structure for special ClickHouse options.
 type ClickHouseOptions struct {
-	TLS     bool   `json:"tls"`
-	SSLCa   string `json:"ssl_ca"`
-	SSLCert string `json:"ssl_cert"`
-	SSLKey  string `json:"ssl_key"`
+	TLS      bool   `json:"tls"`
+	SSLCa    string `json:"ssl_ca"`
+	SSLCert  string `json:"ssl_cert"`
+	SSLKey   string `json:"ssl_key"`
+	Protocol string `json:"protocol"`
 	// NativeEndpoint is true when metrics are scraped from the ClickHouse
 	// native Prometheus endpoint instead of a managed clickhouse_exporter.
 	NativeEndpoint bool `json:"native_endpoint"`
@@ -340,6 +342,7 @@ func (c ClickHouseOptions) IsEmpty() bool {
 	return c.SSLCa == "" &&
 		c.SSLCert == "" &&
 		c.SSLKey == "" &&
+		c.Protocol == "" &&
 		!c.NativeEndpoint &&
 		c.NativeMetricsPort == 0
 }
@@ -481,7 +484,8 @@ func (a *Agent) GetEnvironmentVariableNames() ([]string, error) {
 	}
 
 	var names []string
-	if err := json.Unmarshal(a.EnvironmentVariables, &names); err != nil {
+	err := json.Unmarshal(a.EnvironmentVariables, &names)
+	if err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal shared environment variable names")
 	}
 	return names, nil
@@ -525,7 +529,8 @@ func (a *Agent) UnifiedLabels() (map[string]string, error) {
 	}
 	maps.Copy(res, custom)
 
-	if err = prepareLabels(res, true); err != nil {
+	err = prepareLabels(res, true)
+	if err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -609,9 +614,7 @@ func (a *Agent) DSN(service *Service, dsnParams DSNParams, tdp *DelimiterPair, p
 
 		if a.MySQLOptions.ExtraDSNParams != nil {
 			// Add extra DSN parameters if they are set.
-			for k, v := range a.MySQLOptions.ExtraDSNParams {
-				cfg.Params[k] = v
-			}
+			maps.Copy(cfg.Params, a.MySQLOptions.ExtraDSNParams)
 		}
 
 		// MultiStatements must not be used as it enables SQL injections (in particular, in pmm-agent's Actions)
@@ -651,9 +654,7 @@ func (a *Agent) DSN(service *Service, dsnParams DSNParams, tdp *DelimiterPair, p
 
 		if a.MySQLOptions.ExtraDSNParams != nil {
 			// Add extra DSN parameters if they are set.
-			for k, v := range a.MySQLOptions.ExtraDSNParams {
-				cfg.Params[k] = v
-			}
+			maps.Copy(cfg.Params, a.MySQLOptions.ExtraDSNParams)
 		}
 
 		// MultiStatements must not be used as it enables SQL injections (in particular, in pmm-agent's Actions)
@@ -850,38 +851,36 @@ func (a *Agent) DSN(service *Service, dsnParams DSNParams, tdp *DelimiterPair, p
 		return dsn
 
 	case ClickHouseExporterType, QANClickHouseQueryLogAgentType:
-		urlScheme := "clickhouse"
-		address := ""
-		if socket == "" {
-			address = net.JoinHostPort(host, strconv.Itoa(int(port)))
-		} else {
-			address = socket
-		}
-
-		q := make(url.Values)
-		if a.TLS {
-			q.Set("secure", "true")
-			if a.ClickHouseOptions.TLS && a.TLSSkipVerify {
-				q.Set("skip_verify", "true")
+		proto := a.ClickHouseOptions.Protocol
+		if proto == "" {
+			// Backward compatibility: infer from TLS flag.
+			if a.TLS {
+				proto = "https"
+			} else {
+				proto = "native"
 			}
 		}
 
-		u := &url.URL{
-			Scheme:   urlScheme,
-			Host:     address,
-			RawQuery: q.Encode(),
-		}
-		switch {
-		case password != "":
-			u.User = url.UserPassword(username, password)
-		case username != "":
-			u.User = url.User(username)
+		cfg := clickhouseconn.Config{
+			Protocol:      proto,
+			Host:          host,
+			Port:          port,
+			User:          username,
+			Password:      password,
+			TLS:           a.TLS,
+			TLSSkipVerify: a.TLSSkipVerify,
 		}
 
-		dsn := u.String()
-		dsn = strings.ReplaceAll(dsn, url.QueryEscape(tdp.Left), tdp.Left)
-		dsn = strings.ReplaceAll(dsn, url.QueryEscape(tdp.Right), tdp.Right)
+		if socket != "" {
+			cfg.Host = socket
+			cfg.Port = 0
+		}
 
+		dsn, err := cfg.DSN()
+		if err != nil {
+			// Should not happen with a valid host, but fallback to empty.
+			return ""
+		}
 		return dsn
 	default:
 		panic(fmt.Errorf("unhandled AgentType %q", a.AgentType))
@@ -918,7 +917,7 @@ func (a *Agent) ExporterURL(q *reform.Querier) (string, error) {
 	username := pointer.GetString(a.Username)
 	password := pointer.GetString(a.Password)
 
-	host := "127.0.0.1"
+	host := LocalhostAddr
 	if !a.ExporterOptions.PushMetrics {
 		node, err := FindNodeByID(q, *a.RunsOnNodeID)
 		if err != nil {
@@ -1126,7 +1125,8 @@ func (a *Agent) BuildWebConfigFile() (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "Failed to parse webconfig template")
 	}
-	if err = tmpl.Execute(&configBuffer, hashedPassword); err != nil {
+	err = tmpl.Execute(&configBuffer, hashedPassword)
+	if err != nil {
 		return "", errors.Wrap(err, "Failed to execute webconfig template")
 	}
 

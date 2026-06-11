@@ -40,9 +40,11 @@ import {
   NAV_ALERTS_SILENCES,
   NAV_ALERTS_GROUPS,
   NAV_VALKEY,
+  NAV_CLICKHOUSE,
   NAV_HIGH_AVAILABILITY,
   NAV_USERS_AND_ACCESS,
   NAV_ACCESS_CONTROL,
+  NAV_CLICKHOUSE,
   NAV_HIGH_AVAILABILITY_LEADER,
   NAV_HIGH_AVAILABILITY_NODES,
   NAV_HOME_PAGE,
@@ -123,6 +125,11 @@ export const addDashboardItems = (
   if (types.includes(ServiceType.valkey)) {
     addOtherDashboardsItem(NAV_VALKEY, folders);
     children.push(NAV_VALKEY);
+  }
+
+  if (types.includes(ServiceType.clickhouse)) {
+    addOtherDashboardsItem(NAV_CLICKHOUSE, folders);
+    children.push(NAV_CLICKHOUSE);
   }
 
   addOtherDashboardsItem(NAV_OS, folders);

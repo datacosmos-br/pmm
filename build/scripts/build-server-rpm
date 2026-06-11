@@ -73,6 +73,17 @@ prepare_specs() {
         local full_commit=$(git -C "${git_dir}" rev-parse HEAD)
         local short_commit=${full_commit:0:7}
 
+        # If the component is a fork (remote is not percona), update the spec
+        # provider so spectool downloads from the correct repository.
+        # Only update if the remote URL looks like a real remote (http/https/git),
+        # never a local filesystem path — local paths break %prep symlinks.
+        local remote_url=$(git -C "${git_dir}" remote get-url origin 2>/dev/null || echo "")
+        if [[ -n "${remote_url}" && "${remote_url}" != *"percona"* && \
+              "${remote_url}" =~ ^(https?://|git@) ]]; then
+            local provider=$(echo "${remote_url}" | sed -e 's/\.git$//' -e 's|^https://||' -e 's|^git@github.com:|github.com/|')
+            sed -i -e "s|%global provider.*|%global provider ${provider}|" ${rpmbuild_dir}/SOURCES/${spec_name}.spec
+        fi
+
         sed -i -e "s/global commit.*/global commit ${full_commit}/" ${rpmbuild_dir}/SOURCES/${spec_name}.spec
         if [[ ${spec_name} != "grafana" ]]; then
             sed -i -e "s/Version:.*/Version: ${pmm_version}/"       ${rpmbuild_dir}/SOURCES/${spec_name}.spec
@@ -97,6 +108,14 @@ prepare_specs() {
                 --prefix=${repo_name}-${full_commit}/ \
                 -o ${rpmbuild_dir}/SOURCES/${repo_name}-${short_commit}.tar.gz \
                 "${full_commit}"
+        fi
+
+        # spectool/rpmbuild expect the basename of Source0 (%{provider}/archive/%{commit}.tar.gz).
+        # Create a symlink so the local tarball is found and spectool skips the network download.
+        local expected_name="${full_commit}.tar.gz"
+        if [ ! -e "${rpmbuild_dir}/SOURCES/${expected_name}" ]; then
+            ln -sfn "${rpmbuild_dir}/SOURCES/${repo_name}-${short_commit}.tar.gz" \
+                     "${rpmbuild_dir}/SOURCES/${expected_name}"
         fi
     fi
 }

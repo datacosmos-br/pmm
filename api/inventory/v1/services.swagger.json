@@ -805,6 +805,10 @@
         "version": {
           "type": "string",
           "description": "ClickHouse version."
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Connection protocol: native (tcp), http, or https."
         }
       },
       "description": "ClickHouseService represents a generic ClickHouse instance."

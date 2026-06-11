@@ -8935,6 +8935,9 @@ type AddAgentParamsBodyQANClickhouseQuerylogAgent struct {
 	// - LOG_LEVEL_UNSPECIFIED: Auto
 	// Enum: ["LOG_LEVEL_UNSPECIFIED","LOG_LEVEL_FATAL","LOG_LEVEL_ERROR","LOG_LEVEL_WARN","LOG_LEVEL_INFO","LOG_LEVEL_DEBUG"]
 	LogLevel *string `json:"log_level,omitempty"`
+
+	// Connection protocol: native (tcp), http, or https.
+	Protocol string `json:"protocol,omitempty"`
 }
 
 // Validate validates this add agent params body QAN clickhouse querylog agent

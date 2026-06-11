@@ -102,6 +102,8 @@ func (ss *ServicesService) ListActiveServiceTypes(ctx context.Context) ([]invent
 			res = append(res, inventoryv1.ServiceType_SERVICE_TYPE_POSTGRESQL_SERVICE)
 		case models.ValkeyServiceType:
 			res = append(res, inventoryv1.ServiceType_SERVICE_TYPE_VALKEY_SERVICE)
+		case models.ClickHouseServiceType:
+			res = append(res, inventoryv1.ServiceType_SERVICE_TYPE_CLICKHOUSE_SERVICE)
 		case models.ProxySQLServiceType:
 			res = append(res, inventoryv1.ServiceType_SERVICE_TYPE_PROXYSQL_SERVICE)
 		case models.HAProxyServiceType:
@@ -229,6 +231,28 @@ func (ss *ServicesService) AddValkey(ctx context.Context, params *models.AddDBMS
 	return res.(*inventoryv1.ValkeyService), nil //nolint:forcetypeassert
 }
 
+// AddClickHouse inserts ClickHouse Service with given parameters.
+func (ss *ServicesService) AddClickHouse(ctx context.Context, params *models.AddDBMSServiceParams) (*inventoryv1.ClickHouseService, error) {
+	service := &models.Service{}
+	e := ss.db.InTransactionContext(ctx, nil, func(tx *reform.TX) error {
+		var err error
+		service, err = models.AddNewService(tx.Querier, models.ClickHouseServiceType, params)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if e != nil {
+		return nil, e
+	}
+
+	res, err := services.ToAPIService(service)
+	if err != nil {
+		return nil, err
+	}
+	return res.(*inventoryv1.ClickHouseService), nil //nolint:forcetypeassert
+}
+
 // AddProxySQL inserts ProxySQL Service with given parameters.
 //
 //nolint:dupl
@@ -302,7 +326,7 @@ func (ss *ServicesService) AddExternalService(ctx context.Context, params *model
 func (ss *ServicesService) Remove(ctx context.Context, id string, force bool) error { //nolint:gocognit
 	pmmAgentIDs := make(map[string]struct{})
 
-	if e := ss.db.InTransactionContext(ctx, nil, func(tx *reform.TX) error {
+	e := ss.db.InTransactionContext(ctx, nil, func(tx *reform.TX) error {
 		service, err := models.FindServiceByID(tx.Querier, id)
 		if err != nil {
 			return err
@@ -346,7 +370,8 @@ func (ss *ServicesService) Remove(ctx context.Context, id string, force bool) er
 				}
 
 				if len(pmmAgentIDs) <= 1 {
-					if err = models.RemoveNode(tx.Querier, node.NodeID, models.RemoveCascade); err != nil {
+					err = models.RemoveNode(tx.Querier, node.NodeID, models.RemoveCascade)
+					if err != nil {
 						return err
 					}
 				}
@@ -354,7 +379,8 @@ func (ss *ServicesService) Remove(ctx context.Context, id string, force bool) er
 		}
 
 		return nil
-	}); e != nil {
+	})
+	if e != nil {
 		return e
 	}
 
@@ -374,7 +400,8 @@ func (ss *ServicesService) Remove(ctx context.Context, id string, force bool) er
 func (ss *ServicesService) ChangeService(ctx context.Context, labels *models.ChangeStandardLabelsParams, custom *commonv1.StringMap) (inventoryv1.Service, error) { //nolint:ireturn,lll,nolintlint
 	var service *models.Service
 
-	if err := ss.ms.RemoveScheduledTasks(ctx, ss.db, labels); err != nil {
+	err := ss.ms.RemoveScheduledTasks(ctx, ss.db, labels)
+	if err != nil {
 		return nil, err
 	}
 
@@ -409,7 +436,8 @@ func (ss *ServicesService) ChangeService(ctx context.Context, labels *models.Cha
 		return nil, errTx
 	}
 
-	if err := ss.updateScrapeConfig(ctx, labels.ServiceID); err != nil {
+	err = ss.updateScrapeConfig(ctx, labels.ServiceID)
+	if err != nil {
 		return nil, err
 	}
 

@@ -683,6 +683,99 @@
         }
       }
     },
+    "/v1/actions:clickhouseExplain": {
+      "post": {
+        "description": "Starts ClickHouse EXPLAIN Action.",
+        "tags": [
+          "ActionsService"
+        ],
+        "summary": "Start ClickHouse EXPLAIN Action",
+        "operationId": "StartClickHouseExplainAction",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pmm_agent_id": {
+                  "description": "pmm-agent ID where to run this Action.",
+                  "type": "string",
+                  "x-order": 0
+                },
+                "service_id": {
+                  "description": "Service ID for this Action. Required.",
+                  "type": "string",
+                  "x-order": 1
+                },
+                "query": {
+                  "description": "Query. Required.",
+                  "type": "string",
+                  "x-order": 2
+                },
+                "explain_type": {
+                  "description": "Explain type: PLAN, PIPELINE, AST, ESTIMATE. Defaults to PLAN.",
+                  "type": "string",
+                  "x-order": 3
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action_id": {
+                  "description": "Unique Action ID.",
+                  "type": "string",
+                  "x-order": 0
+                },
+                "pmm_agent_id": {
+                  "description": "pmm-agent ID where to this Action was started.",
+                  "type": "string",
+                  "x-order": 1
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32",
+                  "x-order": 0
+                },
+                "message": {
+                  "type": "string",
+                  "x-order": 1
+                },
+                "details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "@type": {
+                        "type": "string",
+                        "x-order": 0
+                      }
+                    },
+                    "additionalProperties": {}
+                  },
+                  "x-order": 2
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/actions:startNodeAction": {
       "post": {
         "description": "Starts 'Percona Toolkit Summary' Action.",
@@ -1085,6 +1178,32 @@
                     }
                   },
                   "x-order": 11
+                },
+                "clickhouse_explain": {
+                  "type": "object",
+                  "properties": {
+                    "pmm_agent_id": {
+                      "description": "pmm-agent ID where to run this Action.",
+                      "type": "string",
+                      "x-order": 0
+                    },
+                    "service_id": {
+                      "description": "Service ID for this Action. Required.",
+                      "type": "string",
+                      "x-order": 1
+                    },
+                    "query": {
+                      "description": "Query. Required.",
+                      "type": "string",
+                      "x-order": 2
+                    },
+                    "explain_type": {
+                      "description": "Explain type: PLAN, PIPELINE, AST, ESTIMATE. Defaults to PLAN.",
+                      "type": "string",
+                      "x-order": 3
+                    }
+                  },
+                  "x-order": 12
                 }
               }
             }
@@ -1290,6 +1409,22 @@
                     }
                   },
                   "x-order": 11
+                },
+                "clickhouse_explain": {
+                  "type": "object",
+                  "properties": {
+                    "action_id": {
+                      "description": "Unique Action ID.",
+                      "type": "string",
+                      "x-order": 0
+                    },
+                    "pmm_agent_id": {
+                      "description": "pmm-agent ID where to this Action was started.",
+                      "type": "string",
+                      "x-order": 1
+                    }
+                  },
+                  "x-order": 12
                 }
               }
             }
@@ -4763,6 +4898,11 @@
                         "type": "string",
                         "format": "date-time",
                         "x-order": 5
+                      },
+                      "encrypted": {
+                        "description": "This field is set to true if the dump was created with encryption enabled, and false otherwise.",
+                        "type": "boolean",
+                        "x-order": 6
                       }
                     }
                   },
@@ -5007,6 +5147,16 @@
                 "ignore_load": {
                   "type": "boolean",
                   "x-order": 4
+                },
+                "enable_encryption": {
+                  "description": "If true, the dump will be encrypted. Note that enabling encryption may increase the time required to create the dump.",
+                  "type": "boolean",
+                  "x-order": 5
+                },
+                "encryption_password": {
+                  "description": "The password used for encryption. It must be at least 8 characters long. This field is required if enable_encryption is true.",
+                  "type": "string",
+                  "x-order": 6
                 }
               }
             }
@@ -9482,6 +9632,11 @@
                         "LOG_LEVEL_DEBUG"
                       ],
                       "x-order": 13
+                    },
+                    "protocol": {
+                      "description": "Connection protocol: native (tcp), http, or https.",
+                      "type": "string",
+                      "x-order": 14
                     }
                   },
                   "x-order": 18
@@ -20627,6 +20782,11 @@
                         "description": "ClickHouse version.",
                         "type": "string",
                         "x-order": 10
+                      },
+                      "protocol": {
+                        "description": "Connection protocol: native (tcp), http, or https.",
+                        "type": "string",
+                        "x-order": 11
                       }
                     }
                   },
@@ -21637,6 +21797,11 @@
                       "description": "ClickHouse version.",
                       "type": "string",
                       "x-order": 10
+                    },
+                    "protocol": {
+                      "description": "Connection protocol: native (tcp), http, or https.",
+                      "type": "string",
+                      "x-order": 11
                     }
                   },
                   "x-order": 7
@@ -22218,6 +22383,11 @@
                       "description": "ClickHouse version.",
                       "type": "string",
                       "x-order": 10
+                    },
+                    "protocol": {
+                      "description": "Connection protocol: native (tcp), http, or https.",
+                      "type": "string",
+                      "x-order": 11
                     }
                   },
                   "x-order": 7
@@ -22841,6 +23011,11 @@
                       "description": "ClickHouse version.",
                       "type": "string",
                       "x-order": 10
+                    },
+                    "protocol": {
+                      "description": "Connection protocol: native (tcp), http, or https.",
+                      "type": "string",
+                      "x-order": 11
                     }
                   },
                   "x-order": 7
@@ -27039,6 +27214,11 @@
                       "type": "integer",
                       "format": "int64",
                       "x-order": 25
+                    },
+                    "protocol": {
+                      "description": "Connection protocol: native (tcp), http, or https.",
+                      "type": "string",
+                      "x-order": 26
                     }
                   },
                   "x-order": 8
@@ -30205,6 +30385,11 @@
                           "description": "ClickHouse version.",
                           "type": "string",
                           "x-order": 10
+                        },
+                        "protocol": {
+                          "description": "Connection protocol: native (tcp), http, or https.",
+                          "type": "string",
+                          "x-order": 11
                         }
                       },
                       "x-order": 0

@@ -1095,6 +1095,9 @@ type ChangeServiceOKBodyClickhouse struct {
 
 	// ClickHouse version.
 	Version string `json:"version,omitempty"`
+
+	// Connection protocol: native (tcp), http, or https.
+	Protocol string `json:"protocol,omitempty"`
 }
 
 // Validate validates this change service OK body clickhouse

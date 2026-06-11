@@ -20,7 +20,6 @@ import (
 	"context"
 	"errors"
 	_ "expvar" // register /debug/vars
-	"fmt"
 	"html/template"
 	"log"
 	"net"
@@ -28,6 +27,7 @@ import (
 	_ "net/http/pprof" //nolint:gosec
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -55,6 +55,7 @@ import (
 	aservice "github.com/percona/pmm/qan-api2/services/analytics"
 	rservice "github.com/percona/pmm/qan-api2/services/receiver"
 	"github.com/percona/pmm/qan-api2/utils/interceptors"
+	"github.com/percona/pmm/utils/clickhouseconn"
 	"github.com/percona/pmm/utils/dsnutils"
 	pmmerrors "github.com/percona/pmm/utils/errors"
 	"github.com/percona/pmm/utils/logger"
@@ -65,7 +66,7 @@ import (
 const (
 	shutdownTimeout                 = 3 * time.Second
 	defaultDropOldPartitionInterval = 24 * time.Hour
-	defaultDsnF                     = "clickhouse://%s:%s@%s/%s"
+	defaultDsnF                     = "%s://%s:%s@%s/%s"
 	maxIdleConns                    = 5
 	maxOpenConns                    = 10
 )
@@ -163,7 +164,8 @@ func runJSONServer(ctx context.Context, grpcBindF, jsonBindF string) {
 	for _, r := range []registrar{
 		qanv1.RegisterQANServiceHandlerFromEndpoint,
 	} {
-		if err := r(ctx, proxyMux, grpcBindF, opts); err != nil {
+		err := r(ctx, proxyMux, grpcBindF, opts)
+		if err != nil {
 			l.Panic(err)
 		}
 	}
@@ -177,7 +179,8 @@ func runJSONServer(ctx context.Context, grpcBindF, jsonBindF string) {
 		Handler:  mux,
 	}
 	go func() {
-		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+		err := server.ListenAndServe()
+		if !errors.Is(err, http.ErrServerClosed) {
 			l.Panic(err)
 		}
 		l.Println("Server stopped.")
@@ -185,7 +188,8 @@ func runJSONServer(ctx context.Context, grpcBindF, jsonBindF string) {
 
 	<-ctx.Done()
 	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
-	if err := server.Shutdown(ctx); err != nil { //nolint:contextcheck
+	err := server.Shutdown(ctx) //nolint:contextcheck
+	if err != nil {
 		l.Errorf("Failed to shutdown gracefully: %s \n", err)
 		server.Close() //nolint:errcheck
 	}
@@ -238,7 +242,8 @@ func runDebugServer(ctx context.Context, debugBindF string) {
 		ErrorLog: log.New(logrus.StandardLogger().WriterLevel(logrus.ErrorLevel), "runDebugServer: ", 0),
 	}
 	go func() {
-		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+		err := server.ListenAndServe()
+		if !errors.Is(err, http.ErrServerClosed) {
 			l.Panic(err)
 		}
 		l.Info("Server stopped.")
@@ -246,7 +251,8 @@ func runDebugServer(ctx context.Context, debugBindF string) {
 
 	<-ctx.Done()
 	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
-	if err := server.Shutdown(ctx); err != nil { //nolint:contextcheck
+	err = server.Shutdown(ctx) //nolint:contextcheck
+	if err != nil {
 		l.Errorf("Failed to shutdown gracefully: %s", err)
 	}
 	cancel()
@@ -264,8 +270,14 @@ func main() {
 	dsnF := kingpin.Flag("dsn", "ClickHouse database DSN. Can be overridden with database/host/port options").Default(defaultDsnF).String()
 	clickhouseDatabaseF := kingpin.Flag("clickhouse-name", "ClickHouse database name").Default("pmm").Envar("PMM_CLICKHOUSE_DATABASE").String()
 	clickhouseAddrF := kingpin.Flag("clickhouse-addr", "ClickHouse database address").Default("127.0.0.1:9000").Envar("PMM_CLICKHOUSE_ADDR").String()
+	clickhouseProtocolF := kingpin.Flag("clickhouse-protocol", "ClickHouse protocol (native, http, https)").Default("native").Envar("PMM_CLICKHOUSE_PROTOCOL").String()
 	clickhouseUserF := kingpin.Flag("clickhouse-user", "ClickHouse database user").Default("default").Envar("PMM_CLICKHOUSE_USER").String()
 	clickhousePasswordF := kingpin.Flag("clickhouse-password", "ClickHouse database user password").Default("clickhouse").Envar("PMM_CLICKHOUSE_PASSWORD").String()
+	clickhouseTLSF := kingpin.Flag("clickhouse-tls", "Enable TLS for ClickHouse connection").Default("false").Envar("PMM_CLICKHOUSE_TLS").Bool()
+	clickhouseTLSSkipVerifyF := kingpin.Flag("clickhouse-tls-skip-verify", "Skip TLS certificate verification").Default("false").Envar("PMM_CLICKHOUSE_TLS_SKIP_VERIFY").Bool()
+	clickhouseTLSCaF := kingpin.Flag("clickhouse-tls-ca", "Path to TLS CA certificate").Default("").Envar("PMM_CLICKHOUSE_TLS_CA").String()
+	clickhouseTLSCertF := kingpin.Flag("clickhouse-tls-cert", "Path to TLS client certificate").Default("").Envar("PMM_CLICKHOUSE_TLS_CERT").String()
+	clickhouseTLSKeyF := kingpin.Flag("clickhouse-tls-key", "Path to TLS client key").Default("").Envar("PMM_CLICKHOUSE_TLS_KEY").String()
 
 	clickhouseIsClusterF := kingpin.Flag("clickhouse-cluster", "Is ClickHouse a cluster").Default("false").Envar("PMM_CLICKHOUSE_IS_CLUSTER").Bool()
 	clickhouseClusterNameF := kingpin.Flag("clickhouse-cluster-name", "ClickHouse cluster name").Default("").Envar("PMM_CLICKHOUSE_CLUSTER_NAME").String()
@@ -297,7 +309,38 @@ func main() {
 
 	var dsn string
 	if *dsnF == defaultDsnF {
-		dsn = fmt.Sprintf(defaultDsnF, *clickhouseUserF, *clickhousePasswordF, *clickhouseAddrF, *clickhouseDatabaseF)
+		addr := *clickhouseAddrF
+		host, portStr, err := net.SplitHostPort(addr)
+		if err != nil {
+			l.Fatalf("Invalid clickhouse address %q: %v", addr, err)
+		}
+		port64, err := strconv.ParseUint(portStr, 10, 16)
+		if err != nil {
+			l.Fatalf("Invalid clickhouse port %q: %v", portStr, err)
+		}
+
+		proto, err := clickhouseconn.ParseProtocol(*clickhouseProtocolF)
+		if err != nil {
+			l.Fatalf("Invalid clickhouse protocol %q: %v", *clickhouseProtocolF, err)
+		}
+
+		cfg := clickhouseconn.Config{
+			Protocol:      proto,
+			Host:          host,
+			Port:          uint16(port64),
+			Database:      *clickhouseDatabaseF,
+			User:          *clickhouseUserF,
+			Password:      *clickhousePasswordF,
+			TLS:           *clickhouseTLSF,
+			TLSSkipVerify: *clickhouseTLSSkipVerifyF,
+			TLSCa:         *clickhouseTLSCaF,
+			TLSCert:       *clickhouseTLSCertF,
+			TLSKey:        *clickhouseTLSKeyF,
+		}
+		dsn, err = cfg.DSN()
+		if err != nil {
+			l.Fatalf("Failed to build ClickHouse DSN: %v", err)
+		}
 	} else {
 		dsn = *dsnF
 	}

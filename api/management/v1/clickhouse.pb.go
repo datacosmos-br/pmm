@@ -140,8 +140,10 @@ type AddClickHouseServiceParams struct {
 	// ClickHouse native Prometheus endpoint port (default 9363).
 	// Used for the native source and the auto-probe.
 	NativeMetricsPort uint32 `protobuf:"varint,26,opt,name=native_metrics_port,json=nativeMetricsPort,proto3" json:"native_metrics_port,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// Connection protocol: native (tcp), http, or https.
+	Protocol      string `protobuf:"bytes,27,opt,name=protocol,proto3" json:"protocol,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AddClickHouseServiceParams) Reset() {
@@ -356,6 +358,13 @@ func (x *AddClickHouseServiceParams) GetNativeMetricsPort() uint32 {
 	return 0
 }
 
+func (x *AddClickHouseServiceParams) GetProtocol() string {
+	if x != nil {
+		return x.Protocol
+	}
+	return ""
+}
+
 type ClickHouseServiceResult struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Service *v1.ClickHouseService  `protobuf:"bytes,1,opt,name=service,proto3" json:"service,omitempty"`
@@ -422,7 +431,7 @@ var File_management_v1_clickhouse_proto protoreflect.FileDescriptor
 
 const file_management_v1_clickhouse_proto_rawDesc = "" +
 	"\n" +
-	"\x1emanagement/v1/clickhouse.proto\x12\rmanagement.v1\x1a\x1aextensions/v1/redact.proto\x1a\x19inventory/v1/agents.proto\x1a\x1cinventory/v1/log_level.proto\x1a\x1binventory/v1/services.proto\x1a\x1bmanagement/v1/metrics.proto\x1a\x18management/v1/node.proto\x1a\x17validate/validate.proto\"\x84\t\n" +
+	"\x1emanagement/v1/clickhouse.proto\x12\rmanagement.v1\x1a\x1aextensions/v1/redact.proto\x1a\x19inventory/v1/agents.proto\x1a\x1cinventory/v1/log_level.proto\x1a\x1binventory/v1/services.proto\x1a\x1bmanagement/v1/metrics.proto\x1a\x18management/v1/node.proto\x1a\x17validate/validate.proto\"\xa0\t\n" +
 	"\x1aAddClickHouseServiceParams\x12#\n" +
 	"\anode_id\x18\x01 \x01(\tB\n" +
 	"\xfaB\ar\x05\x10\x01\xd0\x01\x01R\x06nodeId\x12'\n" +
@@ -453,7 +462,8 @@ const file_management_v1_clickhouse_proto_rawDesc = "" +
 	"\atls_key\x18\x17 \x01(\tR\x06tlsKey\x12+\n" +
 	"\x0eagent_password\x18\x18 \x01(\tB\x04\x88\xb5\x18\x01R\ragentPassword\x12C\n" +
 	"\x0emetrics_source\x18\x19 \x01(\x0e2\x1c.management.v1.MetricsSourceR\rmetricsSource\x12.\n" +
-	"\x13native_metrics_port\x18\x1a \x01(\rR\x11nativeMetricsPort\x1a?\n" +
+	"\x13native_metrics_port\x18\x1a \x01(\rR\x11nativeMetricsPort\x12\x1a\n" +
+	"\bprotocol\x18\x1b \x01(\tR\bprotocol\x1a?\n" +
 	"\x11CustomLabelsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xf4\x01\n" +

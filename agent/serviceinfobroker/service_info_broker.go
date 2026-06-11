@@ -87,6 +87,8 @@ func (sib *ServiceInfoBroker) GetInfoFromService(ctx context.Context, msg *agent
 			msg.TlsSkipVerify,
 			id,
 		)
+	case inventoryv1.ServiceType_SERVICE_TYPE_CLICKHOUSE_SERVICE:
+		return sib.getClickHouseInfo(ctx, msg.Dsn)
 	// NOTE: these types may be implemented later.
 	case inventoryv1.ServiceType_SERVICE_TYPE_EXTERNAL_SERVICE, inventoryv1.ServiceType_SERVICE_TYPE_HAPROXY_SERVICE:
 		return &agentv1.ServiceInfoResponse{}
@@ -135,7 +137,8 @@ func (sib *ServiceInfoBroker) getMySQLInfo(ctx context.Context, dsn string, file
 	defer db.Close() //nolint:errcheck
 
 	var count uint64
-	if err = db.QueryRowContext(ctx, "SELECT /* agent='serviceinfobroker' */ COUNT(*) FROM information_schema.tables").Scan(&count); err != nil {
+	err = db.QueryRowContext(ctx, "SELECT /* agent='serviceinfobroker' */ COUNT(*) FROM information_schema.tables").Scan(&count)
+	if err != nil {
 		res.Error = err.Error()
 		return &res
 	}
@@ -146,7 +149,8 @@ func (sib *ServiceInfoBroker) getMySQLInfo(ctx context.Context, dsn string, file
 	}
 
 	var version string
-	if err = db.QueryRowContext(ctx, "SELECT /* agent='serviceinfobroker' */ VERSION()").Scan(&version); err != nil {
+	err = db.QueryRowContext(ctx, "SELECT /* agent='serviceinfobroker' */ VERSION()").Scan(&version)
+	if err != nil {
 		res.Error = err.Error()
 	}
 
@@ -182,7 +186,8 @@ func (sib *ServiceInfoBroker) getMongoDBInfo(ctx context.Context, dsn string, fi
 	}
 	defer client.Disconnect(ctx) //nolint:errcheck
 
-	if err = client.Ping(ctx, nil); err != nil {
+	err = client.Ping(ctx, nil)
+	if err != nil {
 		sib.l.Debugf("getMongoDBInfo: failed to Ping: %s", err)
 		res.Error = err.Error()
 		return &res
@@ -241,7 +246,8 @@ func (sib *ServiceInfoBroker) getPostgreSQLInfo(ctx context.Context, dsn string,
 	res.DatabaseList = databaseList
 
 	var version string
-	if err = db.QueryRowContext(ctx, "SHOW /* agent='serviceinfobroker' */ SERVER_VERSION").Scan(&version); err != nil {
+	err = db.QueryRowContext(ctx, "SHOW /* agent='serviceinfobroker' */ SERVER_VERSION").Scan(&version)
+	if err != nil {
 		res.Error = err.Error()
 	}
 	res.Version = version
@@ -335,7 +341,8 @@ func (sib *ServiceInfoBroker) getProxySQLInfo(ctx context.Context, dsn string) *
 	defer db.Close() //nolint:errcheck
 
 	var version string
-	if err := db.QueryRowContext(ctx, "SELECT /* agent='serviceinfobroker' */ @@GLOBAL.'admin-version'").Scan(&version); err != nil {
+	err = db.QueryRowContext(ctx, "SELECT /* agent='serviceinfobroker' */ @@GLOBAL.'admin-version'").Scan(&version)
+	if err != nil {
 		res.Error = err.Error()
 	}
 

@@ -2355,6 +2355,47 @@ func (m *StartActionRequest) validate(all bool) error {
 			}
 		}
 
+	case *StartActionRequest_ClickhouseExplainParams:
+		if v == nil {
+			err := StartActionRequestValidationError{
+				field:  "Params",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouseExplainParams()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StartActionRequestValidationError{
+						field:  "ClickhouseExplainParams",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StartActionRequestValidationError{
+						field:  "ClickhouseExplainParams",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouseExplainParams()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StartActionRequestValidationError{
+					field:  "ClickhouseExplainParams",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *StartActionRequest_PtSummaryParams:
 		if v == nil {
 			err := StartActionRequestValidationError{
@@ -9387,6 +9428,118 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = StartActionRequest_MongoDBExplainParamsValidationError{}
+
+// Validate checks the field values on
+// StartActionRequest_ClickHouseExplainParams with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *StartActionRequest_ClickHouseExplainParams) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// StartActionRequest_ClickHouseExplainParams with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// StartActionRequest_ClickHouseExplainParamsMultiError, or nil if none found.
+func (m *StartActionRequest_ClickHouseExplainParams) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StartActionRequest_ClickHouseExplainParams) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Dsn
+
+	// no validation rules for Query
+
+	// no validation rules for ExplainType
+
+	if len(errors) > 0 {
+		return StartActionRequest_ClickHouseExplainParamsMultiError(errors)
+	}
+
+	return nil
+}
+
+// StartActionRequest_ClickHouseExplainParamsMultiError is an error wrapping
+// multiple validation errors returned by
+// StartActionRequest_ClickHouseExplainParams.ValidateAll() if the designated
+// constraints aren't met.
+type StartActionRequest_ClickHouseExplainParamsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StartActionRequest_ClickHouseExplainParamsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StartActionRequest_ClickHouseExplainParamsMultiError) AllErrors() []error { return m }
+
+// StartActionRequest_ClickHouseExplainParamsValidationError is the validation
+// error returned by StartActionRequest_ClickHouseExplainParams.Validate if
+// the designated constraints aren't met.
+type StartActionRequest_ClickHouseExplainParamsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) ErrorName() string {
+	return "StartActionRequest_ClickHouseExplainParamsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StartActionRequest_ClickHouseExplainParamsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStartActionRequest_ClickHouseExplainParams.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StartActionRequest_ClickHouseExplainParamsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StartActionRequest_ClickHouseExplainParamsValidationError{}
 
 // Validate checks the field values on StartActionRequest_PTSummaryParams with
 // the rules defined in the proto definition for this message. If any rules

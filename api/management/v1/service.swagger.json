@@ -952,6 +952,10 @@
           "type": "integer",
           "format": "int64",
           "description": "ClickHouse native Prometheus endpoint port (default 9363).\nUsed for the native source and the auto-probe."
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Connection protocol: native (tcp), http, or https."
         }
       }
     },
@@ -2223,6 +2227,10 @@
         "version": {
           "type": "string",
           "description": "ClickHouse version."
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Connection protocol: native (tcp), http, or https."
         }
       },
       "description": "ClickHouseService represents a generic ClickHouse instance."

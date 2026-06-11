@@ -184,6 +184,8 @@ func (m *AddClickHouseServiceParams) validate(all bool) error {
 
 	// no validation rules for NativeMetricsPort
 
+	// no validation rules for Protocol
+
 	if len(errors) > 0 {
 		return AddClickHouseServiceParamsMultiError(errors)
 	}

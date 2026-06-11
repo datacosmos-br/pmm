@@ -55,6 +55,8 @@ type ClientService interface {
 
 	GetAction(params *GetActionParams, opts ...ClientOption) (*GetActionOK, error)
 
+	StartClickHouseExplainAction(params *StartClickHouseExplainActionParams, opts ...ClientOption) (*StartClickHouseExplainActionOK, error)
+
 	StartPTSummaryAction(params *StartPTSummaryActionParams, opts ...ClientOption) (*StartPTSummaryActionOK, error)
 
 	StartServiceAction(params *StartServiceActionParams, opts ...ClientOption) (*StartServiceActionOK, error)
@@ -146,6 +148,50 @@ func (a *Client) GetAction(params *GetActionParams, opts ...ClientOption) (*GetA
 	//
 	// a default response is provided: fill this and return an error
 	unexpectedSuccess := result.(*GetActionDefault)
+
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+StartClickHouseExplainAction starts click house e x p l a i n action
+
+Starts ClickHouse EXPLAIN Action.
+*/
+func (a *Client) StartClickHouseExplainAction(params *StartClickHouseExplainActionParams, opts ...ClientOption) (*StartClickHouseExplainActionOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewStartClickHouseExplainActionParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "StartClickHouseExplainAction",
+		Method:             "POST",
+		PathPattern:        "/v1/actions:clickhouseExplain",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &StartClickHouseExplainActionReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*StartClickHouseExplainActionOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+	//
+	// a default response is provided: fill this and return an error
+	unexpectedSuccess := result.(*StartClickHouseExplainActionDefault)
 
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }

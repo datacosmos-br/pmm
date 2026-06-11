@@ -43,6 +43,7 @@ export const ALL_SERVICE_TYPES = [
   ServiceType.posgresql,
   ServiceType.proxysql,
   ServiceType.valkey,
+  ServiceType.clickhouse,
 ];
 
 // 5 seconds

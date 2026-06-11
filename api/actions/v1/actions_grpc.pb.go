@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ActionsService_GetAction_FullMethodName            = "/actions.v1.ActionsService/GetAction"
-	ActionsService_StartServiceAction_FullMethodName   = "/actions.v1.ActionsService/StartServiceAction"
-	ActionsService_StartPTSummaryAction_FullMethodName = "/actions.v1.ActionsService/StartPTSummaryAction"
-	ActionsService_CancelAction_FullMethodName         = "/actions.v1.ActionsService/CancelAction"
+	ActionsService_GetAction_FullMethodName                    = "/actions.v1.ActionsService/GetAction"
+	ActionsService_StartClickHouseExplainAction_FullMethodName = "/actions.v1.ActionsService/StartClickHouseExplainAction"
+	ActionsService_StartServiceAction_FullMethodName           = "/actions.v1.ActionsService/StartServiceAction"
+	ActionsService_StartPTSummaryAction_FullMethodName         = "/actions.v1.ActionsService/StartPTSummaryAction"
+	ActionsService_CancelAction_FullMethodName                 = "/actions.v1.ActionsService/CancelAction"
 )
 
 // ActionsServiceClient is the client API for ActionsService service.
@@ -33,6 +34,8 @@ const (
 type ActionsServiceClient interface {
 	// GetAction gets result of a given Action.
 	GetAction(ctx context.Context, in *GetActionRequest, opts ...grpc.CallOption) (*GetActionResponse, error)
+	// StartClickHouseExplainAction starts ClickHouse EXPLAIN Action.
+	StartClickHouseExplainAction(ctx context.Context, in *StartClickHouseExplainActionParams, opts ...grpc.CallOption) (*StartClickHouseExplainActionResult, error)
 	// StartServiceAction starts a Service Action.
 	StartServiceAction(ctx context.Context, in *StartServiceActionRequest, opts ...grpc.CallOption) (*StartServiceActionResponse, error)
 	// StartPTSummaryAction starts pt-summary Node Action.
@@ -53,6 +56,16 @@ func (c *actionsServiceClient) GetAction(ctx context.Context, in *GetActionReque
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetActionResponse)
 	err := c.cc.Invoke(ctx, ActionsService_GetAction_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *actionsServiceClient) StartClickHouseExplainAction(ctx context.Context, in *StartClickHouseExplainActionParams, opts ...grpc.CallOption) (*StartClickHouseExplainActionResult, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StartClickHouseExplainActionResult)
+	err := c.cc.Invoke(ctx, ActionsService_StartClickHouseExplainAction_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -97,6 +110,8 @@ func (c *actionsServiceClient) CancelAction(ctx context.Context, in *CancelActio
 type ActionsServiceServer interface {
 	// GetAction gets result of a given Action.
 	GetAction(context.Context, *GetActionRequest) (*GetActionResponse, error)
+	// StartClickHouseExplainAction starts ClickHouse EXPLAIN Action.
+	StartClickHouseExplainAction(context.Context, *StartClickHouseExplainActionParams) (*StartClickHouseExplainActionResult, error)
 	// StartServiceAction starts a Service Action.
 	StartServiceAction(context.Context, *StartServiceActionRequest) (*StartServiceActionResponse, error)
 	// StartPTSummaryAction starts pt-summary Node Action.
@@ -115,6 +130,9 @@ type UnimplementedActionsServiceServer struct{}
 
 func (UnimplementedActionsServiceServer) GetAction(context.Context, *GetActionRequest) (*GetActionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAction not implemented")
+}
+func (UnimplementedActionsServiceServer) StartClickHouseExplainAction(context.Context, *StartClickHouseExplainActionParams) (*StartClickHouseExplainActionResult, error) {
+	return nil, status.Error(codes.Unimplemented, "method StartClickHouseExplainAction not implemented")
 }
 func (UnimplementedActionsServiceServer) StartServiceAction(context.Context, *StartServiceActionRequest) (*StartServiceActionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method StartServiceAction not implemented")
@@ -160,6 +178,24 @@ func _ActionsService_GetAction_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ActionsServiceServer).GetAction(ctx, req.(*GetActionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ActionsService_StartClickHouseExplainAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartClickHouseExplainActionParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActionsServiceServer).StartClickHouseExplainAction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ActionsService_StartClickHouseExplainAction_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActionsServiceServer).StartClickHouseExplainAction(ctx, req.(*StartClickHouseExplainActionParams))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -228,6 +264,10 @@ var ActionsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAction",
 			Handler:    _ActionsService_GetAction_Handler,
+		},
+		{
+			MethodName: "StartClickHouseExplainAction",
+			Handler:    _ActionsService_StartClickHouseExplainAction_Handler,
 		},
 		{
 			MethodName: "StartServiceAction",

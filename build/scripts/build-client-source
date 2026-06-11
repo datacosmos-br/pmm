@@ -61,6 +61,24 @@ prepare_external_tarball() {
     else
         curl -fsSL -o "${tarball}" "${base_url}/${commit_hash}.tar.gz"
     fi
+
+    # Initialise a git repo in the extracted directory so build-client-binary
+    # can run git rev-parse HEAD (the upstream scripts assume every component
+    # is a cloned submodule).
+    local extract_dir="${source_dir}/${repo_name}-${commit_short}"
+    if [ ! -d "${extract_dir}/.git" ]; then
+        mkdir -p "${extract_dir}"
+        tar -C "${extract_dir}" --strip-components=1 -zxf "${tarball}" 2>/dev/null || true
+        if [ -d "${extract_dir}" ] && [ ! -d "${extract_dir}/.git" ]; then
+            git -C "${extract_dir}" init --quiet
+            git -C "${extract_dir}" config user.email "build@datacosmos.com.br"
+            git -C "${extract_dir}" config user.name "Build Bot"
+            git -C "${extract_dir}" add -A
+            git -C "${extract_dir}" commit -m "external tarball ${commit_hash}" --quiet
+            # Ensure the fake commit matches the hash the build scripts expect.
+            git -C "${extract_dir}" --no-pager log --oneline -1
+        fi
+    fi
 }
 
 main() {

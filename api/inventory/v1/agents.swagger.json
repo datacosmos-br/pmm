@@ -1172,6 +1172,10 @@
         "log_level": {
           "$ref": "#/definitions/v1LogLevel",
           "description": "Log level for exporter."
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Connection protocol: native (tcp), http, or https."
         }
       }
     },

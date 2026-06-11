@@ -237,7 +237,8 @@ func (s *Supervisor) SetState(state *agentv1.SetStateRequest) {
 	defer s.rw.Unlock()
 
 	// check if we waited for lock too long
-	if err := s.ctx.Err(); err != nil {
+	err := s.ctx.Err()
+	if err != nil {
 		s.l.Errorf("Ignoring SetState: %s.", err)
 		return
 	}
@@ -255,7 +256,8 @@ func (s *Supervisor) RestartAgents() {
 		agent.cancel()
 		<-agent.done
 
-		if err := s.tryStartProcess(id, agent.requestedState, agent.listenPort); err != nil {
+		err := s.tryStartProcess(id, agent.requestedState, agent.listenPort)
+		if err != nil {
 			s.l.Errorf("Failed to restart Agent: %s.", err)
 		}
 	}
@@ -264,7 +266,8 @@ func (s *Supervisor) RestartAgents() {
 		agent.cancel()
 		<-agent.done
 
-		if err := s.startBuiltin(id, agent.requestedState); err != nil {
+		err := s.startBuiltin(id, agent.requestedState)
+		if err != nil {
 			s.l.Errorf("Failed to restart Agent: %s.", err)
 		}
 	}
@@ -309,14 +312,15 @@ func (s *Supervisor) setAgentProcesses(agentProcesses map[string]*agentv1.SetSta
 		agent.cancel()
 		<-agent.done
 
-		if err := s.portsRegistry.Release(agent.listenPort); err != nil {
+		err := s.portsRegistry.Release(agent.listenPort)
+		if err != nil {
 			s.l.Errorf("Failed to release port: %s.", err)
 		}
 
 		delete(s.agentProcesses, agentID)
 
 		agentTmp := filepath.Join(s.cfg.Get().Paths.TempDir, strings.ToLower(agent.requestedState.Type.String()), agentID)
-		err := os.RemoveAll(agentTmp)
+		err = os.RemoveAll(agentTmp)
 		if err != nil {
 			s.l.Warnf("Failed to cleanup directory '%s': %s", agentTmp, err.Error())
 		}
@@ -328,7 +332,8 @@ func (s *Supervisor) setAgentProcesses(agentProcesses map[string]*agentv1.SetSta
 		agent.cancel()
 		<-agent.done
 
-		if err := s.tryStartProcess(agentID, agentProcesses[agentID], agent.listenPort); err != nil {
+		err := s.tryStartProcess(agentID, agentProcesses[agentID], agent.listenPort)
+		if err != nil {
 			s.l.Errorf("Failed to start Agent: %s.", err)
 			// TODO report that error to server
 		}
@@ -336,7 +341,8 @@ func (s *Supervisor) setAgentProcesses(agentProcesses map[string]*agentv1.SetSta
 
 	// start new agents
 	for _, agentID := range toStart {
-		if err := s.tryStartProcess(agentID, agentProcesses[agentID], 0); err != nil {
+		err := s.tryStartProcess(agentID, agentProcesses[agentID], 0)
+		if err != nil {
 			s.l.Errorf("Failed to start Agent: %s.", err)
 			// TODO report that error to server
 		}
@@ -384,7 +390,8 @@ func (s *Supervisor) setBuiltinAgents(builtinAgents map[string]*agentv1.SetState
 		agent.cancel()
 		<-agent.done
 
-		if err := s.startBuiltin(agentID, builtinAgents[agentID]); err != nil {
+		err := s.startBuiltin(agentID, builtinAgents[agentID])
+		if err != nil {
 			s.l.Errorf("Failed to start Agent: %s.", err)
 			// TODO report that error to server
 		}
@@ -392,7 +399,8 @@ func (s *Supervisor) setBuiltinAgents(builtinAgents map[string]*agentv1.SetState
 
 	// start new agents
 	for _, agentID := range toStart {
-		if err := s.startBuiltin(agentID, builtinAgents[agentID]); err != nil {
+		err := s.startBuiltin(agentID, builtinAgents[agentID])
+		if err != nil {
 			s.l.Errorf("Failed to start Agent: %s.", err)
 			// TODO report that error to server
 		}
@@ -446,7 +454,7 @@ const (
 
 func (s *Supervisor) tryStartProcess(agentID string, agentProcess *agentv1.SetStateRequest_AgentProcess, port uint16) error {
 	var err error
-	for i := 0; i < process_Retry_Time; i++ {
+	for range process_Retry_Time {
 		if port == 0 {
 			_port, err := s.portsRegistry.Reserve()
 			if err != nil {
@@ -456,7 +464,8 @@ func (s *Supervisor) tryStartProcess(agentID string, agentProcess *agentv1.SetSt
 			port = _port
 		}
 
-		if err = s.startProcess(agentID, agentProcess, port); err == nil {
+		err = s.startProcess(agentID, agentProcess, port)
+		if err == nil {
 			return nil
 		}
 
@@ -537,7 +546,12 @@ func (s *Supervisor) startProcess(agentID string, agentProcess *agentv1.SetState
 	return nil
 }
 
-func (s *Supervisor) handleNomadAgent(agentID string, processInfo *agentProcessInfo, l *logrus.Entry) { //nolint:lll
+//nolint:funcorder
+func (s *Supervisor) handleNomadAgent(
+	agentID string,
+	processInfo *agentProcessInfo,
+	l *logrus.Entry,
+) {
 	done := make(chan struct{})
 	s.agentProcesses[agentID] = processInfo
 
@@ -755,7 +769,7 @@ func (s *Supervisor) processParams(agentID string, agentProcess *agentv1.SetStat
 	processParams.Type = agentProcess.Type
 
 	cfg := s.cfg.Get()
-	templateParams := map[string]interface{}{
+	templateParams := map[string]any{
 		"listen_port": port,
 	}
 	switch agentProcess.Type {
@@ -786,9 +800,9 @@ func (s *Supervisor) processParams(agentID string, agentProcess *agentv1.SetStat
 		processParams.Path = "sleep"
 	case inventoryv1.AgentType_AGENT_TYPE_VM_AGENT:
 		templateParams["server_insecure"] = cfg.Server.InsecureTLS
-		templateParams["server_url"] = fmt.Sprintf("https://%s", cfg.Server.Address)
+		templateParams["server_url"] = "https://" + cfg.Server.Address
 		if cfg.Server.WithoutTLS {
-			templateParams["server_url"] = fmt.Sprintf("http://%s", cfg.Server.Address)
+			templateParams["server_url"] = "http://" + cfg.Server.Address
 		}
 		templateParams["server_password"] = cfg.Server.Password
 		templateParams["server_username"] = cfg.Server.Username
