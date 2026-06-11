@@ -49,8 +49,12 @@ jobs:
 
       - name: Free up runner disk space
         run: |
-          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache || true
-          docker system prune -af || true
+          for path in /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache; do
+            if [ -e "$path" ]; then
+              sudo rm -rf "$path"
+            fi
+          done
+          docker system prune -af
 
       # Pre-pull the rpmbuild image with retries. public.ecr.aws is
       # anonymous-rate-limited ('toomanyrequests'); an in-build `docker run`
@@ -84,10 +88,17 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           mkdir -p dist
+          test -d pmm-artifacts
+          asset_count=0
           while IFS= read -r f; do
             cp -f "$f" "dist/amd64-$(basename "$f")"
+            asset_count=$((asset_count + 1))
           done < <(find pmm-artifacts -type f \
-            \( -name '*.tar.gz' -o -name '*.rpm' -o -name '*.deb' \) 2>/dev/null)
+            \( -name '*.tar.gz' -o -name '*.rpm' -o -name '*.deb' \))
+          if [ "$asset_count" -eq 0 ]; then
+            echo "::error::no release assets found under pmm-artifacts"
+            exit 1
+          fi
           ls -la dist
           notes="datacosmos PMM ${DC_VERSION} — linux/amd64, built from source and aligned to upstream Percona PMM.
 

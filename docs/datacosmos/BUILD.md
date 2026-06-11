@@ -3,6 +3,16 @@
 This is a datacosmos fork of [`percona/pmm`](https://github.com/percona/pmm),
 tracking the upstream **`v3`** branch.
 
+## Mandatory rule: no bypass, no hidden failure
+
+The datacosmos build must stay minimal over upstream and must never hide a
+failure to keep moving. Do not add or keep `|| true`, ignored exit codes,
+suppressed validation output, skipped gates, fake success paths, permissive
+fallbacks, stubs, or compatibility wrappers in the custom build, sync, release,
+or artifact flow. Expected optional states must be handled explicitly; missing
+required refs, artifacts, images, packages, or credentials must stop the target
+with a clear error.
+
 ## Branch model
 
 | Branch | Purpose | How to keep current |
@@ -114,7 +124,7 @@ RPMBUILD_DOCKER_IMAGE=pmm-rpmbuild:local SKIP_S3_CACHE=1 make dc-build
 `make dc-build` materialises the build tree under `$(ROOT_DIR)` (default
 `../pmm-build-root`, **outside** the repo).
 
-### ⚠️ Build status — verified vs. pending
+### Build status
 
 The default release path is the GitHub Actions workflow. Local full builds still
 need Docker, submodules, and enough disk for PMM's upstream RPM/image pipeline.

@@ -1,5 +1,16 @@
 # PMM Development Guide for AI Agents
 
+## Strongest Rule: No Bypass, No Hidden Failure
+
+This rule is stronger than any local convenience: fix the root cause at the
+source and make failures visible. Do not add or keep `|| true`, ignored exit
+codes, suppressed validation output, permissive fallbacks, skipped gates,
+stubs, fake success paths, or compatibility wrappers that let a broken build,
+test, release, or diagnostic command continue. If a command can fail for an
+expected optional state, handle that state explicitly and still fail loud when
+the required single source of truth is absent. Every completed change must cite
+the command, exit code, and decisive output used to validate it.
+
 ## Maintaining This Document
 
 This file is read by every AI agent at session start. **You are responsible for keeping it accurate.** After completing work, check whether any of these apply:

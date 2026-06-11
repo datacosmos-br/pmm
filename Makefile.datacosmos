@@ -8,10 +8,9 @@
 
 SHELL := /bin/bash -o pipefail
 
-PMM_VERSION ?= $(shell git describe --tags --abbrev=0 \
+PMM_VERSION ?= $(or $(shell git describe --tags --abbrev=0 \
 	--match 'v[0-9]*.[0-9]*.[0-9]*' --exclude '*-dc*' \
-	2>/dev/null | sed 's/^v//')
-PMM_VERSION := $(if $(PMM_VERSION),$(PMM_VERSION),3.0.0)
+	| sed 's/^v//'),$(error no upstream stable PMM tag found for PMM_VERSION))
 
 UPSTREAM_BRANCH ?= upstream/v3
 UPSTREAM_TARGET ?= head
@@ -24,10 +23,10 @@ DC_VERSION ?= $(PMM_VERSION)-dev
 IMAGE_ARCH ?= amd64
 DC_PMM_SUBMODULES_REPO ?= https://github.com/datacosmos-br/pmm-submodules.git
 DC_PMM_DUMP_REPO ?= https://github.com/datacosmos-br/pmm-dump.git
-PMM_SUBMODULES_BRANCH ?= $(shell git config -f .gitmodules submodule.pmm-submodules.branch 2>/dev/null || echo v3)
-DC_RELEASE_COMMIT_PATHS := .gitmodules Makefile.datacosmos .github/workflows/datacosmos-release.yml build/scripts/dc-bump-forks build/scripts/dc-git-status build/scripts/build-client-packages build/scripts/build-client-rpm build/scripts/create-tags docs/datacosmos/BUILD.md
+PMM_SUBMODULES_BRANCH ?= $(or $(shell git config -f .gitmodules submodule.pmm-submodules.branch),$(error .gitmodules missing submodule.pmm-submodules.branch))
+DC_RELEASE_COMMIT_PATHS := .gitmodules Makefile.datacosmos .github/workflows/datacosmos-release.yml build/scripts/dc-bump-forks build/scripts/dc-git-status build/scripts/build-client-packages build/scripts/build-client-rpm build/scripts/create-tags docs/datacosmos/BUILD.md docs/datacosmos/adrs/0001-no-bypass-build-governance.md AGENTS.md CLAUDE.md build/AGENTS.md .agents/skills/agent-coordination/SKILL.md .agents/skills/beads/SKILL.md
 
-FULL_VERSION := $(PMM_VERSION)-$(shell git rev-list --count HEAD 2>/dev/null || echo 1)
+FULL_VERSION := $(PMM_VERSION)-$(or $(shell git rev-list --count HEAD),$(error git rev-list --count HEAD failed))
 CLIENT_IMAGE ?= pmm-local/pmm-client:$(FULL_VERSION)
 SERVER_IMAGE ?= pmm-local/pmm-server:$(FULL_VERSION)
 CLIENT_PUBLISH_IMAGE ?= $(GHCR_NAMESPACE)/pmm-client:$(DC_VERSION)-$(IMAGE_ARCH)
@@ -41,8 +40,10 @@ export PMM_SUBMODULES_BRANCH
 unexport PUSH_DOCKER
 
 define DC_RESOLVE_TAG_SCRIPT
-upstream_ref=$$(git rev-parse -q --verify MERGE_HEAD 2>/dev/null || git merge-base HEAD $(UPSTREAM_BRANCH) 2>/dev/null || git rev-parse HEAD); \
-stable=$$(git tag --points-at "$$upstream_ref" --list 'v[0-9]*.[0-9]*.[0-9]*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | sort -V | sed -n '$$p' || true); \
+if upstream_ref=$$(git rev-parse -q --verify MERGE_HEAD 2>/dev/null); then :; \
+elif upstream_ref=$$(git merge-base HEAD $(UPSTREAM_BRANCH)); then :; \
+else echo "Cannot determine upstream sync position against $(UPSTREAM_BRANCH)"; exit 1; fi; \
+stable=$$(git tag --points-at "$$upstream_ref" --list 'v[0-9]*.[0-9]*.[0-9]*' | sed -n -E '/^v[0-9]+\.[0-9]+\.[0-9]+$$/p' | sort -V | sed -n '$$p'); \
 if [ -n "$$stable" ]; then base="$${stable}-dc"; else base="v3-$$(git show -s --format=%cs "$$upstream_ref")-dc"; fi; \
 last=$$(git tag -l "$${base}*" | sed -n "s/^$${base}\([0-9][0-9]*\)$$/\1/p" | sort -n | sed -n '$$p'); \
 tag="$$base$$(( $${last:-0} + 1 ))"
@@ -163,9 +164,16 @@ dc-publish: .dc-login ## Publish images built by dc-build to ghcr.io/datacosmos-
 .PHONY: dc-artifacts
 dc-artifacts:
 	mkdir -p $(ARTIFACT_DIR)/server-rpms
-	cp -a $(ROOT_DIR)/results/. $(ARTIFACT_DIR)/ 2>/dev/null || true
+	test -d $(ROOT_DIR)/results
+	cp -a $(ROOT_DIR)/results/. $(ARTIFACT_DIR)/
+	test -d $(ROOT_DIR)/tmp/pmm-server/RPMS
+	rpm_count=$$(find $(ROOT_DIR)/tmp/pmm-server/RPMS -name '*.rpm' -type f | wc -l); \
+	if [ "$$rpm_count" -eq 0 ]; then \
+		echo "No server RPM artifacts found in $(ROOT_DIR)/tmp/pmm-server/RPMS"; \
+		exit 1; \
+	fi; \
 	find $(ROOT_DIR)/tmp/pmm-server/RPMS -name '*.rpm' -type f \
-		-exec cp -f {} $(ARTIFACT_DIR)/server-rpms/ \; 2>/dev/null || true
+		-exec cp -f {} $(ARTIFACT_DIR)/server-rpms/ \;
 	echo "Artifacts in $(ARTIFACT_DIR)"
 
 .PHONY: dc-clean

@@ -2,6 +2,15 @@
 
 > **Parent guide**: [AGENTS.md](../AGENTS.md) — product overview, architecture, domain model, global conventions
 
+## Build Gate Law: No Bypass, No Hidden Failure
+
+Build and packaging changes must fix the failing source step, not mask it. Do
+not use `|| true`, ignored exit codes, suppressed validation output, skipped
+artifact collection, fake green paths, or permissive fallbacks in build,
+package, release, or diagnostic scripts. Optional inputs must be checked with
+explicit branches; missing required artifacts, refs, images, packages, or
+credentials must fail the command.
+
 The `/build` directory contains everything needed to build, package, and distribute PMM Server and PMM Client as Docker images, RPM/DEB packages, and cloud machine images (AMI, OVA).
 
 ## Architecture
