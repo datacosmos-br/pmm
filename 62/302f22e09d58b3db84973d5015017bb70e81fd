@@ -1,0 +1,29 @@
+managed/services/management/grpc/actions_server.go
+  s_68ab3b967b2582::t_ad47ed25dca0ab 92-100,427-443
+managed/services/agents/actions.go
+  s_766c358d84b6e2::t_5f9cd566d2e2ed 249-265
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "62302f22e09d58b3db84973d5015017bb70e81fd",
+  "prompts": {},
+  "sessions": {
+    "s_68ab3b967b2582": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7627480e-5c4e-4864-8518-e3cbf3982b1a",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_766c358d84b6e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f70874aa-b264-42d3-b8bb-d7dde6bfa0a2",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
