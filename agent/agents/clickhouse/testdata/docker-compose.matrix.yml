@@ -11,7 +11,7 @@ services:
     hostname: ch-single
     profiles: ["single"]
     ports:
-      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:${CLICKHOUSE_SINGLE_TCP_PORT:-39000}:9000"
     environment:
       - CLICKHOUSE_USER=default
       - CLICKHOUSE_PASSWORD=clickhouse
@@ -29,7 +29,7 @@ services:
     hostname: ch-node1
     profiles: ["cluster"]
     ports:
-      - "127.0.0.1:9100:9000"
+      - "127.0.0.1:${CLICKHOUSE_CLUSTER_NODE1_TCP_PORT:-39010}:9000"
     environment:
       - CLICKHOUSE_USER=default
       - CLICKHOUSE_PASSWORD=clickhouse
@@ -48,7 +48,7 @@ services:
     hostname: ch-node2
     profiles: ["cluster"]
     ports:
-      - "127.0.0.1:9101:9000"
+      - "127.0.0.1:${CLICKHOUSE_CLUSTER_NODE2_TCP_PORT:-39011}:9000"
     environment:
       - CLICKHOUSE_USER=default
       - CLICKHOUSE_PASSWORD=clickhouse

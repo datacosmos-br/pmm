@@ -6,6 +6,8 @@
 # fits within modest memory. Override the matrix with env vars:
 #
 #   CLICKHOUSE_VERSIONS="25.3 24.8"  CLICKHOUSE_TOPOLOGIES="single" ./run-matrix.sh
+#   CLICKHOUSE_SINGLE_TCP_PORT=39000 CLICKHOUSE_CLUSTER_NODE1_TCP_PORT=39010 \
+#     CLICKHOUSE_CLUSTER_NODE2_TCP_PORT=39011 ./run-matrix.sh
 #
 # Usage:  bash run-matrix.sh
 set -uo pipefail
@@ -13,6 +15,13 @@ set -uo pipefail
 cd "$(dirname "$0")"
 repo_root=$(cd ../../../.. && pwd)
 compose=(docker compose -f docker-compose.matrix.yml)
+
+cleanup() {
+    "${compose[@]}" --profile single down -v >/dev/null 2>&1 || true
+    "${compose[@]}" --profile cluster down -v >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+trap 'cleanup; exit 130' INT TERM
 
 # Build the clickhouse_exporter binary once, up front, so the exporter matrix
 # test (TestClickHouseExporterMatrix) can launch the packaged-equivalent binary
@@ -28,6 +37,9 @@ export CLICKHOUSE_EXPORTER_BIN="$exporter_bin"
 # Supported ClickHouse versions and topologies (override via env).
 read -r -a versions <<<"${CLICKHOUSE_VERSIONS:-26.3 25.8 25.3 24.8 24.3}"
 read -r -a topologies <<<"${CLICKHOUSE_TOPOLOGIES:-single cluster}"
+export CLICKHOUSE_SINGLE_TCP_PORT="${CLICKHOUSE_SINGLE_TCP_PORT:-39000}"
+export CLICKHOUSE_CLUSTER_NODE1_TCP_PORT="${CLICKHOUSE_CLUSTER_NODE1_TCP_PORT:-39010}"
+export CLICKHOUSE_CLUSTER_NODE2_TCP_PORT="${CLICKHOUSE_CLUSTER_NODE2_TCP_PORT:-39011}"
 
 rc=0
 for v in "${versions[@]}"; do
@@ -44,10 +56,10 @@ for v in "${versions[@]}"; do
         fi
 
         if [ "$topo" = "single" ]; then
-            endpoints="single-${v}=clickhouse://default:clickhouse@127.0.0.1:9000/default"
+            endpoints="single-${v}=clickhouse://default:clickhouse@127.0.0.1:${CLICKHOUSE_SINGLE_TCP_PORT}/default"
         else
-            endpoints="cluster-${v}-node1=clickhouse://default:clickhouse@127.0.0.1:9100/default"
-            endpoints+=",cluster-${v}-node2=clickhouse://default:clickhouse@127.0.0.1:9101/default"
+            endpoints="cluster-${v}-node1=clickhouse://default:clickhouse@127.0.0.1:${CLICKHOUSE_CLUSTER_NODE1_TCP_PORT}/default"
+            endpoints+=",cluster-${v}-node2=clickhouse://default:clickhouse@127.0.0.1:${CLICKHOUSE_CLUSTER_NODE2_TCP_PORT}/default"
         fi
 
         # The filter intentionally also matches TestClickHouseExporterMatrix and

@@ -87,6 +87,30 @@ dc-sync: dc-upstream
 dc-status: ## Show Git-derived upstream, tag, bump, and worktree status
 	@bash build/scripts/dc-git-status --sync
 
+.PHONY: dc-test-env-up
+dc-test-env-up: ## Start upstream service containers used by local tests
+	$(MAKE) -C agent env-up
+
+.PHONY: dc-test-agent
+dc-test-agent: dc-test-env-up ## Run agent tests against upstream service containers
+	$(MAKE) -C agent test
+
+.PHONY: dc-test-qan
+dc-test-qan: ## Run QAN tests against its upstream ClickHouse test container
+	@if docker container inspect pmm-clickhouse-test >/dev/null 2>&1; then \
+		$(MAKE) -C qan-api2 test-env-down; \
+	fi
+	$(MAKE) -C qan-api2 test-env-up
+	$(MAKE) -C qan-api2 test
+
+.PHONY: dc-test-clickhouse
+dc-test-clickhouse: ## Run ClickHouse unit and Docker matrix tests
+	$(MAKE) test-clickhouse-unit
+	$(MAKE) test-clickhouse-matrix
+
+.PHONY: dc-test-local
+dc-test-local: check-all dc-test-agent dc-test-qan dc-test-clickhouse ## Run local PMM checks with containerized daemons
+
 .PHONY: dc-bump
 dc-bump: ## Update pmm-submodules/pmm-dump fork refs; set DC_BUMP_TARGET=stable|head
 	@set +e; \
