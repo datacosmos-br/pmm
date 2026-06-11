@@ -1,0 +1,19 @@
+Makefile
+  s_db446802125691::t_2a8284368c84b1 41,45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "31d0832099cff37f46ec329ff7d186257fd4ff18",
+  "prompts": {},
+  "sessions": {
+    "s_db446802125691": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb70c-173f-7491-801b-da2ec2d01867",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
