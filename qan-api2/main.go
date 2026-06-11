@@ -314,7 +314,7 @@ func main() {
 		if err != nil {
 			l.Fatalf("Invalid clickhouse address %q: %v", addr, err)
 		}
-		port, err := strconv.Atoi(portStr)
+		port64, err := strconv.ParseUint(portStr, 10, 16)
 		if err != nil {
 			l.Fatalf("Invalid clickhouse port %q: %v", portStr, err)
 		}
@@ -327,7 +327,7 @@ func main() {
 		cfg := clickhouseconn.Config{
 			Protocol:      proto,
 			Host:          host,
-			Port:          uint16(port),
+			Port:          uint16(port64),
 			Database:      *clickhouseDatabaseF,
 			User:          *clickhouseUserF,
 			Password:      *clickhousePasswordF,
