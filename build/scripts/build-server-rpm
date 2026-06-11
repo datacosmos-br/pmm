@@ -112,9 +112,12 @@ prepare_specs() {
 
         # spectool/rpmbuild expect the basename of Source0 (%{provider}/archive/%{commit}.tar.gz).
         # Create a symlink so the local tarball is found and spectool skips the network download.
+        # The target is RELATIVE (same dir) so it also resolves inside the rpmbuild
+        # container, where SOURCES is bind-mounted at a different absolute path —
+        # an absolute target would dangle there and rpmbuild would fail to find Source0.
         local expected_name="${full_commit}.tar.gz"
         if [ ! -e "${rpmbuild_dir}/SOURCES/${expected_name}" ]; then
-            ln -sfn "${rpmbuild_dir}/SOURCES/${repo_name}-${short_commit}.tar.gz" \
+            ln -sfn "${repo_name}-${short_commit}.tar.gz" \
                      "${rpmbuild_dir}/SOURCES/${expected_name}"
         fi
     fi
