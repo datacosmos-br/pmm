@@ -1,0 +1,22 @@
+ui/apps/pmm/src/types/services.types.ts
+  s_9611f97f970de7::t_77303b3f0365df 75-76
+  s_9611f97f970de7::t_783b74b9c971f7 111
+ui/apps/pmm/src/components/icon/Icon.constants.ts
+  s_9611f97f970de7::t_14f00958c2734b 58-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "cefba4354088bc6c58093bcfd8932131a557f7a3",
+  "prompts": {},
+  "sessions": {
+    "s_9611f97f970de7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48c99c3e-e108-433e-9f9d-20adb133fd93",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
