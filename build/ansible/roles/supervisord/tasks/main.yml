@@ -1,16 +1,11 @@
 ---
 - name: Install supervisor
-  pip:
-    name: supervisor==4.2.4
-
-- name: Create a symlink for supervisord
-  file:
-    src: /usr/local/bin/supervisord
-    dest: /usr/bin/supervisord
-    state: link
+  dnf:
+    name: supervisor
+    state: installed
 
 - name: Create a default configuration file for supervisord
-  shell: /usr/local/bin/echo_supervisord_conf > /etc/supervisord.conf
+  shell: /usr/bin/echo_supervisord_conf > /etc/supervisord.conf
 
 - name: Modify supervisord.conf
   ini_file:

@@ -1,4 +1,4 @@
-import { GrafanaTheme } from '@grafana/data';
+import { GrafanaTheme, GrafanaTheme2 } from '@grafana/data';
 
 interface TableTheme {
   backgroundColor: string;
@@ -30,9 +30,17 @@ interface Themes {
  * @param theme - The current Grafana theme
  * @returns Theme configuration object with colors for different UI elements
  */
-export const getPmmTheme = (theme: GrafanaTheme): Themes => {
+type PmmGrafanaTheme = GrafanaTheme | GrafanaTheme2;
+
+const isGrafanaTheme2 = (theme: PmmGrafanaTheme): theme is GrafanaTheme2 => (
+  typeof theme.colors.text !== 'string'
+);
+
+export const getPmmTheme = (theme: PmmGrafanaTheme): Themes => {
   const isLight = theme?.isLight ?? true;
-  const mainTextColor = isLight ? (theme?.colors?.text ?? '#000000') : 'rgba(255, 255, 255, 0.8)';
+  const mainTextColor = isLight
+    ? (isGrafanaTheme2(theme) ? theme.colors.text.primary : theme.colors.text)
+    : 'rgba(255, 255, 255, 0.8)';
 
   const backgroundColor = isLight ? '#f7f8fa' : '#0b0c0e';
   const borderColor = isLight ? mainTextColor : '#292929';
@@ -77,7 +85,7 @@ export const getPmmTheme = (theme: GrafanaTheme): Themes => {
  *
  * @param grafanaTheme - The current Grafana theme
  */
-export const applyPmmCssVariables = (grafanaTheme: GrafanaTheme): void => {
+export const applyPmmCssVariables = (grafanaTheme: PmmGrafanaTheme): void => {
   const pmmTheme = getPmmTheme(grafanaTheme);
 
   if (typeof document === 'undefined') {

@@ -1,8 +1,7 @@
 import { css } from '@emotion/css';
 import { GrafanaTheme } from '@grafana/data';
-import { stylesFactory } from '@grafana/ui';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
+export const getStyles = (theme: GrafanaTheme) => ({
   errorMessage: css`
     color: ${theme.palette.redBase};
     font-size: ${theme.typography.size.sm};
@@ -17,4 +16,4 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
       min-height: 37px;
     }
   `,
-}));
+});

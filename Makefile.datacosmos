@@ -180,7 +180,7 @@ dc-tag: dc-release
 .PHONY: dc-build
 dc-build: .dc-prepare ## Build linux/amd64 images and collect artifacts
 	# build-server already invokes build-client; pass both tags to avoid a duplicate client build.
-	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) RPMBUILD_DIST=$(DIST) DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) DOCKER_TAG=$(SERVER_IMAGE) \
+	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) RPMBUILD_DIST=$(DIST) SKIP_S3_CACHE=1 DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) DOCKER_TAG=$(SERVER_IMAGE) \
 		$(CURDIR)/build/scripts/build-server
 	$(MAKE) dc-artifacts
 

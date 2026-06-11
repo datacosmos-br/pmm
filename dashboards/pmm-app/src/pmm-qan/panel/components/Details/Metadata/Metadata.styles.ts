@@ -3,7 +3,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 import { getPmmTheme } from 'shared/components/helpers/getPmmTheme';
 
 export const getStyles = (theme: GrafanaTheme2) => {
-  const parameters = getPmmTheme(theme.v1);
+  const parameters = getPmmTheme(theme);
 
   return {
     metadataColumn: css`

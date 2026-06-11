@@ -1,10 +1,9 @@
 import { css } from '@emotion/css';
 
-import { stylesFactory } from '@grafana/ui';
 import { GrafanaTheme } from '@grafana/data';
 import { getPmmTheme } from 'shared/components/helpers/getPmmTheme';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme) => {
+export const getStyles = (theme: GrafanaTheme) => {
   const parameters = getPmmTheme(theme);
 
   return {
@@ -24,4 +23,4 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
       margin-right: ${theme.spacing.sm};
     `,
   };
-});
+};

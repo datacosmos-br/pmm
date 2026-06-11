@@ -1,7 +1,7 @@
 import React from 'react';
 import { css, cx } from '@emotion/css';
 import { GrafanaTheme } from '@grafana/data';
-import { stylesFactory, useTheme } from '@grafana/ui';
+import { useTheme } from '@grafana/ui';
 
 export interface FieldProps {
   children: React.ReactElement;
@@ -13,7 +13,7 @@ export interface FieldProps {
   className?: string;
 }
 
-export const getFieldStyles = stylesFactory((theme: GrafanaTheme) => ({
+export const getFieldStyles = (theme: GrafanaTheme) => ({
   label: css`
       font-size: ${theme.typography.size.md};
       font-weight: ${theme.typography.weight.semibold};

@@ -11,8 +11,11 @@ if [ -f "${docker_tarball}" ]; then
 fi
 
 docker_root=$(realpath ${rpms_dir}/..)
-pmm_source_dir=${root_dir}/tmp/source/pmm
-if [ ! -d "${pmm_source_dir}/build/ansible" ]; then
+pmm_source_dir=${PMM_SRC_DIR:-}
+if [ -z "${pmm_source_dir}" ]; then
+    pmm_source_dir=${root_dir}/tmp/source/pmm
+fi
+if [ ! -d "${pmm_source_dir}/build/ansible" ] && [ "${pmm_source_dir}" != "${pmm_src_dir}" ]; then
     pmm_source_dir=${pmm_src_dir}
 fi
 if [ ! -d "${pmm_source_dir}/build/ansible" ] || \

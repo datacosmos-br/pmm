@@ -18,7 +18,7 @@ export const getChartDataFromHistogramItems = (histogram_items: HistogramAPI[], 
 
     const dataSet = {
       data: frequencies,
-      backgroundColor: theme?.v1.colors.bg3,
+      backgroundColor: theme.colors.background.primary,
       dataInPersent,
     };
 
