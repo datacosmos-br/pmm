@@ -1,0 +1,38 @@
+api/agent/v1/agent.pb.go
+  s_766c358d84b6e2::t_0952525cfbea49 133,1001,1135-1143,1302-1305,1376-1377,4451-4514,4524,4536,4549,4565,4577,4590,4634,4646,4659,4704,4716,4729,4784,4796,4809,4857,4869,4882,4928,4940,4953,4994,5006,5019,5064,5076,5089,5120,5132,5145,5176,5188,5201,5232,5244,5257,5288,5300,5313,5340,5352,5365,5386,5398,5450,5462,5574,5586,5679,5691,5820,5832,5943,5955,5990,6002,6043,6055,6087,6099,6124,6136,6161,6173,6198,6210,6238,6250,6296,6308,6333,6345,6370,6382,6407,6419,6444,6456,6481,6493,6527,6539,6668,6680,6807,6818-6819,6871-6875,7197,7258-7304,7308-7310,7313,7321,7329-7456,7485,7558,7561,7564,7568,7572,7586
+agent/client/client.go
+  s_68ab3b967b2582::t_ad47ed25dca0ab 557-559
+agent/runner/actions/clickhouse_explain_action_test.go
+  s_766c358d84b6e2::t_3fdc256edd9b5f 1-103
+api/agent/v1/agent.proto
+  s_766c358d84b6e2::t_5f9cd566d2e2ed 235-243,374
+api/agent/v1/agent.pb.validate.go
+  s_766c358d84b6e2::t_5f9cd566d2e2ed 2358-2398,9432-9542
+agent/runner/actions/clickhouse_explain_action.go
+  s_68ab3b967b2582::t_ad47ed25dca0ab 1-24,26-32,45-51,53-60,66-100,102-105,114-115,124,126,131,133-139,141,143-149,151-158
+  s_766c358d84b6e2::t_3f6915c557fc87 25,33-44,52,61-65,101,106-113,116-123,125,127-130,132,140,142,150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "d3f6f293be7de67e4ca99b04b73b73979cc2ad10",
+  "prompts": {},
+  "sessions": {
+    "s_68ab3b967b2582": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7627480e-5c4e-4864-8518-e3cbf3982b1a",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_766c358d84b6e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f70874aa-b264-42d3-b8bb-d7dde6bfa0a2",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
