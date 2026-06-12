@@ -41,7 +41,7 @@ jobs:
       ARTIFACT_DIR: ${{ github.workspace }}/pmm-artifacts
     steps:
       - name: Checkout (with submodules)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.3
         with:
           submodules: recursive
           fetch-depth: 0
