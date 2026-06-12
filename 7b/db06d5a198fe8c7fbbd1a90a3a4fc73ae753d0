@@ -1,0 +1,39 @@
+agent/agents/clickhouse/querylog/qan_integration_test.go
+  s_84161f43a02c97::t_fbcd5c5e2f57a0 127-128,147
+docs/datacosmos/BUILD.md
+  s_0fb9171e314e37::t_34fb9689b1ea3a 83-86,96,100-102,134
+.github/workflows/datacosmos-release.yml
+  s_aa0bbd287021d9::t_a1de575010284b 5-6,24-33,37,109,111,113,115,119,127-174,176,181-182,186-187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "7bdb06d5a198fe8c7fbbd1a90a3a4fc73ae753d0",
+  "prompts": {},
+  "sessions": {
+    "s_0fb9171e314e37": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2d430206-dc2a-49cc-8559-44e043321d5c",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_84161f43a02c97": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "94423257-b3cf-4f08-b97b-c0e099bdb2e0",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    },
+    "s_aa0bbd287021d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "019eb862-755f-7f23-82e0-c16c29890f21",
+        "model": "unknown"
+      },
+      "human_author": "Marlon Costa <marlon.costa@datacosmos.com.br>"
+    }
+  }
+}
