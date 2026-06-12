@@ -121,14 +121,14 @@ for v in "${versions[@]}"; do
         fi
 
         if ! CLICKHOUSE_TEST_ENDPOINTS="$endpoints" \
-            go -C "$repo_root" test -tags clickhouse_integration -count=1 -v \
+            go -C "$repo_root" test -tags clickhouse_integration -count=1 \
             -run '^(TestClickHouseMatrix|TestClickHouseExporterMatrix)$' ./agent/agents/clickhouse; then
             echo "!!! ${v}/${topo}: collector/exporter integration tests failed"
             rc=1
         fi
 
         if ! CLICKHOUSE_TEST_ENDPOINTS="$endpoints" \
-            go -C "$repo_root" test -tags clickhouse_integration -count=1 -v \
+            go -C "$repo_root" test -tags clickhouse_integration -count=1 \
             -run '^TestClickHouseQANMatrix$' ./agent/agents/clickhouse/querylog; then
             echo "!!! ${v}/${topo}: QAN integration tests failed"
             rc=1

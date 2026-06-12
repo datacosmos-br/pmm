@@ -124,6 +124,8 @@ func TestClickHouseQANMatrix(t *testing.T) {
 			defer pingCancel()
 			pingErr := db.PingContext(pingCtx)
 			require.NoErrorf(t, pingErr, "endpoint %q must be reachable", name)
+			logger := logrus.New()
+			logger.SetLevel(logrus.WarnLevel)
 
 			// A unique marker keeps this run's query_log rows distinct from any
 			// other test's, so the flush poll and assertions are not polluted
@@ -142,7 +144,7 @@ func TestClickHouseQANMatrix(t *testing.T) {
 				DSN:            dsn,
 				AgentID:        "qan-integration-test",
 				MaxQueryLength: 0,
-			}, logrus.WithField("test", t.Name()))
+			}, logrus.NewEntry(logger).WithField("test", t.Name()))
 			require.NoError(t, err)
 			t.Cleanup(func() {
 				require.NoError(t, agent.db.Close(), "closing the ClickHouse QAN agent connection must succeed")

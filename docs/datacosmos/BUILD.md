@@ -80,9 +80,10 @@ such a tag is pushed manually - the workflow triggers on both `v*-dc*` and
 `v3-*` tags - but `dcN` is the current scheme.
 
 Pushing the tag runs `.github/workflows/datacosmos-release.yml`, which builds
-linux/amd64 images and a GitHub Release. The build's internal `PMM_VERSION`
-(written to `VERSION`, used for the upstream S3 RPM cache) is derived
-separately from the nearest upstream semver tag - it stays a clean `X.Y.Z`.
+linux/amd64 and linux/arm64 images and creates the GitHub Release only after
+both architecture builds pass. The build's internal `PMM_VERSION` (written to
+`VERSION`, used for the upstream S3 RPM cache) is derived separately from the
+nearest upstream semver tag - it stays a clean `X.Y.Z`.
 
 ## Building (datacosmos pipeline)
 
@@ -92,9 +93,12 @@ datacosmos-specific `dc-*` targets. Common targets such as `release`, `check`,
 
 ```bash
 make dc-build    # prepare + upstream client/server build + artifacts
-make dc-publish  # push the built amd64 images to ghcr.io/datacosmos-br
+make dc-publish  # push the built images to ghcr.io/datacosmos-br
 make dc-clean    # remove only datacosmos external build/artifact dirs
 ```
+
+Local builds default to `IMAGE_ARCH=amd64`; set `IMAGE_ARCH=arm64` only on an
+arm64 host or runner so the image tag matches the native package build.
 
 ## Validation Integrity
 
@@ -127,7 +131,7 @@ fork can safely reuse public Percona infrastructure:
 - `SKIP_S3_CACHE` is unset by default, so amd64 server RPMs can reuse
   `s3://pmm-build-cache` anonymously and avoid rebuilding Grafana and other
   heavy components.
-- The current datacosmos release workflow publishes linux/amd64 only.
+- The current datacosmos release workflow publishes linux/amd64 and linux/arm64.
 - Images are built locally first by `dc-build` and published to
   `ghcr.io/datacosmos-br` only by the explicit `dc-publish` target.
 - Datacosmos source bumps use `https://github.com/datacosmos-br/pmm-submodules.git`;

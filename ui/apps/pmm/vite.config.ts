@@ -23,6 +23,27 @@ export default defineConfig({
     //exclude: ['@percona/percona-ui'],
     force: true,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-emotion': ['@emotion/react', '@emotion/styled'],
+          'vendor-mui-icons': ['@mui/icons-material'],
+          'vendor-mui-material': ['@mui/material'],
+          'vendor-mui-date-pickers': ['@mui/x-date-pickers'],
+          'vendor-percona-ui': ['@percona/percona-ui'],
+          'vendor-markdown': [
+            'react-markdown',
+            'react-syntax-highlighter',
+            'rehype-raw',
+            'remark-gfm',
+          ],
+          'vendor-date': ['@date-fns/tz', 'date-fns'],
+        },
+      },
+    },
+  },
   server: {
     watch: {
       // Watch the linked package for changes (negated pattern means "don't ignore")

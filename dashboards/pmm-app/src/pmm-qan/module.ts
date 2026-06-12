@@ -1,4 +1,12 @@
-import { PanelPlugin } from '@grafana/data';
-import QueryAnalyticsPanel from 'pmm-qan/panel/QueryAnalytics';
+import React, { Suspense, lazy } from 'react';
+import { PanelPlugin, PanelProps } from '@grafana/data';
 
-export const plugin = new PanelPlugin(QueryAnalyticsPanel);
+const QueryAnalyticsPanel = lazy(() => import('pmm-qan/panel/QueryAnalytics'));
+
+const QueryAnalyticsLazyPanel = (props: PanelProps) => React.createElement(
+  Suspense,
+  { fallback: null },
+  React.createElement(QueryAnalyticsPanel, props),
+);
+
+export const plugin = new PanelPlugin(QueryAnalyticsLazyPanel);

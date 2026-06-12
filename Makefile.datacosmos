@@ -21,6 +21,8 @@ GHCR_NAMESPACE ?= ghcr.io/datacosmos-br
 GHCR_USER ?=
 DC_VERSION ?= $(PMM_VERSION)-dev
 IMAGE_ARCH ?= amd64
+DC_TEST_ENV_UP_FLAGS ?= --detach --force-recreate --renew-anon-volumes --remove-orphans
+DC_TEST_ENV_WAIT_TIMEOUT ?= 180
 DC_PMM_SUBMODULES_REPO ?= https://github.com/datacosmos-br/pmm-submodules.git
 DC_PMM_DUMP_REPO ?= https://github.com/datacosmos-br/pmm-dump.git
 PMM_SUBMODULES_BRANCH ?= $(or $(shell git config -f .gitmodules submodule.pmm-submodules.branch),$(error .gitmodules missing submodule.pmm-submodules.branch))
@@ -115,16 +117,112 @@ dc-test-env-up: ## Start upstream service containers used by local tests
 		service_host="$${PMM_TEST_SERVICE_HOST:-$${DOCKER_HOST#tcp://}}"; \
 		service_host="$${service_host%%:*}"; \
 		if [[ "$$service_host" == "localhost" || "$$service_host" == 127.* || "$$service_host" == "::1" ]]; then \
-			PMM_TEST_BIND_HOST="$${PMM_TEST_BIND_HOST:-0.0.0.0}" PMM_TEST_SERVICE_HOST="$$service_host" $(MAKE) -C agent env-up; \
+			PMM_TEST_BIND_HOST="$${PMM_TEST_BIND_HOST:-0.0.0.0}" PMM_TEST_SERVICE_HOST="$$service_host" $(MAKE) -C agent env-up ENV_UP_FLAGS="$(DC_TEST_ENV_UP_FLAGS)"; \
 		else \
-			PMM_TEST_BIND_HOST="$${PMM_TEST_BIND_HOST:-0.0.0.0}" PMM_TEST_SERVICE_HOST="$$service_host" PMM_TEST_SERVICE_EXTRA_HOST="$$service_host:host-gateway" $(MAKE) -C agent env-up; \
+			PMM_TEST_BIND_HOST="$${PMM_TEST_BIND_HOST:-0.0.0.0}" PMM_TEST_SERVICE_HOST="$$service_host" PMM_TEST_SERVICE_EXTRA_HOST="$$service_host:host-gateway" $(MAKE) -C agent env-up ENV_UP_FLAGS="$(DC_TEST_ENV_UP_FLAGS)"; \
 		fi; \
 	else \
-		$(MAKE) -C agent env-up; \
+		$(MAKE) -C agent env-up ENV_UP_FLAGS="$(DC_TEST_ENV_UP_FLAGS)"; \
 	fi
 
+.PHONY: dc-test-env-wait
+dc-test-env-wait: ## Wait for upstream service containers used by local tests
+	@set -euo pipefail; \
+	valkey_password=$$(sed -n -E 's/^requirepass "([^"]+)"/\1/p' agent/utils/tests/testdata/valkey/valkey.conf); \
+	if [ -z "$$valkey_password" ]; then \
+		echo "Cannot read Valkey password from agent/utils/tests/testdata/valkey/valkey.conf"; \
+		exit 1; \
+	fi; \
+	probe_ready() { \
+		local rows reply status exit_code; \
+		case "$$1" in \
+			test_db) \
+				status=$$(docker inspect --format '{{.State.Status}}' pmm-agent_test_db 2>/dev/null) || return 1; \
+				exit_code=$$(docker inspect --format '{{.State.ExitCode}}' pmm-agent_test_db 2>/dev/null) || return 1; \
+				[ "$$status" = "exited" ] && [ "$$exit_code" = "0" ]; \
+				;; \
+			mysql) \
+				rows=$$(docker exec -e MYSQL_PWD=root-password pmm-agent_mysql mysql --protocol=TCP --host=127.0.0.1 --port=3306 -uroot world -NBe 'SELECT COUNT(*) FROM city' 2>/dev/null) || return 1; \
+				[[ "$$rows" =~ ^[0-9]+$$ ]] && [ "$$rows" -gt 0 ]; \
+				;; \
+			postgres) \
+				rows=$$(docker exec -e PGPASSWORD=pmm-agent-password pmm-agent_postgres psql -U pmm-agent -d pmm-agent -Atc 'SELECT COUNT(*) FROM city' 2>/dev/null) || return 1; \
+				[[ "$$rows" =~ ^[0-9]+$$ ]] && [ "$$rows" -gt 0 ]; \
+				;; \
+			valkey) \
+				reply=$$(docker exec -e REDISCLI_AUTH="$$valkey_password" pmm-agent_valkey valkey-cli ping 2>/dev/null) || return 1; \
+				[ "$$reply" = "PONG" ]; \
+				;; \
+			clickhouse) \
+				reply=$$(docker exec pmm-agent_clickhouse clickhouse-client --user default --password clickhouse --query 'SELECT 1' 2>/dev/null) || return 1; \
+				[ "$$reply" = "1" ]; \
+				;; \
+			mongo) \
+				reply=$$(docker exec pmm-agent_mongo mongosh --quiet -u root -p root-password --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 }).ok' 2>/dev/null) || return 1; \
+				[ "$$reply" = "1" ]; \
+				;; \
+			mongo_tls) \
+				reply=$$(docker exec pmm-agent_mongo_with_tls mongosh --quiet --tls --tlsAllowInvalidCertificates --tlsCertificateKeyFile /etc/tls/certificates/client.pem --tlsCAFile /etc/tls/certificates/ca.crt --host localhost --port 27017 --eval 'db.adminCommand({ ping: 1 }).ok' 2>/dev/null) || return 1; \
+				[ "$$reply" = "1" ]; \
+				;; \
+			mongo_noauth) \
+				reply=$$(docker exec pmm-agent_mongonoauth mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok' 2>/dev/null) || return 1; \
+				[ "$$reply" = "1" ]; \
+				;; \
+			mongo_repl) \
+				reply=$$(docker exec pmm-agent_mongorepl mongosh --quiet --port 27020 --eval 'rs.status().ok' 2>/dev/null) || return 1; \
+				[ "$$reply" = "1" ]; \
+				;; \
+			mongo_repl_tls) \
+				reply=$$(docker exec pmm-agent_mongorepl_with_tls mongosh --quiet --tls --tlsAllowInvalidCertificates --tlsCertificateKeyFile /etc/tls/certificates/client.pem --tlsCAFile /etc/tls/certificates/ca.crt --host localhost --port 27022 --eval 'rs.status().ok' 2>/dev/null) || return 1; \
+				[ "$$reply" = "1" ]; \
+				;; \
+			pmm_server) \
+				status=$$(docker inspect --format '{{.State.Health.Status}}' pmm-server 2>/dev/null) || return 1; \
+				[ "$$status" = "healthy" ]; \
+				;; \
+			sysbench) \
+				status=$$(docker inspect --format '{{.State.Status}}' pmm-agent_sysbench 2>/dev/null) || return 1; \
+				[ "$$status" = "running" ]; \
+				;; \
+			*) \
+				echo "Unknown readiness probe: $$1"; \
+				return 2; \
+				;; \
+		esac; \
+	}; \
+	wait_probe() { \
+		local probe label deadline; \
+		probe="$$1"; \
+		label="$$2"; \
+		deadline=$$((SECONDS + $(DC_TEST_ENV_WAIT_TIMEOUT))); \
+		printf 'Waiting for %s\n' "$$label"; \
+		until probe_ready "$$probe"; do \
+			if [ "$$SECONDS" -ge "$$deadline" ]; then \
+				echo "$$label not ready within $(DC_TEST_ENV_WAIT_TIMEOUT)s"; \
+				exit 1; \
+			fi; \
+			sleep 2; \
+		done; \
+		printf '%s ready\n' "$$label"; \
+	}; \
+	wait_probe test_db "test data import"; \
+	wait_probe mysql "MySQL test data"; \
+	wait_probe postgres "PostgreSQL test data"; \
+	wait_probe valkey "Valkey"; \
+	wait_probe clickhouse "ClickHouse"; \
+	wait_probe mongo "MongoDB"; \
+	wait_probe mongo_tls "MongoDB TLS"; \
+	wait_probe mongo_noauth "MongoDB no-auth"; \
+	wait_probe mongo_repl "MongoDB replica set"; \
+	wait_probe mongo_repl_tls "MongoDB TLS replica set"; \
+	wait_probe pmm_server "PMM Server"; \
+	wait_probe sysbench "sysbench"
+
 .PHONY: dc-test-agent
-dc-test-agent: dc-test-env-up ## Run agent tests against upstream service containers
+dc-test-agent: ## Run agent tests against upstream service containers
+	$(MAKE) dc-test-env-up
+	$(MAKE) dc-test-env-wait
 	$(MAKE) -C agent test
 
 .PHONY: dc-test-qan
@@ -178,7 +276,7 @@ dc-release: .dc-clean-worktree .dc-fetch-tags ## Create and push next release ta
 dc-tag: dc-release
 
 .PHONY: dc-build
-dc-build: .dc-prepare ## Build linux/amd64 images and collect artifacts
+dc-build: .dc-prepare ## Build native linux images and collect artifacts
 	# build-server already invokes build-client; pass both tags to avoid a duplicate client build.
 	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) RPMBUILD_DIST=$(DIST) SKIP_S3_CACHE=1 DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) DOCKER_TAG=$(SERVER_IMAGE) \
 		$(CURDIR)/build/scripts/build-server

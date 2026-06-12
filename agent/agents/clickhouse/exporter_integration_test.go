@@ -117,8 +117,9 @@ func TestClickHouseExporterMatrix(t *testing.T) {
 				"--web.listen-address="+listenAddr,
 				"--web.telemetry-path=/metrics",
 			)
-			cmd.Stdout = os.Stderr
-			cmd.Stderr = os.Stderr
+			var stdout, stderr strings.Builder
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
 			require.NoError(t, cmd.Start(), "the exporter binary must start")
 
 			// waitErr receives the process exit status once Wait returns; it is
@@ -139,7 +140,7 @@ func TestClickHouseExporterMatrix(t *testing.T) {
 				}
 				select {
 				case err := <-waitErr:
-					t.Fatalf("exporter exited before serving metrics: %v", err)
+					t.Fatalf("exporter exited before serving metrics: %v\nstdout:\n%s\nstderr:\n%s", err, stdout.String(), stderr.String())
 				case <-time.After(250 * time.Millisecond):
 				}
 			}
@@ -161,7 +162,7 @@ func TestClickHouseExporterMatrix(t *testing.T) {
 				// A context-canceled process exits non-zero (killed); that is
 				// the expected teardown path, so only an unexpected error fails.
 				if err != nil && !isSignalKill(err) {
-					t.Fatalf("exporter did not shut down cleanly: %v", err)
+					t.Fatalf("exporter did not shut down cleanly: %v\nstdout:\n%s\nstderr:\n%s", err, stdout.String(), stderr.String())
 				}
 			case <-time.After(exporterTeardownTimeout):
 				t.Fatalf("exporter did not exit within %s after shutdown", exporterTeardownTimeout)
