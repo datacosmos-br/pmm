@@ -35,9 +35,9 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DC_INPUT: ${{ github.event.inputs.dc_version }}
       IMAGE_ARCH: ${{ matrix.arch }}
-      # Collect artifacts inside the workspace: actions/upload-artifact@v4
-      # rejects '..' in its path, so ARTIFACT_DIR cannot be the Makefile
-      # default (../pmm-artifacts). ROOT_DIR (the heavy build tree) stays out.
+      # Collect artifacts inside the workspace because actions/upload-artifact
+      # rejects '..' in its path, so ARTIFACT_DIR cannot be the Makefile default
+      # (../pmm-artifacts). ROOT_DIR (the heavy build tree) stays out.
       ARTIFACT_DIR: ${{ github.workspace }}/pmm-artifacts
     steps:
       - name: Checkout (with submodules)
@@ -127,7 +127,7 @@ jobs:
           ls -la "dist-${IMAGE_ARCH}"
 
       - name: Upload release assets
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: pmm-release-assets-${{ matrix.arch }}
           path: dist-${{ matrix.arch }}/*
@@ -153,7 +153,7 @@ jobs:
           echo "tag=${DC_INPUT:-${GITHUB_REF_NAME}}" >> "$GITHUB_OUTPUT"
 
       - name: Download release assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.1
         with:
           pattern: pmm-release-assets-*
           path: dist
