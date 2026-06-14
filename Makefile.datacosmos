@@ -310,7 +310,13 @@ dc-clean: ## Remove datacosmos external build and artifact dirs
 
 .PHONY: .dc-prepare
 .dc-prepare:
-	git submodule update --init --recursive --jobs 10
+	# Bounded submodule init. The `pmm` submodule (sources/pmm/src/github.com/percona/pmm)
+	# re-embeds pmm-submodules, so a plain `--recursive` walks the pmm <-> pmm-submodules
+	# self-reference until it hits an unfetchable deep ref and aborts (Error 128). The pmm
+	# source tree is discarded and re-cloned from $(CURDIR) below, so its nested submodules
+	# are never used: skip it and recurse only into the real leaf component repos.
+	git submodule update --init --jobs 10
+	git -C pmm-submodules -c submodule.pmm.update=none submodule update --init --recursive --jobs 10
 	rm -rf $(ROOT_DIR)/sources $(ROOT_DIR)/tmp/source $(ROOT_DIR)/tmp/binary
 	mkdir -p $(ROOT_DIR)/sources $(ROOT_DIR)/tmp $(ROOT_DIR)/results $(ARTIFACT_DIR)
 	chmod 0777 $(ROOT_DIR)/tmp $(ROOT_DIR)/results
