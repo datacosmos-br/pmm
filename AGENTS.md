@@ -14,6 +14,34 @@ that state explicitly and still fail loud when the required single source of
 truth is absent. Every completed change must cite the command, exit code, and
 decisive output used to validate it.
 
+## Merging upstream & integrating fixes into this fork (apply every session)
+
+This repo is a **datacosmos fork** that adds features upstream PMM lacks (ClickHouse
+exporter/agent, OTEL collector, per-arch release infra) and deliberately diverges from
+upstream in some areas (e.g. grafana server auth mints service-account bearer tokens on
+demand instead of persisting an encrypted token). When merging upstream or integrating a
+specific upstream commit, follow this protocol:
+
+1. **Do the best for the context; for any big-risk decision, first explain the context +
+   implications + recommend the best path, then act.** Never silently force a risky change;
+   never leave work half-done.
+2. **Preserve both sides.** Resolve conflicts as a UNION of fork features and upstream
+   CI/lint fixes. Text/config (`.gitignore`, `AGENTS.md`, `Makefile`) → union;
+   `.gitmodules` → keep the datacosmos pins. A stub-vs-full-implementation conflict → take
+   the full implementation. When each side added an independent feature to one file,
+   rebuild a true union (e.g. `supervisord.go` = fork ClickHouse TLS/cluster + OTEL wiring).
+3. **Never hand-edit generated files** (`*.pb.go`, `*.pb.validate.go`, swagger/`*.json`).
+   Resolve the underlying `.proto`/source, then regenerate with `cd api && make gen`
+   (run it in the **foreground**; the background sandbox OOMs `buf` at a low thread limit).
+4. **Verify before porting an upstream fix.** Check the fix's target mechanism actually
+   exists here (`git grep <symbol> HEAD -- <path>`, `git merge-base --is-ancestor <fix-parent> HEAD`).
+   If the mechanism is **absent**, the fix is Not-Applicable: skip it with evidence
+   (do not add orphan files that break the build). If an equivalent mechanism lives in a
+   different file, port the fix's *behaviour* there. Only port a whole upstream feature with
+   explicit operator approval (it is a separate, larger task).
+5. **Gate green before claiming done:** `go build ./...` and `go vet ./<touched>/...` must
+   return 0, with 0 conflict markers in every resolved file. Cite command + exit + output.
+
 ## How AI tools load this document
 
 This file is the **single authoritative entry point** for AI agents. Tools are wired to it as follows:
