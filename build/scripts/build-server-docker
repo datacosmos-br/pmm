@@ -11,15 +11,32 @@ if [ -f "${docker_tarball}" ]; then
 fi
 
 docker_root=$(realpath ${rpms_dir}/..)
-cp -r ${root_dir}/tmp/source/pmm/build/ansible ${docker_root}/ansible
-cp ${root_dir}/tmp/source/pmm/build/docker/server/* ${docker_root}/
+pmm_source_dir=${PMM_SRC_DIR:-}
+if [ -z "${pmm_source_dir}" ]; then
+    pmm_source_dir=${root_dir}/tmp/source/pmm
+fi
+if [ ! -d "${pmm_source_dir}/build/ansible" ] && [ "${pmm_source_dir}" != "${pmm_src_dir}" ]; then
+    pmm_source_dir=${pmm_src_dir}
+fi
+if [ ! -d "${pmm_source_dir}/build/ansible" ] || \
+   [ ! -d "${pmm_source_dir}/build/docker/server" ] || \
+   [ ! -f "${pmm_source_dir}/go.mod" ]; then
+    echo "build-server-docker: missing PMM source files under ${pmm_source_dir}" >&2
+    exit 1
+fi
+
+cp -aT "${pmm_source_dir}/build/ansible" "${docker_root}/ansible"
+cp -a "${pmm_source_dir}/build/docker/server/." "${docker_root}/"
 cp "${root_dir}/results/tarball/pmm-client-${pmm_version}.tar.gz" "${docker_root}/pmm-client.tar.gz"
 
-git -C ${root_dir} rev-parse HEAD > ${docker_root}/gitCommit
+git -C ${PMM_SRC_DIR:-${root_dir}/sources/pmm/src/github.com/percona/pmm} rev-parse HEAD > ${docker_root}/gitCommit
 ls -la ${rpms_dir}
 docker run --rm -v ${rpms_dir}:/home/builder/rpm/RPMS ${rpmbuild_docker_image} sh -c "
+    set -o errexit
     sudo chown -R builder /home/builder/rpm/RPMS
-    until /usr/bin/createrepo_c --update /home/builder/rpm/RPMS; do
+    find /home/builder/rpm/RPMS -maxdepth 1 -name '*.rpm' -type f -printf '%f\n' > /tmp/rpm-pkglist
+    test -s /tmp/rpm-pkglist
+    until /usr/bin/createrepo_c --update --pkglist /tmp/rpm-pkglist /home/builder/rpm/RPMS; do
         echo waiting...
         sleep 1
     done
@@ -30,7 +47,7 @@ if [ -z "${DOCKER_TAG}" ]; then
 fi
 
 IMAGE_VERSION=$(echo "$DOCKER_TAG" | cut -d ':' -f2)
-GO_VERSION=$(grep '^go ' ${root_dir}/tmp/source/pmm/go.mod | awk '{print $2}')
+GO_VERSION=$(grep '^go ' "${pmm_source_dir}/go.mod" | awk '{print $2}')
 
 docker build --build-arg BUILD_DATE="`date --rfc-3339=seconds`" \
              --build-arg VERSION="$IMAGE_VERSION" \

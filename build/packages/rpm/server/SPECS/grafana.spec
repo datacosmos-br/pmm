@@ -19,7 +19,7 @@ Summary:        Grafana is an open source, feature rich metrics dashboard and gr
 License:        AGPLv3
 URL:            https://github.com/percona/grafana
 Source0:        https://github.com/percona/grafana/archive/%{commit}.tar.gz
-ExclusiveArch:  %{ix86} x86_64 %{arm}
+ExclusiveArch:  %{ix86} x86_64 %{arm} aarch64
 
 BuildRequires: fontconfig
 
@@ -49,10 +49,12 @@ cp -rpav public %{buildroot}%{_datadir}/grafana
 cp -rpav tools %{buildroot}%{_datadir}/grafana
 
 install -d -p %{buildroot}%{_sbindir}
-cp bin/linux/amd64/grafana-server %{buildroot}%{_sbindir}/
-cp bin/linux/amd64/grafana %{buildroot}%{_sbindir}/
+# bin/linux-*/ - `make build-go` builds one platform (linux-amd64 or
+# linux-arm64); the glob picks it without hardcoding the arch.
+cp bin/linux-*/grafana-server %{buildroot}%{_sbindir}/
+cp bin/linux-*/grafana %{buildroot}%{_sbindir}/
 install -d -p %{buildroot}%{_bindir}
-cp bin/linux/amd64/grafana-cli %{buildroot}%{_bindir}/
+cp bin/linux-*/grafana-cli %{buildroot}%{_bindir}/
 
 install -d -p %{buildroot}%{_sysconfdir}/grafana
 cp conf/sample.ini %{buildroot}%{_sysconfdir}/grafana/grafana.ini

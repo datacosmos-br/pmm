@@ -16,7 +16,7 @@ const truncate = (length = 30) => (str = '') => {
     return str;
   }
 
-  return `${str.substr(0, length - 3)}...`;
+  return `${str.slice(0, length - 3)}...`;
 };
 
 let CONFIG_LOG_LEVEL: LOG_LEVELS = LOG_LEVELS.DEBUG;

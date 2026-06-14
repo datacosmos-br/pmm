@@ -37,7 +37,7 @@ export const DetailsSection: FC = () => {
   const [metrics, textMetrics, metricsLoading, metadata] = useMetricsDetails();
   const metadataToShow = metadata ? showMetadata(metadata) : null;
   const [activeTab, changeActiveTab] = useState(TabKeys[openDetailsTab]);
-  const showTablesTab = databaseType !== Databases.mongodb && groupBy === 'queryid' && !totals;
+  const showTablesTab = databaseType !== Databases.mongodb && databaseType !== Databases.clickhouse && groupBy === 'queryid' && !totals;
   const showExplainTab = databaseType !== Databases.postgresql && groupBy === 'queryid' && !totals;
   const showExamplesTab = groupBy === 'queryid' && !totals;
   const showPlanTab = databaseType === Databases.postgresql && groupBy === 'queryid' && !totals;

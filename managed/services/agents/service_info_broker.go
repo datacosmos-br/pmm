@@ -35,6 +35,8 @@ import (
 
 const loggerComponentNameServiceInfoBroker = "service-info-broker"
 
+const clickHouseServiceInfoTimeout = 3 * time.Second
+
 // ServiceInfoBroker helps query various information from services.
 type ServiceInfoBroker struct {
 	r *Registry
@@ -138,6 +140,19 @@ func serviceInfoRequest(q *reform.Querier, service *models.Service, agent *model
 				TemplateRightDelim: tdp.Right,
 			},
 		}
+	case models.ClickHouseServiceType:
+		tdp := agent.TemplateDelimiters(service)
+		request = &agentv1.ServiceInfoRequest{
+			Type:    inventoryv1.ServiceType_SERVICE_TYPE_CLICKHOUSE_SERVICE,
+			Dsn:     agent.DSN(service, models.DSNParams{DialTimeout: time.Second}, nil, pmmAgentVersion),
+			Timeout: durationpb.New(clickHouseServiceInfoTimeout),
+			TextFiles: &agentv1.TextFiles{
+				Files:              agent.Files(),
+				TemplateLeftDelim:  tdp.Left,
+				TemplateRightDelim: tdp.Right,
+			},
+			TlsSkipVerify: agent.TLSSkipVerify,
+		}
 	default:
 		return nil, errors.Errorf("unhandled Service type %s", service.ServiceType)
 	}
@@ -225,7 +240,8 @@ func (c *ServiceInfoBroker) GetInfoFromService(ctx context.Context, q *reform.Qu
 		return updateServiceVersion(ctx, q, resp, service)
 	case models.MongoDBServiceType,
 		models.ProxySQLServiceType,
-		models.ValkeyServiceType:
+		models.ValkeyServiceType,
+		models.ClickHouseServiceType:
 		return updateServiceVersion(ctx, q, resp, service)
 	case models.ExternalServiceType, models.HAProxyServiceType:
 		return nil

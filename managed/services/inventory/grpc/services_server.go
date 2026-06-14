@@ -51,13 +51,15 @@ var serviceTypes = map[inventoryv1.ServiceType]models.ServiceType{
 	inventoryv1.ServiceType_SERVICE_TYPE_HAPROXY_SERVICE:    models.HAProxyServiceType,
 	inventoryv1.ServiceType_SERVICE_TYPE_EXTERNAL_SERVICE:   models.ExternalServiceType,
 	inventoryv1.ServiceType_SERVICE_TYPE_VALKEY_SERVICE:     models.ValkeyServiceType,
+	inventoryv1.ServiceType_SERVICE_TYPE_CLICKHOUSE_SERVICE: models.ClickHouseServiceType,
 }
 
 func serviceType(serviceType inventoryv1.ServiceType) *models.ServiceType {
 	if serviceType == inventoryv1.ServiceType_SERVICE_TYPE_UNSPECIFIED {
 		return nil
 	}
-	return new(serviceTypes[serviceType])
+	t := serviceTypes[serviceType]
+	return &t
 }
 
 // ListServices returns a list of Services for a given filters.
@@ -83,6 +85,8 @@ func (s *servicesServer) ListServices(ctx context.Context, req *inventoryv1.List
 			res.Postgresql = append(res.Postgresql, service)
 		case *inventoryv1.ValkeyService:
 			res.Valkey = append(res.Valkey, service)
+		case *inventoryv1.ClickHouseService:
+			res.Clickhouse = append(res.Clickhouse, service)
 		case *inventoryv1.ProxySQLService:
 			res.Proxysql = append(res.Proxysql, service)
 		case *inventoryv1.HAProxyService:
@@ -130,6 +134,8 @@ func (s *servicesServer) GetService(ctx context.Context, req *inventoryv1.GetSer
 		res.Service = &inventoryv1.GetServiceResponse_Postgresql{Postgresql: service}
 	case *inventoryv1.ValkeyService:
 		res.Service = &inventoryv1.GetServiceResponse_Valkey{Valkey: service}
+	case *inventoryv1.ClickHouseService:
+		res.Service = &inventoryv1.GetServiceResponse_Clickhouse{Clickhouse: service}
 	case *inventoryv1.ProxySQLService:
 		res.Service = &inventoryv1.GetServiceResponse_Proxysql{Proxysql: service}
 	case *inventoryv1.HAProxyService:
@@ -153,6 +159,8 @@ func (s *servicesServer) AddService(ctx context.Context, req *inventoryv1.AddSer
 		return s.addPostgreSQLService(ctx, req.GetPostgresql())
 	case *inventoryv1.AddServiceRequest_Valkey:
 		return s.addValkeyService(ctx, req.GetValkey())
+	case *inventoryv1.AddServiceRequest_Clickhouse:
+		return s.addClickHouseService(ctx, req.GetClickhouse())
 	case *inventoryv1.AddServiceRequest_Proxysql:
 		return s.addProxySQLService(ctx, req.GetProxysql())
 	case *inventoryv1.AddServiceRequest_Haproxy:
@@ -162,6 +170,55 @@ func (s *servicesServer) AddService(ctx context.Context, req *inventoryv1.AddSer
 	default:
 		return nil, status.Errorf(codes.InvalidArgument, "unsupported service type %T", req.Service)
 	}
+}
+
+// RemoveService removes Service.
+func (s *servicesServer) RemoveService(ctx context.Context, req *inventoryv1.RemoveServiceRequest) (*inventoryv1.RemoveServiceResponse, error) {
+	err := s.s.Remove(ctx, req.GetServiceId(), req.GetForce())
+	if err != nil {
+		return nil, err
+	}
+
+	return &inventoryv1.RemoveServiceResponse{}, nil
+}
+
+// ChangeService changes service configuration.
+func (s *servicesServer) ChangeService(ctx context.Context, req *inventoryv1.ChangeServiceRequest) (*inventoryv1.ChangeServiceResponse, error) {
+	sl := &models.ChangeStandardLabelsParams{
+		ServiceID:      req.ServiceId,
+		Cluster:        req.Cluster,
+		Environment:    req.Environment,
+		ReplicationSet: req.ReplicationSet,
+		ExternalGroup:  req.ExternalGroup,
+	}
+
+	service, err := s.s.ChangeService(ctx, sl, req.GetCustomLabels())
+	if err != nil {
+		return nil, toAPIError(err)
+	}
+
+	res := &inventoryv1.ChangeServiceResponse{}
+	switch service := service.(type) {
+	case *inventoryv1.MySQLService:
+		res.Service = &inventoryv1.ChangeServiceResponse_Mysql{Mysql: service}
+	case *inventoryv1.MongoDBService:
+		res.Service = &inventoryv1.ChangeServiceResponse_Mongodb{Mongodb: service}
+	case *inventoryv1.PostgreSQLService:
+		res.Service = &inventoryv1.ChangeServiceResponse_Postgresql{Postgresql: service}
+	case *inventoryv1.ValkeyService:
+		res.Service = &inventoryv1.ChangeServiceResponse_Valkey{Valkey: service}
+	case *inventoryv1.ClickHouseService:
+		res.Service = &inventoryv1.ChangeServiceResponse_Clickhouse{Clickhouse: service}
+	case *inventoryv1.ProxySQLService:
+		res.Service = &inventoryv1.ChangeServiceResponse_Proxysql{Proxysql: service}
+	case *inventoryv1.HAProxyService:
+		res.Service = &inventoryv1.ChangeServiceResponse_Haproxy{Haproxy: service}
+	case *inventoryv1.ExternalService:
+		res.Service = &inventoryv1.ChangeServiceResponse_External{External: service}
+	default:
+		panic(fmt.Errorf("unhandled inventory Service type %T", service))
+	}
+	return res, nil
 }
 
 // addMySQLService adds MySQL Service.
@@ -209,6 +266,31 @@ func (s *servicesServer) addValkeyService(ctx context.Context, params *inventory
 	res := &inventoryv1.AddServiceResponse{
 		Service: &inventoryv1.AddServiceResponse_Valkey{
 			Valkey: service,
+		},
+	}
+	return res, nil
+}
+
+// addClickHouseService adds ClickHouse Service.
+func (s *servicesServer) addClickHouseService(ctx context.Context, params *inventoryv1.AddClickHouseServiceParams) (*inventoryv1.AddServiceResponse, error) {
+	service, err := s.s.AddClickHouse(ctx, &models.AddDBMSServiceParams{
+		ServiceName:    params.ServiceName,
+		NodeID:         params.NodeId,
+		Environment:    params.Environment,
+		Cluster:        params.Cluster,
+		ReplicationSet: params.ReplicationSet,
+		Address:        pointer.ToStringOrNil(params.Address),
+		Port:           pointer.ToUint16OrNil(uint16(params.Port)), //nolint:gosec // port is not expected to overflow uint16
+		Socket:         pointer.ToStringOrNil(params.Socket),
+		CustomLabels:   params.CustomLabels,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res := &inventoryv1.AddServiceResponse{
+		Service: &inventoryv1.AddServiceResponse_Clickhouse{
+			Clickhouse: service,
 		},
 	}
 	return res, nil
@@ -325,53 +407,6 @@ func (s *servicesServer) addExternalService(ctx context.Context, params *invento
 		Service: &inventoryv1.AddServiceResponse_External{
 			External: service,
 		},
-	}
-	return res, nil
-}
-
-// RemoveService removes Service.
-func (s *servicesServer) RemoveService(ctx context.Context, req *inventoryv1.RemoveServiceRequest) (*inventoryv1.RemoveServiceResponse, error) {
-	err := s.s.Remove(ctx, req.GetServiceId(), req.GetForce())
-	if err != nil {
-		return nil, err
-	}
-
-	return &inventoryv1.RemoveServiceResponse{}, nil
-}
-
-// ChangeService changes service configuration.
-func (s *servicesServer) ChangeService(ctx context.Context, req *inventoryv1.ChangeServiceRequest) (*inventoryv1.ChangeServiceResponse, error) {
-	sl := &models.ChangeStandardLabelsParams{
-		ServiceID:      req.ServiceId,
-		Cluster:        req.Cluster,
-		Environment:    req.Environment,
-		ReplicationSet: req.ReplicationSet,
-		ExternalGroup:  req.ExternalGroup,
-	}
-
-	service, err := s.s.ChangeService(ctx, sl, req.GetCustomLabels())
-	if err != nil {
-		return nil, toAPIError(err)
-	}
-
-	res := &inventoryv1.ChangeServiceResponse{}
-	switch service := service.(type) {
-	case *inventoryv1.MySQLService:
-		res.Service = &inventoryv1.ChangeServiceResponse_Mysql{Mysql: service}
-	case *inventoryv1.MongoDBService:
-		res.Service = &inventoryv1.ChangeServiceResponse_Mongodb{Mongodb: service}
-	case *inventoryv1.PostgreSQLService:
-		res.Service = &inventoryv1.ChangeServiceResponse_Postgresql{Postgresql: service}
-	case *inventoryv1.ValkeyService:
-		res.Service = &inventoryv1.ChangeServiceResponse_Valkey{Valkey: service}
-	case *inventoryv1.ProxySQLService:
-		res.Service = &inventoryv1.ChangeServiceResponse_Proxysql{Proxysql: service}
-	case *inventoryv1.HAProxyService:
-		res.Service = &inventoryv1.ChangeServiceResponse_Haproxy{Haproxy: service}
-	case *inventoryv1.ExternalService:
-		res.Service = &inventoryv1.ChangeServiceResponse_External{External: service}
-	default:
-		panic(fmt.Errorf("unhandled inventory Service type %T", service))
 	}
 	return res, nil
 }

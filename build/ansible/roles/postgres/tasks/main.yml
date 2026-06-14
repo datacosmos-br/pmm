@@ -78,12 +78,20 @@
 
 - name: Create pmm-managed user
   postgresql_user:
-    db: pmm-managed
     name: pmm-managed
     password: pmm-managed
-    priv: "ALL"
     expires: infinity
     state: present
+  environment:
+    PGPASSWORD: "{{ lookup('file', '/srv/.postgres_password') }}"
+
+- name: Grant pmm-managed database privileges
+  postgresql_privs:
+    db: postgres
+    type: database
+    objs: pmm-managed
+    roles: pmm-managed
+    privs: ALL
   environment:
     PGPASSWORD: "{{ lookup('file', '/srv/.postgres_password') }}"
 
@@ -104,12 +112,20 @@
 
 - name: Create grafana user in postgres
   postgresql_user:
-    db: grafana
     name: grafana
     password: grafana
-    priv: 'ALL'
     expires: infinity
     state: present
+  environment:
+    PGPASSWORD: "{{ lookup('file', '/srv/.postgres_password') }}"
+
+- name: Grant grafana database privileges
+  postgresql_privs:
+    db: postgres
+    type: database
+    objs: grafana
+    roles: grafana
+    privs: ALL
   environment:
     PGPASSWORD: "{{ lookup('file', '/srv/.postgres_password') }}"
 

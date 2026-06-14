@@ -26,6 +26,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/envoyproxy/protoc-gen-validate v1.3.3
 	github.com/go-co-op/gocron v1.37.0
+	github.com/go-faster/city v1.0.1
 	github.com/go-openapi/errors v0.22.7
 	github.com/go-openapi/runtime v0.32.1
 	github.com/go-openapi/strfmt v0.26.2
@@ -199,7 +200,6 @@ require (
 	github.com/gliderlabs/ssh v0.3.9-0.20241212082318-d137aad99cd6 // indirect
 	github.com/go-delve/delve v1.21.2 // indirect
 	github.com/go-delve/liner v1.2.3-0.20231231155935-4726ab1d7f62 // indirect
-	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.9.0 // indirect

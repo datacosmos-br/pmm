@@ -1,8 +1,7 @@
-import { stylesFactory } from '@grafana/ui';
 import { GrafanaTheme } from '@grafana/data';
 import { css } from '@emotion/css';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
+export const getStyles = (theme: GrafanaTheme) => ({
   searchWrapper: css`
     align-items: center;
     display: flex;
@@ -39,4 +38,4 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
       }
     }
   `,
-}));
+});

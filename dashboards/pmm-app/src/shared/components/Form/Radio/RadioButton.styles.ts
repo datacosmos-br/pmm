@@ -1,8 +1,7 @@
-import { stylesFactory } from '@grafana/ui';
 import { GrafanaTheme } from '@grafana/data';
 import { css } from '@emotion/css';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme) => {
+export const getStyles = (theme: GrafanaTheme) => {
   const { colors, palette }: any = theme;
   const textColor = theme.isLight ? colors.text : palette.gray4;
   const textColorHover = theme.isLight ? palette.dark1 : palette.white;
@@ -42,4 +41,4 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
       pointer-events: none;
     `,
   };
-});
+};

@@ -43,14 +43,14 @@ install -p -m 0755 pmm-dump %{buildroot}%{_sbindir}/pmm-dump
 * Wed Sep 24 2025 Michael Okoko <michael.okoko@percona.com> - 3.4.1
 - PMM-14349 Update pmm-dump sources.
 
-* Thu Jul 28 2025 Michael Okoko <michael.okoko@percona.com> - 3.4.0
+* Mon Jul 28 2025 Michael Okoko <michael.okoko@percona.com> - 3.4.0
 - PMM-14215 Default to main branch for pmm-dump
 - PMM-14085 Fix an issue where pmm-dump would not export OS metrics when used via the PMM GUI
 
 * Thu Aug 8 2024 Alex Demidoff <alexander.demidoff@percona.com> - 3.0.0-1
 - PMM-13282 Migrate pmm-dump to v3 API
 
-* Tue Nov 23 2023 Artem Gavrilov <artem.gavrilov@percona.com> - 0.7.0-ga
+* Thu Nov 23 2023 Artem Gavrilov <artem.gavrilov@percona.com> - 0.7.0-ga
 - PMM-12460 Update pmm-dump to v0.7.0-ga version
 
 * Tue Mar 29 2022 Alex Tymchuk <alexander.tymchuk@percona.com> - 0.6.0-1

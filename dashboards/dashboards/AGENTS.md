@@ -28,6 +28,7 @@ dashboards/dashboards/*.json
 | `PostgreSQL/` | PostgreSQL, Patroni |
 | `OS/` | Node, CPU, memory, disk, network, NUMA, processes |
 | `Valkey/` | Valkey/Redis clients, cluster, memory, replication, slowlog |
+| `ClickHouse/` | ClickHouse instance summary, query performance, replication, fleet overview/compare |
 | `Insight/` | Home Dashboard, Advanced Data Exploration, VictoriaMetrics, Exporters |
 | `Experimental/` | Databases Overview, DB Cluster Summary |
 | `PMM Health/` | Environments Overview, PMM Health Overview, HA Health Overview |

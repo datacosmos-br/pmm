@@ -28,6 +28,7 @@ const (
 	AgentTypeMongoDBExporter                 = "AGENT_TYPE_MONGODB_EXPORTER"
 	AgentTypePostgresExporter                = "AGENT_TYPE_POSTGRES_EXPORTER"
 	AgentTypeValkeyExporter                  = "AGENT_TYPE_VALKEY_EXPORTER"
+	AgentTypeClickHouseExporter              = "AGENT_TYPE_CLICKHOUSE_EXPORTER"
 	AgentTypeProxySQLExporter                = "AGENT_TYPE_PROXYSQL_EXPORTER"
 	AgentTypeQANMySQLPerfSchemaAgent         = "AGENT_TYPE_QAN_MYSQL_PERFSCHEMA_AGENT"
 	AgentTypeQANMySQLSlowlogAgent            = "AGENT_TYPE_QAN_MYSQL_SLOWLOG_AGENT"
@@ -35,6 +36,7 @@ const (
 	AgentTypeQANMongoDBMongologAgent         = "AGENT_TYPE_QAN_MONGODB_MONGOLOG_AGENT"
 	AgentTypeQANPostgreSQLPgStatementsAgent  = "AGENT_TYPE_QAN_POSTGRESQL_PGSTATEMENTS_AGENT"
 	AgentTypeQANPostgreSQLPgStatMonitorAgent = "AGENT_TYPE_QAN_POSTGRESQL_PGSTATMONITOR_AGENT"
+	AgentTypeQANClickHouseQueryLogAgent      = "AGENT_TYPE_QAN_CLICKHOUSE_QUERYLOG_AGENT"
 	AgentTypeRDSExporter                     = "AGENT_TYPE_RDS_EXPORTER"
 	AgentTypeExternalExporter                = "AGENT_TYPE_EXTERNAL_EXPORTER"
 	AgentTypeAzureDatabaseExporter           = "AGENT_TYPE_AZURE_DATABASE_EXPORTER"
@@ -52,6 +54,7 @@ var agentTypeNames = map[string]string{
 	AgentTypeMongoDBExporter:                 "mongodb_exporter",
 	AgentTypePostgresExporter:                "postgres_exporter",
 	AgentTypeValkeyExporter:                  "valkey_exporter",
+	AgentTypeClickHouseExporter:              "clickhouse_exporter",
 	AgentTypeProxySQLExporter:                "proxysql_exporter",
 	AgentTypeQANMySQLPerfSchemaAgent:         "mysql_perfschema_agent",
 	AgentTypeQANMySQLSlowlogAgent:            "mysql_slowlog_agent",
@@ -59,6 +62,7 @@ var agentTypeNames = map[string]string{
 	AgentTypeQANMongoDBMongologAgent:         "mongodb_mongolog_agent",
 	AgentTypeQANPostgreSQLPgStatementsAgent:  "postgresql_pgstatements_agent",
 	AgentTypeQANPostgreSQLPgStatMonitorAgent: "postgresql_pgstatmonitor_agent",
+	AgentTypeQANClickHouseQueryLogAgent:      "clickhouse_querylog_agent",
 	AgentTypeRDSExporter:                     "rds_exporter",
 	AgentTypeExternalExporter:                "external-exporter",
 	AgentTypeAzureDatabaseExporter:           "azure_database_exporter",

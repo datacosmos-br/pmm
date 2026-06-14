@@ -182,6 +182,16 @@ func AddScrapeConfigs(l *logrus.Entry, cfg *config.Config, q *reform.Querier, //
 				metricsResolution: &mr,
 			})
 
+		case models.ClickHouseExporterType:
+			scfgs, err = scrapeConfigForClickHouseExporter(&scrapeConfigParams{
+				host:              paramsHost,
+				node:              paramsNode,
+				service:           paramsService,
+				agent:             agent,
+				streamParse:       true,
+				metricsResolution: &mr,
+			})
+
 		case models.ProxySQLExporterType:
 			scfgs, err = scrapeConfigsForProxySQLExporter(&scrapeConfigParams{
 				host:              paramsHost,
@@ -196,6 +206,8 @@ func AddScrapeConfigs(l *logrus.Entry, cfg *config.Config, q *reform.Querier, //
 		case models.QANMongoDBProfilerAgentType, models.QANMongoDBMongologAgentType:
 			continue
 		case models.QANPostgreSQLPgStatementsAgentType, models.QANPostgreSQLPgStatMonitorAgentType:
+			continue
+		case models.QANClickHouseQueryLogAgentType:
 			continue
 		case models.RTAMongoDBAgentType:
 			continue

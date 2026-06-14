@@ -71,13 +71,22 @@
 
       - name: Create grafana user in postgres
         postgresql_user:
-          db: grafana
           name: grafana
           password: grafana
-          priv: 'ALL'
           expires: infinity
           login_user: postgres
           state: present
+        environment:
+          PGPASSWORD: "{{ lookup('file', '/srv/.postgres_password') }}"
+
+      - name: Grant grafana database privileges
+        postgresql_privs:
+          db: postgres
+          type: database
+          objs: grafana
+          roles: grafana
+          privs: ALL
+          login_user: postgres
         environment:
           PGPASSWORD: "{{ lookup('file', '/srv/.postgres_password') }}"
     when:
@@ -105,7 +114,6 @@
     delay: 5
     register: pmm_ready
     until: pmm_ready.status == 200
-    ignore_errors: true
 
   - name: Initialize admin password for AMI if needed
     include_role:

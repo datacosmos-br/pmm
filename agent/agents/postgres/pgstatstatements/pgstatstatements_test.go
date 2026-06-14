@@ -67,9 +67,7 @@ func filter(mb []*agentv1.MetricsBucket) []*agentv1.MetricsBucket {
 
 func TestPGStatStatementsQAN(t *testing.T) {
 	sqlDB := tests.OpenTestPostgreSQL(t)
-	t.Cleanup(func() {
-		assert.NoError(t, sqlDB.Close())
-	})
+	defer sqlDB.Close() //nolint:errcheck
 	db := reform.NewDB(sqlDB, postgresql.Dialect, reform.NewPrintfLogger(t.Logf))
 
 	_, err := db.Exec("CREATE EXTENSION IF NOT EXISTS pg_stat_statements SCHEMA public")
@@ -287,8 +285,8 @@ func TestPGStatStatementsQAN(t *testing.T) {
 
 		const n = 500
 		placeholders := db.Placeholders(1, n)
-		args := make([]any, n)
-		for i := range n {
+		args := make([]interface{}, n)
+		for i := 0; i < n; i++ {
 			args[i] = i
 		}
 		q := fmt.Sprintf("SELECT /* AllCitiesTruncated:pgstatstatements controller='test' */ * FROM city WHERE id IN (%s)", strings.Join(placeholders, ", "))
@@ -403,16 +401,18 @@ func TestPGStatStatementsQAN(t *testing.T) {
 		var waitGroup sync.WaitGroup
 		n := 1000
 		errChan := make(chan error, 1)
-		for i := range n {
+		for i := 0; i < n; i++ {
 			id := i
-			waitGroup.Go(func() {
+			waitGroup.Add(1)
+			go func() {
+				defer waitGroup.Done()
 				_, err := db.Exec(
 					fmt.Sprintf(`INSERT /* CheckMBlkReadTime controller='test' */ INTO %s (customer_id, first_name, last_name, active) VALUES (%d, 'John', 'Dow', TRUE)`, tableName, id),
 				)
 				if err != nil {
 					errChan <- err
 				}
-			})
+			}()
 		}
 		go func() {
 			waitGroup.Wait()
@@ -480,6 +480,8 @@ func TestPGStatStatementsQAN(t *testing.T) {
 
 func TestPGStatStatementsQPS(t *testing.T) {
 	sqlDB := tests.OpenTestPostgreSQL(t)
+	sqlDB.SetMaxIdleConns(1)
+	sqlDB.SetMaxOpenConns(1)
 	t.Cleanup(func() {
 		assert.NoError(t, sqlDB.Close())
 	})
@@ -494,12 +496,13 @@ func TestPGStatStatementsQPS(t *testing.T) {
 	}()
 
 	// filterInsertQueries retrieves only buckets for insert queries used by test.
-	filterInsertQueries := func(t *testing.T, mb []*agentv1.MetricsBucket) []*agentv1.MetricsBucket {
+	filterInsertQueries := func(t *testing.T, mb []*agentv1.MetricsBucket, tablePrefix string) []*agentv1.MetricsBucket {
 		t.Helper()
 		res := make([]*agentv1.MetricsBucket, 0, len(mb))
 		for _, b := range mb {
 			switch {
-			case strings.Contains(b.Common.Fingerprint, "insert /* controller='test' */"):
+			case strings.Contains(b.Common.Fingerprint, "insert /* controller='test' */") &&
+				strings.Contains(b.Common.Fingerprint, tablePrefix):
 				res = append(res, b)
 			default:
 				continue
@@ -509,33 +512,33 @@ func TestPGStatStatementsQPS(t *testing.T) {
 	}
 
 	t.Run("uses pgss.max value", func(t *testing.T) {
+		var cacheSize uint
+		err = db.Querier.QueryRow(pgssMaxQuery).Scan(&cacheSize)
+		require.NoError(t, err)
 		p := setup(t, db)
-		assert.Equal(t, uint(10000), p.statementsCache.cache.Capacity())
+		assert.Equal(t, cacheSize, p.statementsCache.cache.Capacity())
 	})
 
 	t.Run("check query count when cache size equals pgss.max", func(t *testing.T) {
 		var cacheSize uint
 		err = db.Querier.QueryRow(pgssMaxQuery).Scan(&cacheSize)
 		require.NoError(t, err)
+		require.Greater(t, cacheSize, uint(defaultPgssCacheSize))
+
+		runTimes := defaultPgssCacheSize + 1
+		require.LessOrEqual(t, uint(runTimes), cacheSize)
+		tablePrefix := fmt.Sprintf("qps_%d", time.Now().UnixNano())
+		createTempPGStatStatementTables(t, db, tablePrefix, runTimes)
+		t.Cleanup(func() {
+			dropTempPGStatStatementTables(t, db, tablePrefix, runTimes)
+		})
 		p := setup(t, db)
 
-		runTimes := 7000
-		t.Cleanup(func() {
-			for i := range runTimes {
-				_, _ = db.Exec(fmt.Sprintf("drop table if exists t%d", i))
-			}
-		})
-
-		for i := range runTimes {
-			_, err = db.Exec(fmt.Sprintf("create /* controller='test' */ table t%d (id int);", i))
-			require.NoError(t, err)
-			_, err = db.Exec(fmt.Sprintf("insert /* controller='test' */ into t%d values(1);", i))
-			require.NoError(t, err)
-		}
-
+		insertPGStatStatementRows(t, db, tablePrefix, runTimes)
 		buckets, err := p.getNewBuckets(context.Background(), time.Date(2019, 4, 1, 10, 59, 0, 0, time.UTC), 60)
 		require.NoError(t, err)
-		insertBuckets := filterInsertQueries(t, buckets)
+		insertBuckets := filterInsertQueries(t, buckets, tablePrefix)
+		require.Len(t, insertBuckets, runTimes)
 		mismatchedCount := 0
 		for _, b := range insertBuckets {
 			assert.InDelta(t, float32(1), b.Common.NumQueries, 0.0001)
@@ -545,13 +548,11 @@ func TestPGStatStatementsQPS(t *testing.T) {
 		}
 		assert.Zero(t, mismatchedCount)
 
-		for i := range runTimes {
-			_, err = db.Exec(fmt.Sprintf("insert /* controller='test' */ into t%d values(1);", i))
-			require.NoError(t, err)
-		}
+		insertPGStatStatementRows(t, db, tablePrefix, runTimes)
 		buckets, err = p.getNewBuckets(context.Background(), time.Date(2019, 4, 1, 10, 59, 0, 0, time.UTC), 60)
 		require.NoError(t, err)
-		insertBuckets = filterInsertQueries(t, buckets)
+		insertBuckets = filterInsertQueries(t, buckets, tablePrefix)
+		require.Len(t, insertBuckets, runTimes)
 		mismatchedCount = 0
 		for _, b := range insertBuckets {
 			if b.Common.NumQueries != 1 {
@@ -561,4 +562,45 @@ func TestPGStatStatementsQPS(t *testing.T) {
 
 		assert.Zero(t, mismatchedCount)
 	})
+}
+
+func createTempPGStatStatementTables(t *testing.T, db *reform.DB, tablePrefix string, count int) {
+	t.Helper()
+	execPGStatStatementTableBatch(t, db, tablePrefix, count, func(query *strings.Builder, tableName string) {
+		fmt.Fprintf(query, "create temp table %s (id int);", tableName)
+	})
+}
+
+func insertPGStatStatementRows(t *testing.T, db *reform.DB, tablePrefix string, count int) {
+	t.Helper()
+	execPGStatStatementTableBatch(t, db, tablePrefix, count, func(query *strings.Builder, tableName string) {
+		fmt.Fprintf(query, "insert /* controller='test' */ into %s values (1);", tableName)
+	})
+}
+
+func dropTempPGStatStatementTables(t *testing.T, db *reform.DB, tablePrefix string, count int) {
+	t.Helper()
+	execPGStatStatementTableBatch(t, db, tablePrefix, count, func(query *strings.Builder, tableName string) {
+		fmt.Fprintf(query, "drop table if exists %s;", tableName)
+	})
+}
+
+func execPGStatStatementTableBatch(
+	t *testing.T,
+	db *reform.DB,
+	tablePrefix string,
+	count int,
+	addStatement func(query *strings.Builder, tableName string),
+) {
+	t.Helper()
+	const batchSize = 500
+	for start := 0; start < count; start += batchSize {
+		end := min(start+batchSize, count)
+		var query strings.Builder
+		for i := start; i < end; i++ {
+			addStatement(&query, fmt.Sprintf("%s_%d", tablePrefix, i))
+		}
+		_, err := db.Exec(query.String())
+		require.NoError(t, err)
+	}
 }

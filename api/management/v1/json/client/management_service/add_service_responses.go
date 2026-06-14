@@ -102,6 +102,7 @@ func (o *AddServiceOK) GetPayload() *AddServiceOKBody {
 }
 
 func (o *AddServiceOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(AddServiceOKBody)
 
 	// response payload
@@ -175,6 +176,7 @@ func (o *AddServiceDefault) GetPayload() *AddServiceDefaultBody {
 }
 
 func (o *AddServiceDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(AddServiceDefaultBody)
 
 	// response payload
@@ -190,6 +192,10 @@ AddServiceBody add service body
 swagger:model AddServiceBody
 */
 type AddServiceBody struct {
+
+	// clickhouse
+	Clickhouse *AddServiceParamsBodyClickhouse `json:"clickhouse,omitempty"`
+
 	// external
 	External *AddServiceParamsBodyExternal `json:"external,omitempty"`
 
@@ -218,6 +224,10 @@ type AddServiceBody struct {
 // Validate validates this add service body
 func (o *AddServiceBody) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := o.validateClickhouse(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := o.validateExternal(formats); err != nil {
 		res = append(res, err)
@@ -254,6 +264,29 @@ func (o *AddServiceBody) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *AddServiceBody) validateClickhouse(formats strfmt.Registry) error {
+	if swag.IsZero(o.Clickhouse) { // not required
+		return nil
+	}
+
+	if o.Clickhouse != nil {
+		if err := o.Clickhouse.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("body" + "." + "clickhouse")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("body" + "." + "clickhouse")
+			}
+
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -445,6 +478,10 @@ func (o *AddServiceBody) validateValkey(formats strfmt.Registry) error {
 func (o *AddServiceBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.contextValidateClickhouse(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.contextValidateExternal(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -483,7 +520,33 @@ func (o *AddServiceBody) ContextValidate(ctx context.Context, formats strfmt.Reg
 	return nil
 }
 
+func (o *AddServiceBody) contextValidateClickhouse(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Clickhouse != nil {
+
+		if swag.IsZero(o.Clickhouse) { // not required
+			return nil
+		}
+
+		if err := o.Clickhouse.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("body" + "." + "clickhouse")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("body" + "." + "clickhouse")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (o *AddServiceBody) contextValidateExternal(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.External != nil {
 
 		if swag.IsZero(o.External) { // not required
@@ -508,6 +571,7 @@ func (o *AddServiceBody) contextValidateExternal(ctx context.Context, formats st
 }
 
 func (o *AddServiceBody) contextValidateHaproxy(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Haproxy != nil {
 
 		if swag.IsZero(o.Haproxy) { // not required
@@ -532,6 +596,7 @@ func (o *AddServiceBody) contextValidateHaproxy(ctx context.Context, formats str
 }
 
 func (o *AddServiceBody) contextValidateMongodb(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Mongodb != nil {
 
 		if swag.IsZero(o.Mongodb) { // not required
@@ -556,6 +621,7 @@ func (o *AddServiceBody) contextValidateMongodb(ctx context.Context, formats str
 }
 
 func (o *AddServiceBody) contextValidateMysql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Mysql != nil {
 
 		if swag.IsZero(o.Mysql) { // not required
@@ -580,6 +646,7 @@ func (o *AddServiceBody) contextValidateMysql(ctx context.Context, formats strfm
 }
 
 func (o *AddServiceBody) contextValidatePostgresql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Postgresql != nil {
 
 		if swag.IsZero(o.Postgresql) { // not required
@@ -604,6 +671,7 @@ func (o *AddServiceBody) contextValidatePostgresql(ctx context.Context, formats 
 }
 
 func (o *AddServiceBody) contextValidateProxysql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Proxysql != nil {
 
 		if swag.IsZero(o.Proxysql) { // not required
@@ -628,6 +696,7 @@ func (o *AddServiceBody) contextValidateProxysql(ctx context.Context, formats st
 }
 
 func (o *AddServiceBody) contextValidateRDS(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.RDS != nil {
 
 		if swag.IsZero(o.RDS) { // not required
@@ -652,6 +721,7 @@ func (o *AddServiceBody) contextValidateRDS(ctx context.Context, formats strfmt.
 }
 
 func (o *AddServiceBody) contextValidateValkey(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Valkey != nil {
 
 		if swag.IsZero(o.Valkey) { // not required
@@ -698,6 +768,7 @@ AddServiceDefaultBody add service default body
 swagger:model AddServiceDefaultBody
 */
 type AddServiceDefaultBody struct {
+
 	// code
 	Code int32 `json:"code,omitempty"`
 
@@ -767,7 +838,9 @@ func (o *AddServiceDefaultBody) ContextValidate(ctx context.Context, formats str
 }
 
 func (o *AddServiceDefaultBody) contextValidateDetails(ctx context.Context, formats strfmt.Registry) error {
+
 	for i := 0; i < len(o.Details); i++ {
+
 		if o.Details[i] != nil {
 
 			if swag.IsZero(o.Details[i]) { // not required
@@ -787,6 +860,7 @@ func (o *AddServiceDefaultBody) contextValidateDetails(ctx context.Context, form
 				return err
 			}
 		}
+
 	}
 
 	return nil
@@ -815,6 +889,7 @@ AddServiceDefaultBodyDetailsItems0 add service default body details items0
 swagger:model AddServiceDefaultBodyDetailsItems0
 */
 type AddServiceDefaultBodyDetailsItems0 struct {
+
 	// at type
 	AtType string `json:"@type,omitempty"`
 
@@ -826,6 +901,7 @@ type AddServiceDefaultBodyDetailsItems0 struct {
 func (o *AddServiceDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 	// stage 1, bind the properties
 	var stage1 struct {
+
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -863,6 +939,7 @@ func (o *AddServiceDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 // MarshalJSON marshals this object with additional properties into a JSON object
 func (o AddServiceDefaultBodyDetailsItems0) MarshalJSON() ([]byte, error) {
 	var stage1 struct {
+
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -926,6 +1003,10 @@ AddServiceOKBody add service OK body
 swagger:model AddServiceOKBody
 */
 type AddServiceOKBody struct {
+
+	// clickhouse
+	Clickhouse *AddServiceOKBodyClickhouse `json:"clickhouse,omitempty"`
+
 	// external
 	External *AddServiceOKBodyExternal `json:"external,omitempty"`
 
@@ -954,6 +1035,10 @@ type AddServiceOKBody struct {
 // Validate validates this add service OK body
 func (o *AddServiceOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := o.validateClickhouse(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := o.validateExternal(formats); err != nil {
 		res = append(res, err)
@@ -990,6 +1075,29 @@ func (o *AddServiceOKBody) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *AddServiceOKBody) validateClickhouse(formats strfmt.Registry) error {
+	if swag.IsZero(o.Clickhouse) { // not required
+		return nil
+	}
+
+	if o.Clickhouse != nil {
+		if err := o.Clickhouse.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse")
+			}
+
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -1181,6 +1289,10 @@ func (o *AddServiceOKBody) validateValkey(formats strfmt.Registry) error {
 func (o *AddServiceOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.contextValidateClickhouse(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.contextValidateExternal(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1219,7 +1331,33 @@ func (o *AddServiceOKBody) ContextValidate(ctx context.Context, formats strfmt.R
 	return nil
 }
 
+func (o *AddServiceOKBody) contextValidateClickhouse(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Clickhouse != nil {
+
+		if swag.IsZero(o.Clickhouse) { // not required
+			return nil
+		}
+
+		if err := o.Clickhouse.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (o *AddServiceOKBody) contextValidateExternal(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.External != nil {
 
 		if swag.IsZero(o.External) { // not required
@@ -1244,6 +1382,7 @@ func (o *AddServiceOKBody) contextValidateExternal(ctx context.Context, formats 
 }
 
 func (o *AddServiceOKBody) contextValidateHaproxy(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Haproxy != nil {
 
 		if swag.IsZero(o.Haproxy) { // not required
@@ -1268,6 +1407,7 @@ func (o *AddServiceOKBody) contextValidateHaproxy(ctx context.Context, formats s
 }
 
 func (o *AddServiceOKBody) contextValidateMongodb(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Mongodb != nil {
 
 		if swag.IsZero(o.Mongodb) { // not required
@@ -1292,6 +1432,7 @@ func (o *AddServiceOKBody) contextValidateMongodb(ctx context.Context, formats s
 }
 
 func (o *AddServiceOKBody) contextValidateMysql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Mysql != nil {
 
 		if swag.IsZero(o.Mysql) { // not required
@@ -1316,6 +1457,7 @@ func (o *AddServiceOKBody) contextValidateMysql(ctx context.Context, formats str
 }
 
 func (o *AddServiceOKBody) contextValidatePostgresql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Postgresql != nil {
 
 		if swag.IsZero(o.Postgresql) { // not required
@@ -1340,6 +1482,7 @@ func (o *AddServiceOKBody) contextValidatePostgresql(ctx context.Context, format
 }
 
 func (o *AddServiceOKBody) contextValidateProxysql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Proxysql != nil {
 
 		if swag.IsZero(o.Proxysql) { // not required
@@ -1364,6 +1507,7 @@ func (o *AddServiceOKBody) contextValidateProxysql(ctx context.Context, formats 
 }
 
 func (o *AddServiceOKBody) contextValidateRDS(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.RDS != nil {
 
 		if swag.IsZero(o.RDS) { // not required
@@ -1388,6 +1532,7 @@ func (o *AddServiceOKBody) contextValidateRDS(ctx context.Context, formats strfm
 }
 
 func (o *AddServiceOKBody) contextValidateValkey(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Valkey != nil {
 
 		if swag.IsZero(o.Valkey) { // not required
@@ -1430,10 +1575,830 @@ func (o *AddServiceOKBody) UnmarshalBinary(b []byte) error {
 }
 
 /*
+AddServiceOKBodyClickhouse add service OK body clickhouse
+swagger:model AddServiceOKBodyClickhouse
+*/
+type AddServiceOKBodyClickhouse struct {
+
+	// clickhouse exporter
+	ClickhouseExporter *AddServiceOKBodyClickhouseClickhouseExporter `json:"clickhouse_exporter,omitempty"`
+
+	// external exporter
+	ExternalExporter *AddServiceOKBodyClickhouseExternalExporter `json:"external_exporter,omitempty"`
+
+	// service
+	Service *AddServiceOKBodyClickhouseService `json:"service,omitempty"`
+}
+
+// Validate validates this add service OK body clickhouse
+func (o *AddServiceOKBodyClickhouse) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateClickhouseExporter(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateExternalExporter(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateService(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouse) validateClickhouseExporter(formats strfmt.Registry) error {
+	if swag.IsZero(o.ClickhouseExporter) { // not required
+		return nil
+	}
+
+	if o.ClickhouseExporter != nil {
+		if err := o.ClickhouseExporter.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "clickhouse_exporter")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "clickhouse_exporter")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouse) validateExternalExporter(formats strfmt.Registry) error {
+	if swag.IsZero(o.ExternalExporter) { // not required
+		return nil
+	}
+
+	if o.ExternalExporter != nil {
+		if err := o.ExternalExporter.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "external_exporter")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "external_exporter")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouse) validateService(formats strfmt.Registry) error {
+	if swag.IsZero(o.Service) { // not required
+		return nil
+	}
+
+	if o.Service != nil {
+		if err := o.Service.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "service")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "service")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this add service OK body clickhouse based on the context it is used
+func (o *AddServiceOKBodyClickhouse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateClickhouseExporter(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.contextValidateExternalExporter(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.contextValidateService(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouse) contextValidateClickhouseExporter(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.ClickhouseExporter != nil {
+
+		if swag.IsZero(o.ClickhouseExporter) { // not required
+			return nil
+		}
+
+		if err := o.ClickhouseExporter.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "clickhouse_exporter")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "clickhouse_exporter")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouse) contextValidateExternalExporter(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.ExternalExporter != nil {
+
+		if swag.IsZero(o.ExternalExporter) { // not required
+			return nil
+		}
+
+		if err := o.ExternalExporter.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "external_exporter")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "external_exporter")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouse) contextValidateService(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Service != nil {
+
+		if swag.IsZero(o.Service) { // not required
+			return nil
+		}
+
+		if err := o.Service.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "service")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "service")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouse) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouse) UnmarshalBinary(b []byte) error {
+	var res AddServiceOKBodyClickhouse
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+AddServiceOKBodyClickhouseClickhouseExporter ClickHouseExporter runs on Generic or Container Node and exposes ClickHouse Service metrics.
+swagger:model AddServiceOKBodyClickhouseClickhouseExporter
+*/
+type AddServiceOKBodyClickhouseClickhouseExporter struct {
+
+	// Unique randomly generated instance identifier.
+	AgentID string `json:"agent_id,omitempty"`
+
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Desired Agent status: enabled (false) or disabled (true).
+	Disabled bool `json:"disabled,omitempty"`
+
+	// Service identifier.
+	ServiceID string `json:"service_id,omitempty"`
+
+	// ClickHouse username for scraping metrics.
+	Username string `json:"username,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname verification.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// True if exporter uses push metrics mode.
+	PushMetricsEnabled bool `json:"push_metrics_enabled,omitempty"`
+
+	// List of disabled collector names.
+	DisabledCollectors []string `json:"disabled_collectors"`
+
+	// AgentStatus represents actual Agent status.
+	//
+	//  - AGENT_STATUS_STARTING: Agent is starting.
+	//  - AGENT_STATUS_INITIALIZATION_ERROR: Agent encountered error when starting.
+	//  - AGENT_STATUS_RUNNING: Agent is running.
+	//  - AGENT_STATUS_WAITING: Agent encountered error and will be restarted automatically soon.
+	//  - AGENT_STATUS_STOPPING: Agent is stopping.
+	//  - AGENT_STATUS_DONE: Agent has been stopped or disabled.
+	//  - AGENT_STATUS_UNKNOWN: Agent is not connected, we don't know anything about it's state.
+	// Enum: ["AGENT_STATUS_UNSPECIFIED","AGENT_STATUS_STARTING","AGENT_STATUS_INITIALIZATION_ERROR","AGENT_STATUS_RUNNING","AGENT_STATUS_WAITING","AGENT_STATUS_STOPPING","AGENT_STATUS_DONE","AGENT_STATUS_UNKNOWN"]
+	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
+
+	// Path to exec process.
+	ProcessExecPath string `json:"process_exec_path,omitempty"`
+
+	// Optionally expose the exporter process on all public interfaces
+	ExposeExporter bool `json:"expose_exporter,omitempty"`
+
+	// metrics resolutions
+	MetricsResolutions *AddServiceOKBodyClickhouseClickhouseExporterMetricsResolutions `json:"metrics_resolutions,omitempty"`
+}
+
+// Validate validates this add service OK body clickhouse clickhouse exporter
+func (o *AddServiceOKBodyClickhouseClickhouseExporter) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateMetricsResolutions(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var addServiceOkBodyClickhouseClickhouseExporterTypeStatusPropEnum []any
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["AGENT_STATUS_UNSPECIFIED","AGENT_STATUS_STARTING","AGENT_STATUS_INITIALIZATION_ERROR","AGENT_STATUS_RUNNING","AGENT_STATUS_WAITING","AGENT_STATUS_STOPPING","AGENT_STATUS_DONE","AGENT_STATUS_UNKNOWN"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		addServiceOkBodyClickhouseClickhouseExporterTypeStatusPropEnum = append(addServiceOkBodyClickhouseClickhouseExporterTypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSUNSPECIFIED captures enum value "AGENT_STATUS_UNSPECIFIED"
+	AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSUNSPECIFIED string = "AGENT_STATUS_UNSPECIFIED"
+
+	// AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSSTARTING captures enum value "AGENT_STATUS_STARTING"
+	AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSSTARTING string = "AGENT_STATUS_STARTING"
+
+	// AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSINITIALIZATIONERROR captures enum value "AGENT_STATUS_INITIALIZATION_ERROR"
+	AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSINITIALIZATIONERROR string = "AGENT_STATUS_INITIALIZATION_ERROR"
+
+	// AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSRUNNING captures enum value "AGENT_STATUS_RUNNING"
+	AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSRUNNING string = "AGENT_STATUS_RUNNING"
+
+	// AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSWAITING captures enum value "AGENT_STATUS_WAITING"
+	AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSWAITING string = "AGENT_STATUS_WAITING"
+
+	// AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSSTOPPING captures enum value "AGENT_STATUS_STOPPING"
+	AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSSTOPPING string = "AGENT_STATUS_STOPPING"
+
+	// AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSDONE captures enum value "AGENT_STATUS_DONE"
+	AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSDONE string = "AGENT_STATUS_DONE"
+
+	// AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSUNKNOWN captures enum value "AGENT_STATUS_UNKNOWN"
+	AddServiceOKBodyClickhouseClickhouseExporterStatusAGENTSTATUSUNKNOWN string = "AGENT_STATUS_UNKNOWN"
+)
+
+// prop value enum
+func (o *AddServiceOKBodyClickhouseClickhouseExporter) validateStatusEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, addServiceOkBodyClickhouseClickhouseExporterTypeStatusPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouseClickhouseExporter) validateStatus(formats strfmt.Registry) error {
+	if swag.IsZero(o.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateStatusEnum("addServiceOk"+"."+"clickhouse"+"."+"clickhouse_exporter"+"."+"status", "body", *o.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouseClickhouseExporter) validateMetricsResolutions(formats strfmt.Registry) error {
+	if swag.IsZero(o.MetricsResolutions) { // not required
+		return nil
+	}
+
+	if o.MetricsResolutions != nil {
+		if err := o.MetricsResolutions.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "clickhouse_exporter" + "." + "metrics_resolutions")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "clickhouse_exporter" + "." + "metrics_resolutions")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this add service OK body clickhouse clickhouse exporter based on the context it is used
+func (o *AddServiceOKBodyClickhouseClickhouseExporter) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateMetricsResolutions(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouseClickhouseExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.MetricsResolutions != nil {
+
+		if swag.IsZero(o.MetricsResolutions) { // not required
+			return nil
+		}
+
+		if err := o.MetricsResolutions.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "clickhouse_exporter" + "." + "metrics_resolutions")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "clickhouse_exporter" + "." + "metrics_resolutions")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouseClickhouseExporter) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouseClickhouseExporter) UnmarshalBinary(b []byte) error {
+	var res AddServiceOKBodyClickhouseClickhouseExporter
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+AddServiceOKBodyClickhouseClickhouseExporterMetricsResolutions MetricsResolutions represents Prometheus exporters metrics resolutions.
+swagger:model AddServiceOKBodyClickhouseClickhouseExporterMetricsResolutions
+*/
+type AddServiceOKBodyClickhouseClickhouseExporterMetricsResolutions struct {
+
+	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
+	Hr string `json:"hr,omitempty"`
+
+	// Medium resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
+	Mr string `json:"mr,omitempty"`
+
+	// Low resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
+	Lr string `json:"lr,omitempty"`
+}
+
+// Validate validates this add service OK body clickhouse clickhouse exporter metrics resolutions
+func (o *AddServiceOKBodyClickhouseClickhouseExporterMetricsResolutions) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this add service OK body clickhouse clickhouse exporter metrics resolutions based on context it is used
+func (o *AddServiceOKBodyClickhouseClickhouseExporterMetricsResolutions) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouseClickhouseExporterMetricsResolutions) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouseClickhouseExporterMetricsResolutions) UnmarshalBinary(b []byte) error {
+	var res AddServiceOKBodyClickhouseClickhouseExporterMetricsResolutions
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+AddServiceOKBodyClickhouseExternalExporter ExternalExporter runs on any Node type, including Remote Node.
+swagger:model AddServiceOKBodyClickhouseExternalExporter
+*/
+type AddServiceOKBodyClickhouseExternalExporter struct {
+
+	// Unique randomly generated instance identifier.
+	AgentID string `json:"agent_id,omitempty"`
+
+	// Node identifier where this instance runs.
+	RunsOnNodeID string `json:"runs_on_node_id,omitempty"`
+
+	// If disabled, metrics from this exporter will not be collected.
+	Disabled bool `json:"disabled,omitempty"`
+
+	// Service identifier.
+	ServiceID string `json:"service_id,omitempty"`
+
+	// HTTP basic auth username for collecting metrics.
+	Username string `json:"username,omitempty"`
+
+	// Scheme to generate URI to exporter metrics endpoints.
+	Scheme string `json:"scheme,omitempty"`
+
+	// Path under which metrics are exposed, used to generate URI.
+	MetricsPath string `json:"metrics_path,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
+
+	// True if exporter uses push metrics mode.
+	PushMetricsEnabled bool `json:"push_metrics_enabled,omitempty"`
+
+	// Path to exec process.
+	ProcessExecPath string `json:"process_exec_path,omitempty"`
+
+	// Skip TLS certificate and hostname verification.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// AgentStatus represents actual Agent status.
+	//
+	//  - AGENT_STATUS_STARTING: Agent is starting.
+	//  - AGENT_STATUS_INITIALIZATION_ERROR: Agent encountered error when starting.
+	//  - AGENT_STATUS_RUNNING: Agent is running.
+	//  - AGENT_STATUS_WAITING: Agent encountered error and will be restarted automatically soon.
+	//  - AGENT_STATUS_STOPPING: Agent is stopping.
+	//  - AGENT_STATUS_DONE: Agent has been stopped or disabled.
+	//  - AGENT_STATUS_UNKNOWN: Agent is not connected, we don't know anything about it's state.
+	// Enum: ["AGENT_STATUS_UNSPECIFIED","AGENT_STATUS_STARTING","AGENT_STATUS_INITIALIZATION_ERROR","AGENT_STATUS_RUNNING","AGENT_STATUS_WAITING","AGENT_STATUS_STOPPING","AGENT_STATUS_DONE","AGENT_STATUS_UNKNOWN"]
+	Status *string `json:"status,omitempty"`
+
+	// metrics resolutions
+	MetricsResolutions *AddServiceOKBodyClickhouseExternalExporterMetricsResolutions `json:"metrics_resolutions,omitempty"`
+}
+
+// Validate validates this add service OK body clickhouse external exporter
+func (o *AddServiceOKBodyClickhouseExternalExporter) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateMetricsResolutions(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var addServiceOkBodyClickhouseExternalExporterTypeStatusPropEnum []any
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["AGENT_STATUS_UNSPECIFIED","AGENT_STATUS_STARTING","AGENT_STATUS_INITIALIZATION_ERROR","AGENT_STATUS_RUNNING","AGENT_STATUS_WAITING","AGENT_STATUS_STOPPING","AGENT_STATUS_DONE","AGENT_STATUS_UNKNOWN"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		addServiceOkBodyClickhouseExternalExporterTypeStatusPropEnum = append(addServiceOkBodyClickhouseExternalExporterTypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSUNSPECIFIED captures enum value "AGENT_STATUS_UNSPECIFIED"
+	AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSUNSPECIFIED string = "AGENT_STATUS_UNSPECIFIED"
+
+	// AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSSTARTING captures enum value "AGENT_STATUS_STARTING"
+	AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSSTARTING string = "AGENT_STATUS_STARTING"
+
+	// AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSINITIALIZATIONERROR captures enum value "AGENT_STATUS_INITIALIZATION_ERROR"
+	AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSINITIALIZATIONERROR string = "AGENT_STATUS_INITIALIZATION_ERROR"
+
+	// AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSRUNNING captures enum value "AGENT_STATUS_RUNNING"
+	AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSRUNNING string = "AGENT_STATUS_RUNNING"
+
+	// AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSWAITING captures enum value "AGENT_STATUS_WAITING"
+	AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSWAITING string = "AGENT_STATUS_WAITING"
+
+	// AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSSTOPPING captures enum value "AGENT_STATUS_STOPPING"
+	AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSSTOPPING string = "AGENT_STATUS_STOPPING"
+
+	// AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSDONE captures enum value "AGENT_STATUS_DONE"
+	AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSDONE string = "AGENT_STATUS_DONE"
+
+	// AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSUNKNOWN captures enum value "AGENT_STATUS_UNKNOWN"
+	AddServiceOKBodyClickhouseExternalExporterStatusAGENTSTATUSUNKNOWN string = "AGENT_STATUS_UNKNOWN"
+)
+
+// prop value enum
+func (o *AddServiceOKBodyClickhouseExternalExporter) validateStatusEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, addServiceOkBodyClickhouseExternalExporterTypeStatusPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouseExternalExporter) validateStatus(formats strfmt.Registry) error {
+	if swag.IsZero(o.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateStatusEnum("addServiceOk"+"."+"clickhouse"+"."+"external_exporter"+"."+"status", "body", *o.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouseExternalExporter) validateMetricsResolutions(formats strfmt.Registry) error {
+	if swag.IsZero(o.MetricsResolutions) { // not required
+		return nil
+	}
+
+	if o.MetricsResolutions != nil {
+		if err := o.MetricsResolutions.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "external_exporter" + "." + "metrics_resolutions")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "external_exporter" + "." + "metrics_resolutions")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this add service OK body clickhouse external exporter based on the context it is used
+func (o *AddServiceOKBodyClickhouseExternalExporter) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateMetricsResolutions(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *AddServiceOKBodyClickhouseExternalExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.MetricsResolutions != nil {
+
+		if swag.IsZero(o.MetricsResolutions) { // not required
+			return nil
+		}
+
+		if err := o.MetricsResolutions.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "external_exporter" + "." + "metrics_resolutions")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("addServiceOk" + "." + "clickhouse" + "." + "external_exporter" + "." + "metrics_resolutions")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouseExternalExporter) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouseExternalExporter) UnmarshalBinary(b []byte) error {
+	var res AddServiceOKBodyClickhouseExternalExporter
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+AddServiceOKBodyClickhouseExternalExporterMetricsResolutions MetricsResolutions represents Prometheus exporters metrics resolutions.
+swagger:model AddServiceOKBodyClickhouseExternalExporterMetricsResolutions
+*/
+type AddServiceOKBodyClickhouseExternalExporterMetricsResolutions struct {
+
+	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
+	Hr string `json:"hr,omitempty"`
+
+	// Medium resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
+	Mr string `json:"mr,omitempty"`
+
+	// Low resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
+	Lr string `json:"lr,omitempty"`
+}
+
+// Validate validates this add service OK body clickhouse external exporter metrics resolutions
+func (o *AddServiceOKBodyClickhouseExternalExporterMetricsResolutions) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this add service OK body clickhouse external exporter metrics resolutions based on context it is used
+func (o *AddServiceOKBodyClickhouseExternalExporterMetricsResolutions) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouseExternalExporterMetricsResolutions) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouseExternalExporterMetricsResolutions) UnmarshalBinary(b []byte) error {
+	var res AddServiceOKBodyClickhouseExternalExporterMetricsResolutions
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+AddServiceOKBodyClickhouseService ClickHouseService represents a generic ClickHouse instance.
+swagger:model AddServiceOKBodyClickhouseService
+*/
+type AddServiceOKBodyClickhouseService struct {
+
+	// Unique randomly generated instance identifier.
+	ServiceID string `json:"service_id,omitempty"`
+
+	// Unique across all Services user-defined name.
+	ServiceName string `json:"service_name,omitempty"`
+
+	// Node identifier where this instance runs.
+	NodeID string `json:"node_id,omitempty"`
+
+	// Access address (DNS name or IP).
+	// Address (and port) or socket is required.
+	Address string `json:"address,omitempty"`
+
+	// Access port.
+	// Port is required when the address present.
+	Port int64 `json:"port,omitempty"`
+
+	// Access unix socket.
+	// Address (and port) or socket is required.
+	Socket string `json:"socket,omitempty"`
+
+	// Environment name.
+	Environment string `json:"environment,omitempty"`
+
+	// Cluster name.
+	Cluster string `json:"cluster,omitempty"`
+
+	// Replication set name.
+	ReplicationSet string `json:"replication_set,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// ClickHouse version.
+	Version string `json:"version,omitempty"`
+
+	// Connection protocol: native (tcp), http, or https.
+	Protocol string `json:"protocol,omitempty"`
+}
+
+// Validate validates this add service OK body clickhouse service
+func (o *AddServiceOKBodyClickhouseService) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this add service OK body clickhouse service based on context it is used
+func (o *AddServiceOKBodyClickhouseService) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouseService) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AddServiceOKBodyClickhouseService) UnmarshalBinary(b []byte) error {
+	var res AddServiceOKBodyClickhouseService
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
 AddServiceOKBodyExternal add service OK body external
 swagger:model AddServiceOKBodyExternal
 */
 type AddServiceOKBodyExternal struct {
+
 	// external exporter
 	ExternalExporter *AddServiceOKBodyExternalExternalExporter `json:"external_exporter,omitempty"`
 
@@ -1524,6 +2489,7 @@ func (o *AddServiceOKBodyExternal) ContextValidate(ctx context.Context, formats 
 }
 
 func (o *AddServiceOKBodyExternal) contextValidateExternalExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.ExternalExporter != nil {
 
 		if swag.IsZero(o.ExternalExporter) { // not required
@@ -1548,6 +2514,7 @@ func (o *AddServiceOKBodyExternal) contextValidateExternalExporter(ctx context.C
 }
 
 func (o *AddServiceOKBodyExternal) contextValidateService(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Service != nil {
 
 		if swag.IsZero(o.Service) { // not required
@@ -1594,6 +2561,7 @@ AddServiceOKBodyExternalExternalExporter ExternalExporter runs on any Node type,
 swagger:model AddServiceOKBodyExternalExternalExporter
 */
 type AddServiceOKBodyExternalExternalExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -1762,6 +2730,7 @@ func (o *AddServiceOKBodyExternalExternalExporter) ContextValidate(ctx context.C
 }
 
 func (o *AddServiceOKBodyExternalExternalExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -1808,6 +2777,7 @@ AddServiceOKBodyExternalExternalExporterMetricsResolutions MetricsResolutions re
 swagger:model AddServiceOKBodyExternalExternalExporterMetricsResolutions
 */
 type AddServiceOKBodyExternalExternalExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -1851,6 +2821,7 @@ AddServiceOKBodyExternalService ExternalService represents a generic External se
 swagger:model AddServiceOKBodyExternalService
 */
 type AddServiceOKBodyExternalService struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -1915,6 +2886,7 @@ AddServiceOKBodyHaproxy add service OK body haproxy
 swagger:model AddServiceOKBodyHaproxy
 */
 type AddServiceOKBodyHaproxy struct {
+
 	// external exporter
 	ExternalExporter *AddServiceOKBodyHaproxyExternalExporter `json:"external_exporter,omitempty"`
 
@@ -2005,6 +2977,7 @@ func (o *AddServiceOKBodyHaproxy) ContextValidate(ctx context.Context, formats s
 }
 
 func (o *AddServiceOKBodyHaproxy) contextValidateExternalExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.ExternalExporter != nil {
 
 		if swag.IsZero(o.ExternalExporter) { // not required
@@ -2029,6 +3002,7 @@ func (o *AddServiceOKBodyHaproxy) contextValidateExternalExporter(ctx context.Co
 }
 
 func (o *AddServiceOKBodyHaproxy) contextValidateService(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Service != nil {
 
 		if swag.IsZero(o.Service) { // not required
@@ -2075,6 +3049,7 @@ AddServiceOKBodyHaproxyExternalExporter ExternalExporter runs on any Node type, 
 swagger:model AddServiceOKBodyHaproxyExternalExporter
 */
 type AddServiceOKBodyHaproxyExternalExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -2243,6 +3218,7 @@ func (o *AddServiceOKBodyHaproxyExternalExporter) ContextValidate(ctx context.Co
 }
 
 func (o *AddServiceOKBodyHaproxyExternalExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -2289,6 +3265,7 @@ AddServiceOKBodyHaproxyExternalExporterMetricsResolutions MetricsResolutions rep
 swagger:model AddServiceOKBodyHaproxyExternalExporterMetricsResolutions
 */
 type AddServiceOKBodyHaproxyExternalExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -2332,6 +3309,7 @@ AddServiceOKBodyHaproxyService HAProxyService represents a generic HAProxy servi
 swagger:model AddServiceOKBodyHaproxyService
 */
 type AddServiceOKBodyHaproxyService struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -2387,6 +3365,7 @@ AddServiceOKBodyMongodb add service OK body mongodb
 swagger:model AddServiceOKBodyMongodb
 */
 type AddServiceOKBodyMongodb struct {
+
 	// mongodb exporter
 	MongodbExporter *AddServiceOKBodyMongodbMongodbExporter `json:"mongodb_exporter,omitempty"`
 
@@ -2579,6 +3558,7 @@ func (o *AddServiceOKBodyMongodb) ContextValidate(ctx context.Context, formats s
 }
 
 func (o *AddServiceOKBodyMongodb) contextValidateMongodbExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MongodbExporter != nil {
 
 		if swag.IsZero(o.MongodbExporter) { // not required
@@ -2603,6 +3583,7 @@ func (o *AddServiceOKBodyMongodb) contextValidateMongodbExporter(ctx context.Con
 }
 
 func (o *AddServiceOKBodyMongodb) contextValidateQANMongodbMongolog(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANMongodbMongolog != nil {
 
 		if swag.IsZero(o.QANMongodbMongolog) { // not required
@@ -2627,6 +3608,7 @@ func (o *AddServiceOKBodyMongodb) contextValidateQANMongodbMongolog(ctx context.
 }
 
 func (o *AddServiceOKBodyMongodb) contextValidateQANMongodbProfiler(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANMongodbProfiler != nil {
 
 		if swag.IsZero(o.QANMongodbProfiler) { // not required
@@ -2651,6 +3633,7 @@ func (o *AddServiceOKBodyMongodb) contextValidateQANMongodbProfiler(ctx context.
 }
 
 func (o *AddServiceOKBodyMongodb) contextValidateRtaMongodbAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.RtaMongodbAgent != nil {
 
 		if swag.IsZero(o.RtaMongodbAgent) { // not required
@@ -2675,6 +3658,7 @@ func (o *AddServiceOKBodyMongodb) contextValidateRtaMongodbAgent(ctx context.Con
 }
 
 func (o *AddServiceOKBodyMongodb) contextValidateService(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Service != nil {
 
 		if swag.IsZero(o.Service) { // not required
@@ -2721,6 +3705,7 @@ AddServiceOKBodyMongodbMongodbExporter MongoDBExporter runs on Generic or Contai
 swagger:model AddServiceOKBodyMongodbMongodbExporter
 */
 type AddServiceOKBodyMongodbMongodbExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -2972,6 +3957,7 @@ func (o *AddServiceOKBodyMongodbMongodbExporter) ContextValidate(ctx context.Con
 }
 
 func (o *AddServiceOKBodyMongodbMongodbExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -3018,6 +4004,7 @@ AddServiceOKBodyMongodbMongodbExporterMetricsResolutions MetricsResolutions repr
 swagger:model AddServiceOKBodyMongodbMongodbExporterMetricsResolutions
 */
 type AddServiceOKBodyMongodbMongodbExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -3061,6 +4048,7 @@ AddServiceOKBodyMongodbQANMongodbMongolog QANMongoDBMongologAgent runs within pm
 swagger:model AddServiceOKBodyMongodbQANMongodbMongolog
 */
 type AddServiceOKBodyMongodbQANMongodbMongolog struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3270,6 +4258,7 @@ AddServiceOKBodyMongodbQANMongodbProfiler QANMongoDBProfilerAgent runs within pm
 swagger:model AddServiceOKBodyMongodbQANMongodbProfiler
 */
 type AddServiceOKBodyMongodbQANMongodbProfiler struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3479,6 +4468,7 @@ AddServiceOKBodyMongodbRtaMongodbAgent RTAMongoDBAgent runs within pmm-agent and
 swagger:model AddServiceOKBodyMongodbRtaMongodbAgent
 */
 type AddServiceOKBodyMongodbRtaMongodbAgent struct {
+
 	// Unique agent identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3699,6 +4689,7 @@ func (o *AddServiceOKBodyMongodbRtaMongodbAgent) ContextValidate(ctx context.Con
 }
 
 func (o *AddServiceOKBodyMongodbRtaMongodbAgent) contextValidateRtaOptions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.RtaOptions != nil {
 
 		if swag.IsZero(o.RtaOptions) { // not required
@@ -3745,6 +4736,7 @@ AddServiceOKBodyMongodbRtaMongodbAgentRtaOptions RTAOptions holds Real-Time Quer
 swagger:model AddServiceOKBodyMongodbRtaMongodbAgentRtaOptions
 */
 type AddServiceOKBodyMongodbRtaMongodbAgentRtaOptions struct {
+
 	// Query collect interval (default 2s is set by server).
 	CollectInterval string `json:"collect_interval,omitempty"`
 }
@@ -3782,6 +4774,7 @@ AddServiceOKBodyMongodbService MongoDBService represents a generic MongoDB insta
 swagger:model AddServiceOKBodyMongodbService
 */
 type AddServiceOKBodyMongodbService struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -3852,6 +4845,7 @@ AddServiceOKBodyMysql add service OK body mysql
 swagger:model AddServiceOKBodyMysql
 */
 type AddServiceOKBodyMysql struct {
+
 	// Actual table count at the moment of adding.
 	TableCount int32 `json:"table_count,omitempty"`
 
@@ -4013,6 +5007,7 @@ func (o *AddServiceOKBodyMysql) ContextValidate(ctx context.Context, formats str
 }
 
 func (o *AddServiceOKBodyMysql) contextValidateMysqldExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqldExporter != nil {
 
 		if swag.IsZero(o.MysqldExporter) { // not required
@@ -4037,6 +5032,7 @@ func (o *AddServiceOKBodyMysql) contextValidateMysqldExporter(ctx context.Contex
 }
 
 func (o *AddServiceOKBodyMysql) contextValidateQANMysqlPerfschema(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANMysqlPerfschema != nil {
 
 		if swag.IsZero(o.QANMysqlPerfschema) { // not required
@@ -4061,6 +5057,7 @@ func (o *AddServiceOKBodyMysql) contextValidateQANMysqlPerfschema(ctx context.Co
 }
 
 func (o *AddServiceOKBodyMysql) contextValidateQANMysqlSlowlog(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANMysqlSlowlog != nil {
 
 		if swag.IsZero(o.QANMysqlSlowlog) { // not required
@@ -4085,6 +5082,7 @@ func (o *AddServiceOKBodyMysql) contextValidateQANMysqlSlowlog(ctx context.Conte
 }
 
 func (o *AddServiceOKBodyMysql) contextValidateService(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Service != nil {
 
 		if swag.IsZero(o.Service) { // not required
@@ -4131,6 +5129,7 @@ AddServiceOKBodyMysqlMysqldExporter MySQLdExporter runs on Generic or Container 
 swagger:model AddServiceOKBodyMysqlMysqldExporter
 */
 type AddServiceOKBodyMysqlMysqldExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4392,6 +5391,7 @@ func (o *AddServiceOKBodyMysqlMysqldExporter) ContextValidate(ctx context.Contex
 }
 
 func (o *AddServiceOKBodyMysqlMysqldExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -4438,6 +5438,7 @@ AddServiceOKBodyMysqlMysqldExporterMetricsResolutions MetricsResolutions represe
 swagger:model AddServiceOKBodyMysqlMysqldExporterMetricsResolutions
 */
 type AddServiceOKBodyMysqlMysqldExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -4481,6 +5482,7 @@ AddServiceOKBodyMysqlQANMysqlPerfschema QANMySQLPerfSchemaAgent runs within pmm-
 swagger:model AddServiceOKBodyMysqlQANMysqlPerfschema
 */
 type AddServiceOKBodyMysqlQANMysqlPerfschema struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4708,6 +5710,7 @@ AddServiceOKBodyMysqlQANMysqlSlowlog QANMySQLSlowlogAgent runs within pmm-agent 
 swagger:model AddServiceOKBodyMysqlQANMysqlSlowlog
 */
 type AddServiceOKBodyMysqlQANMysqlSlowlog struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4938,6 +5941,7 @@ AddServiceOKBodyMysqlService MySQLService represents a generic MySQL instance.
 swagger:model AddServiceOKBodyMysqlService
 */
 type AddServiceOKBodyMysqlService struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -5011,6 +6015,7 @@ AddServiceOKBodyPostgresql add service OK body postgresql
 swagger:model AddServiceOKBodyPostgresql
 */
 type AddServiceOKBodyPostgresql struct {
+
 	// Warning message.
 	Warning string `json:"warning,omitempty"`
 
@@ -5172,6 +6177,7 @@ func (o *AddServiceOKBodyPostgresql) ContextValidate(ctx context.Context, format
 }
 
 func (o *AddServiceOKBodyPostgresql) contextValidatePostgresExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PostgresExporter != nil {
 
 		if swag.IsZero(o.PostgresExporter) { // not required
@@ -5196,6 +6202,7 @@ func (o *AddServiceOKBodyPostgresql) contextValidatePostgresExporter(ctx context
 }
 
 func (o *AddServiceOKBodyPostgresql) contextValidateQANPostgresqlPgstatementsAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANPostgresqlPgstatementsAgent != nil {
 
 		if swag.IsZero(o.QANPostgresqlPgstatementsAgent) { // not required
@@ -5220,6 +6227,7 @@ func (o *AddServiceOKBodyPostgresql) contextValidateQANPostgresqlPgstatementsAge
 }
 
 func (o *AddServiceOKBodyPostgresql) contextValidateQANPostgresqlPgstatmonitorAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANPostgresqlPgstatmonitorAgent != nil {
 
 		if swag.IsZero(o.QANPostgresqlPgstatmonitorAgent) { // not required
@@ -5244,6 +6252,7 @@ func (o *AddServiceOKBodyPostgresql) contextValidateQANPostgresqlPgstatmonitorAg
 }
 
 func (o *AddServiceOKBodyPostgresql) contextValidateService(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Service != nil {
 
 		if swag.IsZero(o.Service) { // not required
@@ -5290,6 +6299,7 @@ AddServiceOKBodyPostgresqlPostgresExporter PostgresExporter runs on Generic or C
 swagger:model AddServiceOKBodyPostgresqlPostgresExporter
 */
 type AddServiceOKBodyPostgresqlPostgresExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -5534,6 +6544,7 @@ func (o *AddServiceOKBodyPostgresqlPostgresExporter) ContextValidate(ctx context
 }
 
 func (o *AddServiceOKBodyPostgresqlPostgresExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -5580,6 +6591,7 @@ AddServiceOKBodyPostgresqlPostgresExporterMetricsResolutions MetricsResolutions 
 swagger:model AddServiceOKBodyPostgresqlPostgresExporterMetricsResolutions
 */
 type AddServiceOKBodyPostgresqlPostgresExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -5623,6 +6635,7 @@ AddServiceOKBodyPostgresqlQANPostgresqlPgstatementsAgent QANPostgreSQLPgStatemen
 swagger:model AddServiceOKBodyPostgresqlQANPostgresqlPgstatementsAgent
 */
 type AddServiceOKBodyPostgresqlQANPostgresqlPgstatementsAgent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -5835,6 +6848,7 @@ AddServiceOKBodyPostgresqlQANPostgresqlPgstatmonitorAgent QANPostgreSQLPgStatMon
 swagger:model AddServiceOKBodyPostgresqlQANPostgresqlPgstatmonitorAgent
 */
 type AddServiceOKBodyPostgresqlQANPostgresqlPgstatmonitorAgent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -6050,6 +7064,7 @@ AddServiceOKBodyPostgresqlService PostgreSQLService represents a generic Postgre
 swagger:model AddServiceOKBodyPostgresqlService
 */
 type AddServiceOKBodyPostgresqlService struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -6126,6 +7141,7 @@ AddServiceOKBodyProxysql add service OK body proxysql
 swagger:model AddServiceOKBodyProxysql
 */
 type AddServiceOKBodyProxysql struct {
+
 	// proxysql exporter
 	ProxysqlExporter *AddServiceOKBodyProxysqlProxysqlExporter `json:"proxysql_exporter,omitempty"`
 
@@ -6216,6 +7232,7 @@ func (o *AddServiceOKBodyProxysql) ContextValidate(ctx context.Context, formats 
 }
 
 func (o *AddServiceOKBodyProxysql) contextValidateProxysqlExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.ProxysqlExporter != nil {
 
 		if swag.IsZero(o.ProxysqlExporter) { // not required
@@ -6240,6 +7257,7 @@ func (o *AddServiceOKBodyProxysql) contextValidateProxysqlExporter(ctx context.C
 }
 
 func (o *AddServiceOKBodyProxysql) contextValidateService(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Service != nil {
 
 		if swag.IsZero(o.Service) { // not required
@@ -6286,6 +7304,7 @@ AddServiceOKBodyProxysqlProxysqlExporter ProxySQLExporter runs on Generic or Con
 swagger:model AddServiceOKBodyProxysqlProxysqlExporter
 */
 type AddServiceOKBodyProxysqlProxysqlExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -6524,6 +7543,7 @@ func (o *AddServiceOKBodyProxysqlProxysqlExporter) ContextValidate(ctx context.C
 }
 
 func (o *AddServiceOKBodyProxysqlProxysqlExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -6570,6 +7590,7 @@ AddServiceOKBodyProxysqlProxysqlExporterMetricsResolutions MetricsResolutions re
 swagger:model AddServiceOKBodyProxysqlProxysqlExporterMetricsResolutions
 */
 type AddServiceOKBodyProxysqlProxysqlExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -6613,6 +7634,7 @@ AddServiceOKBodyProxysqlService ProxySQLService represents a generic ProxySQL in
 swagger:model AddServiceOKBodyProxysqlService
 */
 type AddServiceOKBodyProxysqlService struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -6683,6 +7705,7 @@ AddServiceOKBodyRDS add service OK body RDS
 swagger:model AddServiceOKBodyRDS
 */
 type AddServiceOKBodyRDS struct {
+
 	// mysql
 	Mysql *AddServiceOKBodyRDSMysql `json:"mysql,omitempty"`
 
@@ -6977,6 +8000,7 @@ func (o *AddServiceOKBodyRDS) ContextValidate(ctx context.Context, formats strfm
 }
 
 func (o *AddServiceOKBodyRDS) contextValidateMysql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Mysql != nil {
 
 		if swag.IsZero(o.Mysql) { // not required
@@ -7001,6 +8025,7 @@ func (o *AddServiceOKBodyRDS) contextValidateMysql(ctx context.Context, formats 
 }
 
 func (o *AddServiceOKBodyRDS) contextValidateMysqldExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqldExporter != nil {
 
 		if swag.IsZero(o.MysqldExporter) { // not required
@@ -7025,6 +8050,7 @@ func (o *AddServiceOKBodyRDS) contextValidateMysqldExporter(ctx context.Context,
 }
 
 func (o *AddServiceOKBodyRDS) contextValidateNode(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Node != nil {
 
 		if swag.IsZero(o.Node) { // not required
@@ -7049,6 +8075,7 @@ func (o *AddServiceOKBodyRDS) contextValidateNode(ctx context.Context, formats s
 }
 
 func (o *AddServiceOKBodyRDS) contextValidatePostgresql(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Postgresql != nil {
 
 		if swag.IsZero(o.Postgresql) { // not required
@@ -7073,6 +8100,7 @@ func (o *AddServiceOKBodyRDS) contextValidatePostgresql(ctx context.Context, for
 }
 
 func (o *AddServiceOKBodyRDS) contextValidatePostgresqlExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PostgresqlExporter != nil {
 
 		if swag.IsZero(o.PostgresqlExporter) { // not required
@@ -7097,6 +8125,7 @@ func (o *AddServiceOKBodyRDS) contextValidatePostgresqlExporter(ctx context.Cont
 }
 
 func (o *AddServiceOKBodyRDS) contextValidateQANMysqlPerfschema(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANMysqlPerfschema != nil {
 
 		if swag.IsZero(o.QANMysqlPerfschema) { // not required
@@ -7121,6 +8150,7 @@ func (o *AddServiceOKBodyRDS) contextValidateQANMysqlPerfschema(ctx context.Cont
 }
 
 func (o *AddServiceOKBodyRDS) contextValidateQANPostgresqlPgstatements(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANPostgresqlPgstatements != nil {
 
 		if swag.IsZero(o.QANPostgresqlPgstatements) { // not required
@@ -7145,6 +8175,7 @@ func (o *AddServiceOKBodyRDS) contextValidateQANPostgresqlPgstatements(ctx conte
 }
 
 func (o *AddServiceOKBodyRDS) contextValidateRDSExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.RDSExporter != nil {
 
 		if swag.IsZero(o.RDSExporter) { // not required
@@ -7191,6 +8222,7 @@ AddServiceOKBodyRDSMysql MySQLService represents a generic MySQL instance.
 swagger:model AddServiceOKBodyRDSMysql
 */
 type AddServiceOKBodyRDSMysql struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -7264,6 +8296,7 @@ AddServiceOKBodyRDSMysqldExporter MySQLdExporter runs on Generic or Container No
 swagger:model AddServiceOKBodyRDSMysqldExporter
 */
 type AddServiceOKBodyRDSMysqldExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -7525,6 +8558,7 @@ func (o *AddServiceOKBodyRDSMysqldExporter) ContextValidate(ctx context.Context,
 }
 
 func (o *AddServiceOKBodyRDSMysqldExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -7571,6 +8605,7 @@ AddServiceOKBodyRDSMysqldExporterMetricsResolutions MetricsResolutions represent
 swagger:model AddServiceOKBodyRDSMysqldExporterMetricsResolutions
 */
 type AddServiceOKBodyRDSMysqldExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -7614,6 +8649,7 @@ AddServiceOKBodyRDSNode RemoteRDSNode represents remote RDS Node. Agents can't r
 swagger:model AddServiceOKBodyRDSNode
 */
 type AddServiceOKBodyRDSNode struct {
+
 	// Unique randomly generated instance identifier.
 	NodeID string `json:"node_id,omitempty"`
 
@@ -7672,6 +8708,7 @@ AddServiceOKBodyRDSPostgresql PostgreSQLService represents a generic PostgreSQL 
 swagger:model AddServiceOKBodyRDSPostgresql
 */
 type AddServiceOKBodyRDSPostgresql struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -7748,6 +8785,7 @@ AddServiceOKBodyRDSPostgresqlExporter PostgresExporter runs on Generic or Contai
 swagger:model AddServiceOKBodyRDSPostgresqlExporter
 */
 type AddServiceOKBodyRDSPostgresqlExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -7992,6 +9030,7 @@ func (o *AddServiceOKBodyRDSPostgresqlExporter) ContextValidate(ctx context.Cont
 }
 
 func (o *AddServiceOKBodyRDSPostgresqlExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -8038,6 +9077,7 @@ AddServiceOKBodyRDSPostgresqlExporterMetricsResolutions MetricsResolutions repre
 swagger:model AddServiceOKBodyRDSPostgresqlExporterMetricsResolutions
 */
 type AddServiceOKBodyRDSPostgresqlExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -8081,6 +9121,7 @@ AddServiceOKBodyRDSQANMysqlPerfschema QANMySQLPerfSchemaAgent runs within pmm-ag
 swagger:model AddServiceOKBodyRDSQANMysqlPerfschema
 */
 type AddServiceOKBodyRDSQANMysqlPerfschema struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -8308,6 +9349,7 @@ AddServiceOKBodyRDSQANPostgresqlPgstatements QANPostgreSQLPgStatementsAgent runs
 swagger:model AddServiceOKBodyRDSQANPostgresqlPgstatements
 */
 type AddServiceOKBodyRDSQANPostgresqlPgstatements struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -8520,6 +9562,7 @@ AddServiceOKBodyRDSRDSExporter RDSExporter runs on Generic or Container Node and
 swagger:model AddServiceOKBodyRDSRDSExporter
 */
 type AddServiceOKBodyRDSRDSExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -8752,6 +9795,7 @@ func (o *AddServiceOKBodyRDSRDSExporter) ContextValidate(ctx context.Context, fo
 }
 
 func (o *AddServiceOKBodyRDSRDSExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -8798,6 +9842,7 @@ AddServiceOKBodyRDSRDSExporterMetricsResolutions MetricsResolutions represents P
 swagger:model AddServiceOKBodyRDSRDSExporterMetricsResolutions
 */
 type AddServiceOKBodyRDSRDSExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -8841,6 +9886,7 @@ AddServiceOKBodyValkey add service OK body valkey
 swagger:model AddServiceOKBodyValkey
 */
 type AddServiceOKBodyValkey struct {
+
 	// service
 	Service *AddServiceOKBodyValkeyService `json:"service,omitempty"`
 
@@ -8931,6 +9977,7 @@ func (o *AddServiceOKBodyValkey) ContextValidate(ctx context.Context, formats st
 }
 
 func (o *AddServiceOKBodyValkey) contextValidateService(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Service != nil {
 
 		if swag.IsZero(o.Service) { // not required
@@ -8955,6 +10002,7 @@ func (o *AddServiceOKBodyValkey) contextValidateService(ctx context.Context, for
 }
 
 func (o *AddServiceOKBodyValkey) contextValidateValkeyExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.ValkeyExporter != nil {
 
 		if swag.IsZero(o.ValkeyExporter) { // not required
@@ -9001,6 +10049,7 @@ AddServiceOKBodyValkeyService ValkeyService represents a generic Valkey instance
 swagger:model AddServiceOKBodyValkeyService
 */
 type AddServiceOKBodyValkeyService struct {
+
 	// Unique randomly generated instance identifier.
 	ServiceID string `json:"service_id,omitempty"`
 
@@ -9071,6 +10120,7 @@ AddServiceOKBodyValkeyValkeyExporter ValkeyExporter runs on Generic or Container
 swagger:model AddServiceOKBodyValkeyValkeyExporter
 */
 type AddServiceOKBodyValkeyValkeyExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -9245,6 +10295,7 @@ func (o *AddServiceOKBodyValkeyValkeyExporter) ContextValidate(ctx context.Conte
 }
 
 func (o *AddServiceOKBodyValkeyValkeyExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -9291,6 +10342,7 @@ AddServiceOKBodyValkeyValkeyExporterMetricsResolutions MetricsResolutions repres
 swagger:model AddServiceOKBodyValkeyValkeyExporterMetricsResolutions
 */
 type AddServiceOKBodyValkeyValkeyExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -9330,10 +10382,496 @@ func (o *AddServiceOKBodyValkeyValkeyExporterMetricsResolutions) UnmarshalBinary
 }
 
 /*
+AddServiceParamsBodyClickhouse add service params body clickhouse
+swagger:model AddServiceParamsBodyClickhouse
+*/
+type AddServiceParamsBodyClickhouse struct {
+
+	// Node identifier on which the service is running.
+	// Only one of these parameters should be present: node_id, node_name, add_node.
+	NodeID string `json:"node_id,omitempty"`
+
+	// Node name on which a service is running.
+	// Only one of these parameters should be present: node_id, node_name, add_node.
+	NodeName string `json:"node_name,omitempty"`
+
+	// User-defined name, it is required and should be unique across all services.
+	ServiceName string `json:"service_name,omitempty"`
+
+	// Node and Service access address (DNS name or IP).
+	// Address (and port) or socket is required.
+	Address string `json:"address,omitempty"`
+
+	// Service access port.
+	// Port is required when the address is present.
+	Port int64 `json:"port,omitempty"`
+
+	// Service access socket.
+	// Address (and port) or socket is required.
+	Socket string `json:"socket,omitempty"`
+
+	// The "pmm-agent" identifier which should run agents. Required.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// ClickHouse username for scraping metrics.
+	Username string `json:"username,omitempty"`
+
+	// ClickHouse password for scraping metrics.
+	Password string `json:"password,omitempty"`
+
+	// Environment name.
+	Environment string `json:"environment,omitempty"`
+
+	// Cluster name.
+	Cluster string `json:"cluster,omitempty"`
+
+	// Replication set name.
+	ReplicationSet string `json:"replication_set,omitempty"`
+
+	// Custom user-assigned labels for Service.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// Skip connection check.
+	SkipConnectionCheck bool `json:"skip_connection_check,omitempty"`
+
+	// Use TLS for connection.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS verification.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// MetricsMode defines desired metrics mode for agent,
+	// it can be pull, push or auto mode chosen by server.
+	//
+	//  - METRICS_MODE_UNSPECIFIED: Auto
+	// Enum: ["METRICS_MODE_UNSPECIFIED","METRICS_MODE_PULL","METRICS_MODE_PUSH"]
+	MetricsMode *string `json:"metrics_mode,omitempty"`
+
+	// Log level for exporters
+	//
+	// - LOG_LEVEL_UNSPECIFIED: Auto
+	// Enum: ["LOG_LEVEL_UNSPECIFIED","LOG_LEVEL_FATAL","LOG_LEVEL_ERROR","LOG_LEVEL_WARN","LOG_LEVEL_INFO","LOG_LEVEL_DEBUG"]
+	LogLevel *string `json:"log_level,omitempty"`
+
+	// Optionally expose the exporter process on all public interfaces
+	ExposeExporter bool `json:"expose_exporter,omitempty"`
+
+	// TLS CA certificate.
+	TLSCa string `json:"tls_ca,omitempty"`
+
+	// TLS Certificate.
+	TLSCert string `json:"tls_cert,omitempty"`
+
+	// TLS Certificate Key.
+	TLSKey string `json:"tls_key,omitempty"`
+
+	// Custom password for exporter endpoint /metrics.
+	AgentPassword string `json:"agent_password,omitempty"`
+
+	// MetricsSource selects how ClickHouse metrics reach PMM.
+	//
+	//  - METRICS_SOURCE_UNSPECIFIED: Auto-probe the native endpoint and fall back to the managed exporter.
+	//  - METRICS_SOURCE_NATIVE: Scrape the ClickHouse native Prometheus endpoint (<prometheus> config).
+	//  - METRICS_SOURCE_EXPORTER: Run a PMM-managed clickhouse_exporter process.
+	// Enum: ["METRICS_SOURCE_UNSPECIFIED","METRICS_SOURCE_NATIVE","METRICS_SOURCE_EXPORTER"]
+	MetricsSource *string `json:"metrics_source,omitempty"`
+
+	// ClickHouse native Prometheus endpoint port (default 9363).
+	// Used for the native source and the auto-probe.
+	NativeMetricsPort int64 `json:"native_metrics_port,omitempty"`
+
+	// Connection protocol: native (tcp), http, or https.
+	Protocol string `json:"protocol,omitempty"`
+
+	// add node
+	AddNode *AddServiceParamsBodyClickhouseAddNode `json:"add_node,omitempty"`
+}
+
+// Validate validates this add service params body clickhouse
+func (o *AddServiceParamsBodyClickhouse) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateMetricsMode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateLogLevel(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateMetricsSource(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateAddNode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var addServiceParamsBodyClickhouseTypeMetricsModePropEnum []any
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["METRICS_MODE_UNSPECIFIED","METRICS_MODE_PULL","METRICS_MODE_PUSH"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		addServiceParamsBodyClickhouseTypeMetricsModePropEnum = append(addServiceParamsBodyClickhouseTypeMetricsModePropEnum, v)
+	}
+}
+
+const (
+
+	// AddServiceParamsBodyClickhouseMetricsModeMETRICSMODEUNSPECIFIED captures enum value "METRICS_MODE_UNSPECIFIED"
+	AddServiceParamsBodyClickhouseMetricsModeMETRICSMODEUNSPECIFIED string = "METRICS_MODE_UNSPECIFIED"
+
+	// AddServiceParamsBodyClickhouseMetricsModeMETRICSMODEPULL captures enum value "METRICS_MODE_PULL"
+	AddServiceParamsBodyClickhouseMetricsModeMETRICSMODEPULL string = "METRICS_MODE_PULL"
+
+	// AddServiceParamsBodyClickhouseMetricsModeMETRICSMODEPUSH captures enum value "METRICS_MODE_PUSH"
+	AddServiceParamsBodyClickhouseMetricsModeMETRICSMODEPUSH string = "METRICS_MODE_PUSH"
+)
+
+// prop value enum
+func (o *AddServiceParamsBodyClickhouse) validateMetricsModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, addServiceParamsBodyClickhouseTypeMetricsModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *AddServiceParamsBodyClickhouse) validateMetricsMode(formats strfmt.Registry) error {
+	if swag.IsZero(o.MetricsMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateMetricsModeEnum("body"+"."+"clickhouse"+"."+"metrics_mode", "body", *o.MetricsMode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var addServiceParamsBodyClickhouseTypeLogLevelPropEnum []any
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["LOG_LEVEL_UNSPECIFIED","LOG_LEVEL_FATAL","LOG_LEVEL_ERROR","LOG_LEVEL_WARN","LOG_LEVEL_INFO","LOG_LEVEL_DEBUG"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		addServiceParamsBodyClickhouseTypeLogLevelPropEnum = append(addServiceParamsBodyClickhouseTypeLogLevelPropEnum, v)
+	}
+}
+
+const (
+
+	// AddServiceParamsBodyClickhouseLogLevelLOGLEVELUNSPECIFIED captures enum value "LOG_LEVEL_UNSPECIFIED"
+	AddServiceParamsBodyClickhouseLogLevelLOGLEVELUNSPECIFIED string = "LOG_LEVEL_UNSPECIFIED"
+
+	// AddServiceParamsBodyClickhouseLogLevelLOGLEVELFATAL captures enum value "LOG_LEVEL_FATAL"
+	AddServiceParamsBodyClickhouseLogLevelLOGLEVELFATAL string = "LOG_LEVEL_FATAL"
+
+	// AddServiceParamsBodyClickhouseLogLevelLOGLEVELERROR captures enum value "LOG_LEVEL_ERROR"
+	AddServiceParamsBodyClickhouseLogLevelLOGLEVELERROR string = "LOG_LEVEL_ERROR"
+
+	// AddServiceParamsBodyClickhouseLogLevelLOGLEVELWARN captures enum value "LOG_LEVEL_WARN"
+	AddServiceParamsBodyClickhouseLogLevelLOGLEVELWARN string = "LOG_LEVEL_WARN"
+
+	// AddServiceParamsBodyClickhouseLogLevelLOGLEVELINFO captures enum value "LOG_LEVEL_INFO"
+	AddServiceParamsBodyClickhouseLogLevelLOGLEVELINFO string = "LOG_LEVEL_INFO"
+
+	// AddServiceParamsBodyClickhouseLogLevelLOGLEVELDEBUG captures enum value "LOG_LEVEL_DEBUG"
+	AddServiceParamsBodyClickhouseLogLevelLOGLEVELDEBUG string = "LOG_LEVEL_DEBUG"
+)
+
+// prop value enum
+func (o *AddServiceParamsBodyClickhouse) validateLogLevelEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, addServiceParamsBodyClickhouseTypeLogLevelPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *AddServiceParamsBodyClickhouse) validateLogLevel(formats strfmt.Registry) error {
+	if swag.IsZero(o.LogLevel) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateLogLevelEnum("body"+"."+"clickhouse"+"."+"log_level", "body", *o.LogLevel); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var addServiceParamsBodyClickhouseTypeMetricsSourcePropEnum []any
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["METRICS_SOURCE_UNSPECIFIED","METRICS_SOURCE_NATIVE","METRICS_SOURCE_EXPORTER"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		addServiceParamsBodyClickhouseTypeMetricsSourcePropEnum = append(addServiceParamsBodyClickhouseTypeMetricsSourcePropEnum, v)
+	}
+}
+
+const (
+
+	// AddServiceParamsBodyClickhouseMetricsSourceMETRICSSOURCEUNSPECIFIED captures enum value "METRICS_SOURCE_UNSPECIFIED"
+	AddServiceParamsBodyClickhouseMetricsSourceMETRICSSOURCEUNSPECIFIED string = "METRICS_SOURCE_UNSPECIFIED"
+
+	// AddServiceParamsBodyClickhouseMetricsSourceMETRICSSOURCENATIVE captures enum value "METRICS_SOURCE_NATIVE"
+	AddServiceParamsBodyClickhouseMetricsSourceMETRICSSOURCENATIVE string = "METRICS_SOURCE_NATIVE"
+
+	// AddServiceParamsBodyClickhouseMetricsSourceMETRICSSOURCEEXPORTER captures enum value "METRICS_SOURCE_EXPORTER"
+	AddServiceParamsBodyClickhouseMetricsSourceMETRICSSOURCEEXPORTER string = "METRICS_SOURCE_EXPORTER"
+)
+
+// prop value enum
+func (o *AddServiceParamsBodyClickhouse) validateMetricsSourceEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, addServiceParamsBodyClickhouseTypeMetricsSourcePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *AddServiceParamsBodyClickhouse) validateMetricsSource(formats strfmt.Registry) error {
+	if swag.IsZero(o.MetricsSource) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateMetricsSourceEnum("body"+"."+"clickhouse"+"."+"metrics_source", "body", *o.MetricsSource); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *AddServiceParamsBodyClickhouse) validateAddNode(formats strfmt.Registry) error {
+	if swag.IsZero(o.AddNode) { // not required
+		return nil
+	}
+
+	if o.AddNode != nil {
+		if err := o.AddNode.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("body" + "." + "clickhouse" + "." + "add_node")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("body" + "." + "clickhouse" + "." + "add_node")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this add service params body clickhouse based on the context it is used
+func (o *AddServiceParamsBodyClickhouse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateAddNode(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *AddServiceParamsBodyClickhouse) contextValidateAddNode(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.AddNode != nil {
+
+		if swag.IsZero(o.AddNode) { // not required
+			return nil
+		}
+
+		if err := o.AddNode.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("body" + "." + "clickhouse" + "." + "add_node")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("body" + "." + "clickhouse" + "." + "add_node")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AddServiceParamsBodyClickhouse) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AddServiceParamsBodyClickhouse) UnmarshalBinary(b []byte) error {
+	var res AddServiceParamsBodyClickhouse
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+AddServiceParamsBodyClickhouseAddNode AddNodeParams holds node params and is used to add new node to inventory while adding new service.
+swagger:model AddServiceParamsBodyClickhouseAddNode
+*/
+type AddServiceParamsBodyClickhouseAddNode struct {
+
+	// NodeType describes supported Node types.
+	// Enum: ["NODE_TYPE_UNSPECIFIED","NODE_TYPE_GENERIC_NODE","NODE_TYPE_CONTAINER_NODE","NODE_TYPE_REMOTE_NODE","NODE_TYPE_REMOTE_RDS_NODE","NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"]
+	NodeType *string `json:"node_type,omitempty"`
+
+	// Unique across all Nodes user-defined name.
+	NodeName string `json:"node_name,omitempty"`
+
+	// Linux machine-id.
+	MachineID string `json:"machine_id,omitempty"`
+
+	// Linux distribution name and version.
+	Distro string `json:"distro,omitempty"`
+
+	// Container identifier. If specified, must be a unique Docker container identifier.
+	ContainerID string `json:"container_id,omitempty"`
+
+	// Container name.
+	ContainerName string `json:"container_name,omitempty"`
+
+	// Node model.
+	NodeModel string `json:"node_model,omitempty"`
+
+	// Node region.
+	Region string `json:"region,omitempty"`
+
+	// Node availability zone.
+	Az string `json:"az,omitempty"`
+
+	// Custom user-assigned labels for Node.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+}
+
+// Validate validates this add service params body clickhouse add node
+func (o *AddServiceParamsBodyClickhouseAddNode) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateNodeType(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var addServiceParamsBodyClickhouseAddNodeTypeNodeTypePropEnum []any
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["NODE_TYPE_UNSPECIFIED","NODE_TYPE_GENERIC_NODE","NODE_TYPE_CONTAINER_NODE","NODE_TYPE_REMOTE_NODE","NODE_TYPE_REMOTE_RDS_NODE","NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		addServiceParamsBodyClickhouseAddNodeTypeNodeTypePropEnum = append(addServiceParamsBodyClickhouseAddNodeTypeNodeTypePropEnum, v)
+	}
+}
+
+const (
+
+	// AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPEUNSPECIFIED captures enum value "NODE_TYPE_UNSPECIFIED"
+	AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPEUNSPECIFIED string = "NODE_TYPE_UNSPECIFIED"
+
+	// AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPEGENERICNODE captures enum value "NODE_TYPE_GENERIC_NODE"
+	AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPEGENERICNODE string = "NODE_TYPE_GENERIC_NODE"
+
+	// AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPECONTAINERNODE captures enum value "NODE_TYPE_CONTAINER_NODE"
+	AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPECONTAINERNODE string = "NODE_TYPE_CONTAINER_NODE"
+
+	// AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPEREMOTENODE captures enum value "NODE_TYPE_REMOTE_NODE"
+	AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPEREMOTENODE string = "NODE_TYPE_REMOTE_NODE"
+
+	// AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPEREMOTERDSNODE captures enum value "NODE_TYPE_REMOTE_RDS_NODE"
+	AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPEREMOTERDSNODE string = "NODE_TYPE_REMOTE_RDS_NODE"
+
+	// AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPEREMOTEAZUREDATABASENODE captures enum value "NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"
+	AddServiceParamsBodyClickhouseAddNodeNodeTypeNODETYPEREMOTEAZUREDATABASENODE string = "NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"
+)
+
+// prop value enum
+func (o *AddServiceParamsBodyClickhouseAddNode) validateNodeTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, addServiceParamsBodyClickhouseAddNodeTypeNodeTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *AddServiceParamsBodyClickhouseAddNode) validateNodeType(formats strfmt.Registry) error {
+	if swag.IsZero(o.NodeType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateNodeTypeEnum("body"+"."+"clickhouse"+"."+"add_node"+"."+"node_type", "body", *o.NodeType); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validates this add service params body clickhouse add node based on context it is used
+func (o *AddServiceParamsBodyClickhouseAddNode) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *AddServiceParamsBodyClickhouseAddNode) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *AddServiceParamsBodyClickhouseAddNode) UnmarshalBinary(b []byte) error {
+	var res AddServiceParamsBodyClickhouseAddNode
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
 AddServiceParamsBodyExternal add service params body external
 swagger:model AddServiceParamsBodyExternal
 */
 type AddServiceParamsBodyExternal struct {
+
 	// Node identifier on which an external exporter is been running.
 	// runs_on_node_id should always be passed with node_id.
 	// Exactly one of these parameters should be present: node_id, node_name, add_node.
@@ -9502,6 +11040,7 @@ func (o *AddServiceParamsBodyExternal) ContextValidate(ctx context.Context, form
 }
 
 func (o *AddServiceParamsBodyExternal) contextValidateAddNode(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.AddNode != nil {
 
 		if swag.IsZero(o.AddNode) { // not required
@@ -9548,6 +11087,7 @@ AddServiceParamsBodyExternalAddNode AddNodeParams holds node params and is used 
 swagger:model AddServiceParamsBodyExternalAddNode
 */
 type AddServiceParamsBodyExternalAddNode struct {
+
 	// NodeType describes supported Node types.
 	// Enum: ["NODE_TYPE_UNSPECIFIED","NODE_TYPE_GENERIC_NODE","NODE_TYPE_CONTAINER_NODE","NODE_TYPE_REMOTE_NODE","NODE_TYPE_REMOTE_RDS_NODE","NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"]
 	NodeType *string `json:"node_type,omitempty"`
@@ -9676,6 +11216,7 @@ AddServiceParamsBodyHaproxy add service params body haproxy
 swagger:model AddServiceParamsBodyHaproxy
 */
 type AddServiceParamsBodyHaproxy struct {
+
 	// Node identifier on which an external exporter is been running.
 	// Exactly one of these parameters should be present: node_id, node_name, add_node.
 	NodeID string `json:"node_id,omitempty"`
@@ -9836,6 +11377,7 @@ func (o *AddServiceParamsBodyHaproxy) ContextValidate(ctx context.Context, forma
 }
 
 func (o *AddServiceParamsBodyHaproxy) contextValidateAddNode(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.AddNode != nil {
 
 		if swag.IsZero(o.AddNode) { // not required
@@ -9882,6 +11424,7 @@ AddServiceParamsBodyHaproxyAddNode AddNodeParams holds node params and is used t
 swagger:model AddServiceParamsBodyHaproxyAddNode
 */
 type AddServiceParamsBodyHaproxyAddNode struct {
+
 	// NodeType describes supported Node types.
 	// Enum: ["NODE_TYPE_UNSPECIFIED","NODE_TYPE_GENERIC_NODE","NODE_TYPE_CONTAINER_NODE","NODE_TYPE_REMOTE_NODE","NODE_TYPE_REMOTE_RDS_NODE","NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"]
 	NodeType *string `json:"node_type,omitempty"`
@@ -10010,6 +11553,7 @@ AddServiceParamsBodyMongodb add service params body mongodb
 swagger:model AddServiceParamsBodyMongodb
 */
 type AddServiceParamsBodyMongodb struct {
+
 	// Node identifier on which a service is been running.
 	// Exactly one of these parameters should be present: node_id, node_name, add_node.
 	NodeID string `json:"node_id,omitempty"`
@@ -10294,6 +11838,7 @@ func (o *AddServiceParamsBodyMongodb) ContextValidate(ctx context.Context, forma
 }
 
 func (o *AddServiceParamsBodyMongodb) contextValidateAddNode(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.AddNode != nil {
 
 		if swag.IsZero(o.AddNode) { // not required
@@ -10340,6 +11885,7 @@ AddServiceParamsBodyMongodbAddNode AddNodeParams holds node params and is used t
 swagger:model AddServiceParamsBodyMongodbAddNode
 */
 type AddServiceParamsBodyMongodbAddNode struct {
+
 	// NodeType describes supported Node types.
 	// Enum: ["NODE_TYPE_UNSPECIFIED","NODE_TYPE_GENERIC_NODE","NODE_TYPE_CONTAINER_NODE","NODE_TYPE_REMOTE_NODE","NODE_TYPE_REMOTE_RDS_NODE","NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"]
 	NodeType *string `json:"node_type,omitempty"`
@@ -10468,6 +12014,7 @@ AddServiceParamsBodyMysql add service params body mysql
 swagger:model AddServiceParamsBodyMysql
 */
 type AddServiceParamsBodyMysql struct {
+
 	// Node identifier on which a service is been running.
 	// Exactly one of these parameters should be present: node_id, node_name, add_node.
 	NodeID string `json:"node_id,omitempty"`
@@ -10746,6 +12293,7 @@ func (o *AddServiceParamsBodyMysql) ContextValidate(ctx context.Context, formats
 }
 
 func (o *AddServiceParamsBodyMysql) contextValidateAddNode(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.AddNode != nil {
 
 		if swag.IsZero(o.AddNode) { // not required
@@ -10792,6 +12340,7 @@ AddServiceParamsBodyMysqlAddNode AddNodeParams holds node params and is used to 
 swagger:model AddServiceParamsBodyMysqlAddNode
 */
 type AddServiceParamsBodyMysqlAddNode struct {
+
 	// NodeType describes supported Node types.
 	// Enum: ["NODE_TYPE_UNSPECIFIED","NODE_TYPE_GENERIC_NODE","NODE_TYPE_CONTAINER_NODE","NODE_TYPE_REMOTE_NODE","NODE_TYPE_REMOTE_RDS_NODE","NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"]
 	NodeType *string `json:"node_type,omitempty"`
@@ -10920,6 +12469,7 @@ AddServiceParamsBodyPostgresql add service params body postgresql
 swagger:model AddServiceParamsBodyPostgresql
 */
 type AddServiceParamsBodyPostgresql struct {
+
 	// Node identifier on which a service is been running.
 	// Exactly one of these parameters should be present: node_id, node_name, add_node.
 	NodeID string `json:"node_id,omitempty"`
@@ -11194,6 +12744,7 @@ func (o *AddServiceParamsBodyPostgresql) ContextValidate(ctx context.Context, fo
 }
 
 func (o *AddServiceParamsBodyPostgresql) contextValidateAddNode(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.AddNode != nil {
 
 		if swag.IsZero(o.AddNode) { // not required
@@ -11240,6 +12791,7 @@ AddServiceParamsBodyPostgresqlAddNode AddNodeParams holds node params and is use
 swagger:model AddServiceParamsBodyPostgresqlAddNode
 */
 type AddServiceParamsBodyPostgresqlAddNode struct {
+
 	// NodeType describes supported Node types.
 	// Enum: ["NODE_TYPE_UNSPECIFIED","NODE_TYPE_GENERIC_NODE","NODE_TYPE_CONTAINER_NODE","NODE_TYPE_REMOTE_NODE","NODE_TYPE_REMOTE_RDS_NODE","NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"]
 	NodeType *string `json:"node_type,omitempty"`
@@ -11368,6 +12920,7 @@ AddServiceParamsBodyProxysql add service params body proxysql
 swagger:model AddServiceParamsBodyProxysql
 */
 type AddServiceParamsBodyProxysql struct {
+
 	// Node identifier on which a service is been running.
 	// Exactly one of these parameters should be present: node_id, node_name, add_node.
 	NodeID string `json:"node_id,omitempty"`
@@ -11609,6 +13162,7 @@ func (o *AddServiceParamsBodyProxysql) ContextValidate(ctx context.Context, form
 }
 
 func (o *AddServiceParamsBodyProxysql) contextValidateAddNode(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.AddNode != nil {
 
 		if swag.IsZero(o.AddNode) { // not required
@@ -11655,6 +13209,7 @@ AddServiceParamsBodyProxysqlAddNode AddNodeParams holds node params and is used 
 swagger:model AddServiceParamsBodyProxysqlAddNode
 */
 type AddServiceParamsBodyProxysqlAddNode struct {
+
 	// NodeType describes supported Node types.
 	// Enum: ["NODE_TYPE_UNSPECIFIED","NODE_TYPE_GENERIC_NODE","NODE_TYPE_CONTAINER_NODE","NODE_TYPE_REMOTE_NODE","NODE_TYPE_REMOTE_RDS_NODE","NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"]
 	NodeType *string `json:"node_type,omitempty"`
@@ -11783,6 +13338,7 @@ AddServiceParamsBodyRDS add service params body RDS
 swagger:model AddServiceParamsBodyRDS
 */
 type AddServiceParamsBodyRDS struct {
+
 	// AWS region.
 	Region string `json:"region,omitempty"`
 
@@ -12032,6 +13588,7 @@ AddServiceParamsBodyValkey add service params body valkey
 swagger:model AddServiceParamsBodyValkey
 */
 type AddServiceParamsBodyValkey struct {
+
 	// Node identifier on which the service is running.
 	// Only one of these parameters should be present: node_id, node_name, add_node.
 	NodeID string `json:"node_id,omitempty"`
@@ -12279,6 +13836,7 @@ func (o *AddServiceParamsBodyValkey) ContextValidate(ctx context.Context, format
 }
 
 func (o *AddServiceParamsBodyValkey) contextValidateAddNode(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.AddNode != nil {
 
 		if swag.IsZero(o.AddNode) { // not required
@@ -12325,6 +13883,7 @@ AddServiceParamsBodyValkeyAddNode AddNodeParams holds node params and is used to
 swagger:model AddServiceParamsBodyValkeyAddNode
 */
 type AddServiceParamsBodyValkeyAddNode struct {
+
 	// NodeType describes supported Node types.
 	// Enum: ["NODE_TYPE_UNSPECIFIED","NODE_TYPE_GENERIC_NODE","NODE_TYPE_CONTAINER_NODE","NODE_TYPE_REMOTE_NODE","NODE_TYPE_REMOTE_RDS_NODE","NODE_TYPE_REMOTE_AZURE_DATABASE_NODE"]
 	NodeType *string `json:"node_type,omitempty"`

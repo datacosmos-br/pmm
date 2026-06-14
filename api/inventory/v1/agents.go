@@ -43,5 +43,7 @@ func (*RDSExporter) sealedAgent()                     {}
 func (*ExternalExporter) sealedAgent()                {}
 func (*AzureDatabaseExporter) sealedAgent()           {}
 func (*ValkeyExporter) sealedAgent()                  {}
+func (*ClickHouseExporter) sealedAgent()              {}
+func (*QANClickHouseQueryLogAgent) sealedAgent()      {}
 func (*RTAMongoDBAgent) sealedAgent()                 {}
 func (*OtelCollector) sealedAgent()                   {}

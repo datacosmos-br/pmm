@@ -102,6 +102,7 @@ func (o *GetAgentOK) GetPayload() *GetAgentOKBody {
 }
 
 func (o *GetAgentOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(GetAgentOKBody)
 
 	// response payload
@@ -175,6 +176,7 @@ func (o *GetAgentDefault) GetPayload() *GetAgentDefaultBody {
 }
 
 func (o *GetAgentDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(GetAgentDefaultBody)
 
 	// response payload
@@ -190,6 +192,7 @@ GetAgentDefaultBody get agent default body
 swagger:model GetAgentDefaultBody
 */
 type GetAgentDefaultBody struct {
+
 	// code
 	Code int32 `json:"code,omitempty"`
 
@@ -259,7 +262,9 @@ func (o *GetAgentDefaultBody) ContextValidate(ctx context.Context, formats strfm
 }
 
 func (o *GetAgentDefaultBody) contextValidateDetails(ctx context.Context, formats strfmt.Registry) error {
+
 	for i := 0; i < len(o.Details); i++ {
+
 		if o.Details[i] != nil {
 
 			if swag.IsZero(o.Details[i]) { // not required
@@ -279,6 +284,7 @@ func (o *GetAgentDefaultBody) contextValidateDetails(ctx context.Context, format
 				return err
 			}
 		}
+
 	}
 
 	return nil
@@ -307,6 +313,7 @@ GetAgentDefaultBodyDetailsItems0 get agent default body details items0
 swagger:model GetAgentDefaultBodyDetailsItems0
 */
 type GetAgentDefaultBodyDetailsItems0 struct {
+
 	// at type
 	AtType string `json:"@type,omitempty"`
 
@@ -318,6 +325,7 @@ type GetAgentDefaultBodyDetailsItems0 struct {
 func (o *GetAgentDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 	// stage 1, bind the properties
 	var stage1 struct {
+
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -355,6 +363,7 @@ func (o *GetAgentDefaultBodyDetailsItems0) UnmarshalJSON(data []byte) error {
 // MarshalJSON marshals this object with additional properties into a JSON object
 func (o GetAgentDefaultBodyDetailsItems0) MarshalJSON() ([]byte, error) {
 	var stage1 struct {
+
 		// at type
 		AtType string `json:"@type,omitempty"`
 	}
@@ -418,8 +427,12 @@ GetAgentOKBody get agent OK body
 swagger:model GetAgentOKBody
 */
 type GetAgentOKBody struct {
+
 	// azure database exporter
 	AzureDatabaseExporter *GetAgentOKBodyAzureDatabaseExporter `json:"azure_database_exporter,omitempty"`
+
+	// clickhouse exporter
+	ClickhouseExporter *GetAgentOKBodyClickhouseExporter `json:"clickhouse_exporter,omitempty"`
 
 	// external exporter
 	ExternalExporter *GetAgentOKBodyExternalExporter `json:"external_exporter,omitempty"`
@@ -447,6 +460,9 @@ type GetAgentOKBody struct {
 
 	// proxysql exporter
 	ProxysqlExporter *GetAgentOKBodyProxysqlExporter `json:"proxysql_exporter,omitempty"`
+
+	// qan clickhouse querylog agent
+	QANClickhouseQuerylogAgent *GetAgentOKBodyQANClickhouseQuerylogAgent `json:"qan_clickhouse_querylog_agent,omitempty"`
 
 	// qan mongodb mongolog agent
 	QANMongodbMongologAgent *GetAgentOKBodyQANMongodbMongologAgent `json:"qan_mongodb_mongolog_agent,omitempty"`
@@ -487,6 +503,10 @@ func (o *GetAgentOKBody) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := o.validateClickhouseExporter(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.validateExternalExporter(formats); err != nil {
 		res = append(res, err)
 	}
@@ -520,6 +540,10 @@ func (o *GetAgentOKBody) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := o.validateProxysqlExporter(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateQANClickhouseQuerylogAgent(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -583,6 +607,29 @@ func (o *GetAgentOKBody) validateAzureDatabaseExporter(formats strfmt.Registry) 
 			ce := new(errors.CompositeError)
 			if stderrors.As(err, &ce) {
 				return ce.ValidateName("getAgentOk" + "." + "azure_database_exporter")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (o *GetAgentOKBody) validateClickhouseExporter(formats strfmt.Registry) error {
+	if swag.IsZero(o.ClickhouseExporter) { // not required
+		return nil
+	}
+
+	if o.ClickhouseExporter != nil {
+		if err := o.ClickhouseExporter.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("getAgentOk" + "." + "clickhouse_exporter")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("getAgentOk" + "." + "clickhouse_exporter")
 			}
 
 			return err
@@ -790,6 +837,29 @@ func (o *GetAgentOKBody) validateProxysqlExporter(formats strfmt.Registry) error
 			ce := new(errors.CompositeError)
 			if stderrors.As(err, &ce) {
 				return ce.ValidateName("getAgentOk" + "." + "proxysql_exporter")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (o *GetAgentOKBody) validateQANClickhouseQuerylogAgent(formats strfmt.Registry) error {
+	if swag.IsZero(o.QANClickhouseQuerylogAgent) { // not required
+		return nil
+	}
+
+	if o.QANClickhouseQuerylogAgent != nil {
+		if err := o.QANClickhouseQuerylogAgent.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("getAgentOk" + "." + "qan_clickhouse_querylog_agent")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("getAgentOk" + "." + "qan_clickhouse_querylog_agent")
 			}
 
 			return err
@@ -1037,6 +1107,10 @@ func (o *GetAgentOKBody) ContextValidate(ctx context.Context, formats strfmt.Reg
 		res = append(res, err)
 	}
 
+	if err := o.contextValidateClickhouseExporter(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.contextValidateExternalExporter(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -1070,6 +1144,10 @@ func (o *GetAgentOKBody) ContextValidate(ctx context.Context, formats strfmt.Reg
 	}
 
 	if err := o.contextValidateProxysqlExporter(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.contextValidateQANClickhouseQuerylogAgent(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -1120,6 +1198,7 @@ func (o *GetAgentOKBody) ContextValidate(ctx context.Context, formats strfmt.Reg
 }
 
 func (o *GetAgentOKBody) contextValidateAzureDatabaseExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.AzureDatabaseExporter != nil {
 
 		if swag.IsZero(o.AzureDatabaseExporter) { // not required
@@ -1143,7 +1222,33 @@ func (o *GetAgentOKBody) contextValidateAzureDatabaseExporter(ctx context.Contex
 	return nil
 }
 
+func (o *GetAgentOKBody) contextValidateClickhouseExporter(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.ClickhouseExporter != nil {
+
+		if swag.IsZero(o.ClickhouseExporter) { // not required
+			return nil
+		}
+
+		if err := o.ClickhouseExporter.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("getAgentOk" + "." + "clickhouse_exporter")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("getAgentOk" + "." + "clickhouse_exporter")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (o *GetAgentOKBody) contextValidateExternalExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.ExternalExporter != nil {
 
 		if swag.IsZero(o.ExternalExporter) { // not required
@@ -1168,6 +1273,7 @@ func (o *GetAgentOKBody) contextValidateExternalExporter(ctx context.Context, fo
 }
 
 func (o *GetAgentOKBody) contextValidateMongodbExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MongodbExporter != nil {
 
 		if swag.IsZero(o.MongodbExporter) { // not required
@@ -1192,6 +1298,7 @@ func (o *GetAgentOKBody) contextValidateMongodbExporter(ctx context.Context, for
 }
 
 func (o *GetAgentOKBody) contextValidateMysqldExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MysqldExporter != nil {
 
 		if swag.IsZero(o.MysqldExporter) { // not required
@@ -1216,6 +1323,7 @@ func (o *GetAgentOKBody) contextValidateMysqldExporter(ctx context.Context, form
 }
 
 func (o *GetAgentOKBody) contextValidateNodeExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.NodeExporter != nil {
 
 		if swag.IsZero(o.NodeExporter) { // not required
@@ -1240,6 +1348,7 @@ func (o *GetAgentOKBody) contextValidateNodeExporter(ctx context.Context, format
 }
 
 func (o *GetAgentOKBody) contextValidateNomadAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.NomadAgent != nil {
 
 		if swag.IsZero(o.NomadAgent) { // not required
@@ -1264,6 +1373,7 @@ func (o *GetAgentOKBody) contextValidateNomadAgent(ctx context.Context, formats 
 }
 
 func (o *GetAgentOKBody) contextValidateOtelCollector(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.OtelCollector != nil {
 
 		if swag.IsZero(o.OtelCollector) { // not required
@@ -1288,6 +1398,7 @@ func (o *GetAgentOKBody) contextValidateOtelCollector(ctx context.Context, forma
 }
 
 func (o *GetAgentOKBody) contextValidatePMMAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PMMAgent != nil {
 
 		if swag.IsZero(o.PMMAgent) { // not required
@@ -1312,6 +1423,7 @@ func (o *GetAgentOKBody) contextValidatePMMAgent(ctx context.Context, formats st
 }
 
 func (o *GetAgentOKBody) contextValidatePostgresExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.PostgresExporter != nil {
 
 		if swag.IsZero(o.PostgresExporter) { // not required
@@ -1336,6 +1448,7 @@ func (o *GetAgentOKBody) contextValidatePostgresExporter(ctx context.Context, fo
 }
 
 func (o *GetAgentOKBody) contextValidateProxysqlExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.ProxysqlExporter != nil {
 
 		if swag.IsZero(o.ProxysqlExporter) { // not required
@@ -1359,7 +1472,33 @@ func (o *GetAgentOKBody) contextValidateProxysqlExporter(ctx context.Context, fo
 	return nil
 }
 
+func (o *GetAgentOKBody) contextValidateQANClickhouseQuerylogAgent(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.QANClickhouseQuerylogAgent != nil {
+
+		if swag.IsZero(o.QANClickhouseQuerylogAgent) { // not required
+			return nil
+		}
+
+		if err := o.QANClickhouseQuerylogAgent.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("getAgentOk" + "." + "qan_clickhouse_querylog_agent")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("getAgentOk" + "." + "qan_clickhouse_querylog_agent")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (o *GetAgentOKBody) contextValidateQANMongodbMongologAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANMongodbMongologAgent != nil {
 
 		if swag.IsZero(o.QANMongodbMongologAgent) { // not required
@@ -1384,6 +1523,7 @@ func (o *GetAgentOKBody) contextValidateQANMongodbMongologAgent(ctx context.Cont
 }
 
 func (o *GetAgentOKBody) contextValidateQANMongodbProfilerAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANMongodbProfilerAgent != nil {
 
 		if swag.IsZero(o.QANMongodbProfilerAgent) { // not required
@@ -1408,6 +1548,7 @@ func (o *GetAgentOKBody) contextValidateQANMongodbProfilerAgent(ctx context.Cont
 }
 
 func (o *GetAgentOKBody) contextValidateQANMysqlPerfschemaAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANMysqlPerfschemaAgent != nil {
 
 		if swag.IsZero(o.QANMysqlPerfschemaAgent) { // not required
@@ -1432,6 +1573,7 @@ func (o *GetAgentOKBody) contextValidateQANMysqlPerfschemaAgent(ctx context.Cont
 }
 
 func (o *GetAgentOKBody) contextValidateQANMysqlSlowlogAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANMysqlSlowlogAgent != nil {
 
 		if swag.IsZero(o.QANMysqlSlowlogAgent) { // not required
@@ -1456,6 +1598,7 @@ func (o *GetAgentOKBody) contextValidateQANMysqlSlowlogAgent(ctx context.Context
 }
 
 func (o *GetAgentOKBody) contextValidateQANPostgresqlPgstatementsAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANPostgresqlPgstatementsAgent != nil {
 
 		if swag.IsZero(o.QANPostgresqlPgstatementsAgent) { // not required
@@ -1480,6 +1623,7 @@ func (o *GetAgentOKBody) contextValidateQANPostgresqlPgstatementsAgent(ctx conte
 }
 
 func (o *GetAgentOKBody) contextValidateQANPostgresqlPgstatmonitorAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.QANPostgresqlPgstatmonitorAgent != nil {
 
 		if swag.IsZero(o.QANPostgresqlPgstatmonitorAgent) { // not required
@@ -1504,6 +1648,7 @@ func (o *GetAgentOKBody) contextValidateQANPostgresqlPgstatmonitorAgent(ctx cont
 }
 
 func (o *GetAgentOKBody) contextValidateRDSExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.RDSExporter != nil {
 
 		if swag.IsZero(o.RDSExporter) { // not required
@@ -1528,6 +1673,7 @@ func (o *GetAgentOKBody) contextValidateRDSExporter(ctx context.Context, formats
 }
 
 func (o *GetAgentOKBody) contextValidateRtaMongodbAgent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.RtaMongodbAgent != nil {
 
 		if swag.IsZero(o.RtaMongodbAgent) { // not required
@@ -1552,6 +1698,7 @@ func (o *GetAgentOKBody) contextValidateRtaMongodbAgent(ctx context.Context, for
 }
 
 func (o *GetAgentOKBody) contextValidateValkeyExporter(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.ValkeyExporter != nil {
 
 		if swag.IsZero(o.ValkeyExporter) { // not required
@@ -1576,6 +1723,7 @@ func (o *GetAgentOKBody) contextValidateValkeyExporter(ctx context.Context, form
 }
 
 func (o *GetAgentOKBody) contextValidateVmagent(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.Vmagent != nil {
 
 		if swag.IsZero(o.Vmagent) { // not required
@@ -1622,6 +1770,7 @@ GetAgentOKBodyAzureDatabaseExporter AzureDatabaseExporter runs on Generic or Con
 swagger:model GetAgentOKBodyAzureDatabaseExporter
 */
 type GetAgentOKBodyAzureDatabaseExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -1848,6 +1997,7 @@ func (o *GetAgentOKBodyAzureDatabaseExporter) ContextValidate(ctx context.Contex
 }
 
 func (o *GetAgentOKBodyAzureDatabaseExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -1894,6 +2044,7 @@ GetAgentOKBodyAzureDatabaseExporterMetricsResolutions MetricsResolutions represe
 swagger:model GetAgentOKBodyAzureDatabaseExporterMetricsResolutions
 */
 type GetAgentOKBodyAzureDatabaseExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -1933,10 +2084,274 @@ func (o *GetAgentOKBodyAzureDatabaseExporterMetricsResolutions) UnmarshalBinary(
 }
 
 /*
+GetAgentOKBodyClickhouseExporter ClickHouseExporter runs on Generic or Container Node and exposes ClickHouse Service metrics.
+swagger:model GetAgentOKBodyClickhouseExporter
+*/
+type GetAgentOKBodyClickhouseExporter struct {
+
+	// Unique randomly generated instance identifier.
+	AgentID string `json:"agent_id,omitempty"`
+
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Desired Agent status: enabled (false) or disabled (true).
+	Disabled bool `json:"disabled,omitempty"`
+
+	// Service identifier.
+	ServiceID string `json:"service_id,omitempty"`
+
+	// ClickHouse username for scraping metrics.
+	Username string `json:"username,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname verification.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// True if exporter uses push metrics mode.
+	PushMetricsEnabled bool `json:"push_metrics_enabled,omitempty"`
+
+	// List of disabled collector names.
+	DisabledCollectors []string `json:"disabled_collectors"`
+
+	// AgentStatus represents actual Agent status.
+	//
+	//  - AGENT_STATUS_STARTING: Agent is starting.
+	//  - AGENT_STATUS_INITIALIZATION_ERROR: Agent encountered error when starting.
+	//  - AGENT_STATUS_RUNNING: Agent is running.
+	//  - AGENT_STATUS_WAITING: Agent encountered error and will be restarted automatically soon.
+	//  - AGENT_STATUS_STOPPING: Agent is stopping.
+	//  - AGENT_STATUS_DONE: Agent has been stopped or disabled.
+	//  - AGENT_STATUS_UNKNOWN: Agent is not connected, we don't know anything about it's state.
+	// Enum: ["AGENT_STATUS_UNSPECIFIED","AGENT_STATUS_STARTING","AGENT_STATUS_INITIALIZATION_ERROR","AGENT_STATUS_RUNNING","AGENT_STATUS_WAITING","AGENT_STATUS_STOPPING","AGENT_STATUS_DONE","AGENT_STATUS_UNKNOWN"]
+	Status *string `json:"status,omitempty"`
+
+	// Listen port for scraping metrics.
+	ListenPort int64 `json:"listen_port,omitempty"`
+
+	// Path to exec process.
+	ProcessExecPath string `json:"process_exec_path,omitempty"`
+
+	// Optionally expose the exporter process on all public interfaces
+	ExposeExporter bool `json:"expose_exporter,omitempty"`
+
+	// metrics resolutions
+	MetricsResolutions *GetAgentOKBodyClickhouseExporterMetricsResolutions `json:"metrics_resolutions,omitempty"`
+}
+
+// Validate validates this get agent OK body clickhouse exporter
+func (o *GetAgentOKBodyClickhouseExporter) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateMetricsResolutions(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var getAgentOkBodyClickhouseExporterTypeStatusPropEnum []any
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["AGENT_STATUS_UNSPECIFIED","AGENT_STATUS_STARTING","AGENT_STATUS_INITIALIZATION_ERROR","AGENT_STATUS_RUNNING","AGENT_STATUS_WAITING","AGENT_STATUS_STOPPING","AGENT_STATUS_DONE","AGENT_STATUS_UNKNOWN"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		getAgentOkBodyClickhouseExporterTypeStatusPropEnum = append(getAgentOkBodyClickhouseExporterTypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSUNSPECIFIED captures enum value "AGENT_STATUS_UNSPECIFIED"
+	GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSUNSPECIFIED string = "AGENT_STATUS_UNSPECIFIED"
+
+	// GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSSTARTING captures enum value "AGENT_STATUS_STARTING"
+	GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSSTARTING string = "AGENT_STATUS_STARTING"
+
+	// GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSINITIALIZATIONERROR captures enum value "AGENT_STATUS_INITIALIZATION_ERROR"
+	GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSINITIALIZATIONERROR string = "AGENT_STATUS_INITIALIZATION_ERROR"
+
+	// GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSRUNNING captures enum value "AGENT_STATUS_RUNNING"
+	GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSRUNNING string = "AGENT_STATUS_RUNNING"
+
+	// GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSWAITING captures enum value "AGENT_STATUS_WAITING"
+	GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSWAITING string = "AGENT_STATUS_WAITING"
+
+	// GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSSTOPPING captures enum value "AGENT_STATUS_STOPPING"
+	GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSSTOPPING string = "AGENT_STATUS_STOPPING"
+
+	// GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSDONE captures enum value "AGENT_STATUS_DONE"
+	GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSDONE string = "AGENT_STATUS_DONE"
+
+	// GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSUNKNOWN captures enum value "AGENT_STATUS_UNKNOWN"
+	GetAgentOKBodyClickhouseExporterStatusAGENTSTATUSUNKNOWN string = "AGENT_STATUS_UNKNOWN"
+)
+
+// prop value enum
+func (o *GetAgentOKBodyClickhouseExporter) validateStatusEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, getAgentOkBodyClickhouseExporterTypeStatusPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *GetAgentOKBodyClickhouseExporter) validateStatus(formats strfmt.Registry) error {
+	if swag.IsZero(o.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateStatusEnum("getAgentOk"+"."+"clickhouse_exporter"+"."+"status", "body", *o.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetAgentOKBodyClickhouseExporter) validateMetricsResolutions(formats strfmt.Registry) error {
+	if swag.IsZero(o.MetricsResolutions) { // not required
+		return nil
+	}
+
+	if o.MetricsResolutions != nil {
+		if err := o.MetricsResolutions.Validate(formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("getAgentOk" + "." + "clickhouse_exporter" + "." + "metrics_resolutions")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("getAgentOk" + "." + "clickhouse_exporter" + "." + "metrics_resolutions")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this get agent OK body clickhouse exporter based on the context it is used
+func (o *GetAgentOKBodyClickhouseExporter) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateMetricsResolutions(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetAgentOKBodyClickhouseExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.MetricsResolutions != nil {
+
+		if swag.IsZero(o.MetricsResolutions) { // not required
+			return nil
+		}
+
+		if err := o.MetricsResolutions.ContextValidate(ctx, formats); err != nil {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
+				return ve.ValidateName("getAgentOk" + "." + "clickhouse_exporter" + "." + "metrics_resolutions")
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
+				return ce.ValidateName("getAgentOk" + "." + "clickhouse_exporter" + "." + "metrics_resolutions")
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetAgentOKBodyClickhouseExporter) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetAgentOKBodyClickhouseExporter) UnmarshalBinary(b []byte) error {
+	var res GetAgentOKBodyClickhouseExporter
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+GetAgentOKBodyClickhouseExporterMetricsResolutions MetricsResolutions represents Prometheus exporters metrics resolutions.
+swagger:model GetAgentOKBodyClickhouseExporterMetricsResolutions
+*/
+type GetAgentOKBodyClickhouseExporterMetricsResolutions struct {
+
+	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
+	Hr string `json:"hr,omitempty"`
+
+	// Medium resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
+	Mr string `json:"mr,omitempty"`
+
+	// Low resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
+	Lr string `json:"lr,omitempty"`
+}
+
+// Validate validates this get agent OK body clickhouse exporter metrics resolutions
+func (o *GetAgentOKBodyClickhouseExporterMetricsResolutions) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this get agent OK body clickhouse exporter metrics resolutions based on context it is used
+func (o *GetAgentOKBodyClickhouseExporterMetricsResolutions) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetAgentOKBodyClickhouseExporterMetricsResolutions) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetAgentOKBodyClickhouseExporterMetricsResolutions) UnmarshalBinary(b []byte) error {
+	var res GetAgentOKBodyClickhouseExporterMetricsResolutions
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
 GetAgentOKBodyExternalExporter ExternalExporter runs on any Node type, including Remote Node.
 swagger:model GetAgentOKBodyExternalExporter
 */
 type GetAgentOKBodyExternalExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -2105,6 +2520,7 @@ func (o *GetAgentOKBodyExternalExporter) ContextValidate(ctx context.Context, fo
 }
 
 func (o *GetAgentOKBodyExternalExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -2151,6 +2567,7 @@ GetAgentOKBodyExternalExporterMetricsResolutions MetricsResolutions represents P
 swagger:model GetAgentOKBodyExternalExporterMetricsResolutions
 */
 type GetAgentOKBodyExternalExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -2194,6 +2611,7 @@ GetAgentOKBodyMongodbExporter MongoDBExporter runs on Generic or Container Node 
 swagger:model GetAgentOKBodyMongodbExporter
 */
 type GetAgentOKBodyMongodbExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -2445,6 +2863,7 @@ func (o *GetAgentOKBodyMongodbExporter) ContextValidate(ctx context.Context, for
 }
 
 func (o *GetAgentOKBodyMongodbExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -2491,6 +2910,7 @@ GetAgentOKBodyMongodbExporterMetricsResolutions MetricsResolutions represents Pr
 swagger:model GetAgentOKBodyMongodbExporterMetricsResolutions
 */
 type GetAgentOKBodyMongodbExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -2534,6 +2954,7 @@ GetAgentOKBodyMysqldExporter MySQLdExporter runs on Generic or Container Node an
 swagger:model GetAgentOKBodyMysqldExporter
 */
 type GetAgentOKBodyMysqldExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -2795,6 +3216,7 @@ func (o *GetAgentOKBodyMysqldExporter) ContextValidate(ctx context.Context, form
 }
 
 func (o *GetAgentOKBodyMysqldExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -2841,6 +3263,7 @@ GetAgentOKBodyMysqldExporterMetricsResolutions MetricsResolutions represents Pro
 swagger:model GetAgentOKBodyMysqldExporterMetricsResolutions
 */
 type GetAgentOKBodyMysqldExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -2884,6 +3307,7 @@ GetAgentOKBodyNodeExporter NodeExporter runs on Generic or Container Node and ex
 swagger:model GetAgentOKBodyNodeExporter
 */
 type GetAgentOKBodyNodeExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3107,6 +3531,7 @@ func (o *GetAgentOKBodyNodeExporter) ContextValidate(ctx context.Context, format
 }
 
 func (o *GetAgentOKBodyNodeExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -3153,6 +3578,7 @@ GetAgentOKBodyNodeExporterMetricsResolutions MetricsResolutions represents Prome
 swagger:model GetAgentOKBodyNodeExporterMetricsResolutions
 */
 type GetAgentOKBodyNodeExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -3196,6 +3622,7 @@ GetAgentOKBodyNomadAgent get agent OK body nomad agent
 swagger:model GetAgentOKBodyNomadAgent
 */
 type GetAgentOKBodyNomadAgent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3326,6 +3753,7 @@ GetAgentOKBodyOtelCollector OtelCollector runs on the same node as pmm-agent and
 swagger:model GetAgentOKBodyOtelCollector
 */
 type GetAgentOKBodyOtelCollector struct {
+
 	// agent id
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3456,6 +3884,7 @@ GetAgentOKBodyPMMAgent PMMAgent runs on Generic or Container Node.
 swagger:model GetAgentOKBodyPMMAgent
 */
 type GetAgentOKBodyPMMAgent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3505,6 +3934,7 @@ GetAgentOKBodyPostgresExporter PostgresExporter runs on Generic or Container Nod
 swagger:model GetAgentOKBodyPostgresExporter
 */
 type GetAgentOKBodyPostgresExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -3749,6 +4179,7 @@ func (o *GetAgentOKBodyPostgresExporter) ContextValidate(ctx context.Context, fo
 }
 
 func (o *GetAgentOKBodyPostgresExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -3795,6 +4226,7 @@ GetAgentOKBodyPostgresExporterMetricsResolutions MetricsResolutions represents P
 swagger:model GetAgentOKBodyPostgresExporterMetricsResolutions
 */
 type GetAgentOKBodyPostgresExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -3838,6 +4270,7 @@ GetAgentOKBodyProxysqlExporter ProxySQLExporter runs on Generic or Container Nod
 swagger:model GetAgentOKBodyProxysqlExporter
 */
 type GetAgentOKBodyProxysqlExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4076,6 +4509,7 @@ func (o *GetAgentOKBodyProxysqlExporter) ContextValidate(ctx context.Context, fo
 }
 
 func (o *GetAgentOKBodyProxysqlExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -4122,6 +4556,7 @@ GetAgentOKBodyProxysqlExporterMetricsResolutions MetricsResolutions represents P
 swagger:model GetAgentOKBodyProxysqlExporterMetricsResolutions
 */
 type GetAgentOKBodyProxysqlExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -4161,10 +4596,224 @@ func (o *GetAgentOKBodyProxysqlExporterMetricsResolutions) UnmarshalBinary(b []b
 }
 
 /*
+GetAgentOKBodyQANClickhouseQuerylogAgent QANClickHouseQueryLogAgent runs within pmm-agent and sends ClickHouse Query Analytics data to the PMM Server.
+swagger:model GetAgentOKBodyQANClickhouseQuerylogAgent
+*/
+type GetAgentOKBodyQANClickhouseQuerylogAgent struct {
+
+	// Unique randomly generated instance identifier.
+	AgentID string `json:"agent_id,omitempty"`
+
+	// The pmm-agent identifier which runs this instance.
+	PMMAgentID string `json:"pmm_agent_id,omitempty"`
+
+	// Desired Agent status: enabled (false) or disabled (true).
+	Disabled bool `json:"disabled,omitempty"`
+
+	// Service identifier.
+	ServiceID string `json:"service_id,omitempty"`
+
+	// ClickHouse username for reading system.query_log.
+	Username string `json:"username,omitempty"`
+
+	// Disable parsing comments from queries and showing them in QAN.
+	DisableCommentsParsing bool `json:"disable_comments_parsing,omitempty"`
+
+	// Limit query length in QAN (default: server-defined; -1: no limit).
+	MaxQueryLength int32 `json:"max_query_length,omitempty"`
+
+	// Use TLS for database connections.
+	TLS bool `json:"tls,omitempty"`
+
+	// Skip TLS certificate and hostname validation.
+	TLSSkipVerify bool `json:"tls_skip_verify,omitempty"`
+
+	// Custom user-assigned labels.
+	CustomLabels map[string]string `json:"custom_labels,omitempty"`
+
+	// AgentStatus represents actual Agent status.
+	//
+	//  - AGENT_STATUS_STARTING: Agent is starting.
+	//  - AGENT_STATUS_INITIALIZATION_ERROR: Agent encountered error when starting.
+	//  - AGENT_STATUS_RUNNING: Agent is running.
+	//  - AGENT_STATUS_WAITING: Agent encountered error and will be restarted automatically soon.
+	//  - AGENT_STATUS_STOPPING: Agent is stopping.
+	//  - AGENT_STATUS_DONE: Agent has been stopped or disabled.
+	//  - AGENT_STATUS_UNKNOWN: Agent is not connected, we don't know anything about it's state.
+	// Enum: ["AGENT_STATUS_UNSPECIFIED","AGENT_STATUS_STARTING","AGENT_STATUS_INITIALIZATION_ERROR","AGENT_STATUS_RUNNING","AGENT_STATUS_WAITING","AGENT_STATUS_STOPPING","AGENT_STATUS_DONE","AGENT_STATUS_UNKNOWN"]
+	Status *string `json:"status,omitempty"`
+
+	// Path to exec process.
+	ProcessExecPath string `json:"process_exec_path,omitempty"`
+
+	// Log level for exporters
+	//
+	// - LOG_LEVEL_UNSPECIFIED: Auto
+	// Enum: ["LOG_LEVEL_UNSPECIFIED","LOG_LEVEL_FATAL","LOG_LEVEL_ERROR","LOG_LEVEL_WARN","LOG_LEVEL_INFO","LOG_LEVEL_DEBUG"]
+	LogLevel *string `json:"log_level,omitempty"`
+}
+
+// Validate validates this get agent OK body QAN clickhouse querylog agent
+func (o *GetAgentOKBodyQANClickhouseQuerylogAgent) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateLogLevel(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var getAgentOkBodyQanClickhouseQuerylogAgentTypeStatusPropEnum []any
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["AGENT_STATUS_UNSPECIFIED","AGENT_STATUS_STARTING","AGENT_STATUS_INITIALIZATION_ERROR","AGENT_STATUS_RUNNING","AGENT_STATUS_WAITING","AGENT_STATUS_STOPPING","AGENT_STATUS_DONE","AGENT_STATUS_UNKNOWN"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		getAgentOkBodyQanClickhouseQuerylogAgentTypeStatusPropEnum = append(getAgentOkBodyQanClickhouseQuerylogAgentTypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSUNSPECIFIED captures enum value "AGENT_STATUS_UNSPECIFIED"
+	GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSUNSPECIFIED string = "AGENT_STATUS_UNSPECIFIED"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSSTARTING captures enum value "AGENT_STATUS_STARTING"
+	GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSSTARTING string = "AGENT_STATUS_STARTING"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSINITIALIZATIONERROR captures enum value "AGENT_STATUS_INITIALIZATION_ERROR"
+	GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSINITIALIZATIONERROR string = "AGENT_STATUS_INITIALIZATION_ERROR"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSRUNNING captures enum value "AGENT_STATUS_RUNNING"
+	GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSRUNNING string = "AGENT_STATUS_RUNNING"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSWAITING captures enum value "AGENT_STATUS_WAITING"
+	GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSWAITING string = "AGENT_STATUS_WAITING"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSSTOPPING captures enum value "AGENT_STATUS_STOPPING"
+	GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSSTOPPING string = "AGENT_STATUS_STOPPING"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSDONE captures enum value "AGENT_STATUS_DONE"
+	GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSDONE string = "AGENT_STATUS_DONE"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSUNKNOWN captures enum value "AGENT_STATUS_UNKNOWN"
+	GetAgentOKBodyQANClickhouseQuerylogAgentStatusAGENTSTATUSUNKNOWN string = "AGENT_STATUS_UNKNOWN"
+)
+
+// prop value enum
+func (o *GetAgentOKBodyQANClickhouseQuerylogAgent) validateStatusEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, getAgentOkBodyQanClickhouseQuerylogAgentTypeStatusPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *GetAgentOKBodyQANClickhouseQuerylogAgent) validateStatus(formats strfmt.Registry) error {
+	if swag.IsZero(o.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateStatusEnum("getAgentOk"+"."+"qan_clickhouse_querylog_agent"+"."+"status", "body", *o.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var getAgentOkBodyQanClickhouseQuerylogAgentTypeLogLevelPropEnum []any
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["LOG_LEVEL_UNSPECIFIED","LOG_LEVEL_FATAL","LOG_LEVEL_ERROR","LOG_LEVEL_WARN","LOG_LEVEL_INFO","LOG_LEVEL_DEBUG"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		getAgentOkBodyQanClickhouseQuerylogAgentTypeLogLevelPropEnum = append(getAgentOkBodyQanClickhouseQuerylogAgentTypeLogLevelPropEnum, v)
+	}
+}
+
+const (
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELUNSPECIFIED captures enum value "LOG_LEVEL_UNSPECIFIED"
+	GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELUNSPECIFIED string = "LOG_LEVEL_UNSPECIFIED"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELFATAL captures enum value "LOG_LEVEL_FATAL"
+	GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELFATAL string = "LOG_LEVEL_FATAL"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELERROR captures enum value "LOG_LEVEL_ERROR"
+	GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELERROR string = "LOG_LEVEL_ERROR"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELWARN captures enum value "LOG_LEVEL_WARN"
+	GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELWARN string = "LOG_LEVEL_WARN"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELINFO captures enum value "LOG_LEVEL_INFO"
+	GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELINFO string = "LOG_LEVEL_INFO"
+
+	// GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELDEBUG captures enum value "LOG_LEVEL_DEBUG"
+	GetAgentOKBodyQANClickhouseQuerylogAgentLogLevelLOGLEVELDEBUG string = "LOG_LEVEL_DEBUG"
+)
+
+// prop value enum
+func (o *GetAgentOKBodyQANClickhouseQuerylogAgent) validateLogLevelEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, getAgentOkBodyQanClickhouseQuerylogAgentTypeLogLevelPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *GetAgentOKBodyQANClickhouseQuerylogAgent) validateLogLevel(formats strfmt.Registry) error {
+	if swag.IsZero(o.LogLevel) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := o.validateLogLevelEnum("getAgentOk"+"."+"qan_clickhouse_querylog_agent"+"."+"log_level", "body", *o.LogLevel); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validates this get agent OK body QAN clickhouse querylog agent based on context it is used
+func (o *GetAgentOKBodyQANClickhouseQuerylogAgent) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetAgentOKBodyQANClickhouseQuerylogAgent) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetAgentOKBodyQANClickhouseQuerylogAgent) UnmarshalBinary(b []byte) error {
+	var res GetAgentOKBodyQANClickhouseQuerylogAgent
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
 GetAgentOKBodyQANMongodbMongologAgent QANMongoDBMongologAgent runs within pmm-agent and sends MongoDB Query Analytics data to the PMM Server.
 swagger:model GetAgentOKBodyQANMongodbMongologAgent
 */
 type GetAgentOKBodyQANMongodbMongologAgent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4374,6 +5023,7 @@ GetAgentOKBodyQANMongodbProfilerAgent QANMongoDBProfilerAgent runs within pmm-ag
 swagger:model GetAgentOKBodyQANMongodbProfilerAgent
 */
 type GetAgentOKBodyQANMongodbProfilerAgent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4583,6 +5233,7 @@ GetAgentOKBodyQANMysqlPerfschemaAgent QANMySQLPerfSchemaAgent runs within pmm-ag
 swagger:model GetAgentOKBodyQANMysqlPerfschemaAgent
 */
 type GetAgentOKBodyQANMysqlPerfschemaAgent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -4810,6 +5461,7 @@ GetAgentOKBodyQANMysqlSlowlogAgent QANMySQLSlowlogAgent runs within pmm-agent an
 swagger:model GetAgentOKBodyQANMysqlSlowlogAgent
 */
 type GetAgentOKBodyQANMysqlSlowlogAgent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -5040,6 +5692,7 @@ GetAgentOKBodyQANPostgresqlPgstatementsAgent QANPostgreSQLPgStatementsAgent runs
 swagger:model GetAgentOKBodyQANPostgresqlPgstatementsAgent
 */
 type GetAgentOKBodyQANPostgresqlPgstatementsAgent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -5252,6 +5905,7 @@ GetAgentOKBodyQANPostgresqlPgstatmonitorAgent QANPostgreSQLPgStatMonitorAgent ru
 swagger:model GetAgentOKBodyQANPostgresqlPgstatmonitorAgent
 */
 type GetAgentOKBodyQANPostgresqlPgstatmonitorAgent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -5467,6 +6121,7 @@ GetAgentOKBodyRDSExporter RDSExporter runs on Generic or Container Node and expo
 swagger:model GetAgentOKBodyRDSExporter
 */
 type GetAgentOKBodyRDSExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -5699,6 +6354,7 @@ func (o *GetAgentOKBodyRDSExporter) ContextValidate(ctx context.Context, formats
 }
 
 func (o *GetAgentOKBodyRDSExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -5745,6 +6401,7 @@ GetAgentOKBodyRDSExporterMetricsResolutions MetricsResolutions represents Promet
 swagger:model GetAgentOKBodyRDSExporterMetricsResolutions
 */
 type GetAgentOKBodyRDSExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -5788,6 +6445,7 @@ GetAgentOKBodyRtaMongodbAgent RTAMongoDBAgent runs within pmm-agent and sends Mo
 swagger:model GetAgentOKBodyRtaMongodbAgent
 */
 type GetAgentOKBodyRtaMongodbAgent struct {
+
 	// Unique agent identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -6008,6 +6666,7 @@ func (o *GetAgentOKBodyRtaMongodbAgent) ContextValidate(ctx context.Context, for
 }
 
 func (o *GetAgentOKBodyRtaMongodbAgent) contextValidateRtaOptions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.RtaOptions != nil {
 
 		if swag.IsZero(o.RtaOptions) { // not required
@@ -6054,6 +6713,7 @@ GetAgentOKBodyRtaMongodbAgentRtaOptions RTAOptions holds Real-Time Query Analyti
 swagger:model GetAgentOKBodyRtaMongodbAgentRtaOptions
 */
 type GetAgentOKBodyRtaMongodbAgentRtaOptions struct {
+
 	// Query collect interval (default 2s is set by server).
 	CollectInterval string `json:"collect_interval,omitempty"`
 }
@@ -6091,6 +6751,7 @@ GetAgentOKBodyValkeyExporter ValkeyExporter runs on Generic or Container Node an
 swagger:model GetAgentOKBodyValkeyExporter
 */
 type GetAgentOKBodyValkeyExporter struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 
@@ -6265,6 +6926,7 @@ func (o *GetAgentOKBodyValkeyExporter) ContextValidate(ctx context.Context, form
 }
 
 func (o *GetAgentOKBodyValkeyExporter) contextValidateMetricsResolutions(ctx context.Context, formats strfmt.Registry) error {
+
 	if o.MetricsResolutions != nil {
 
 		if swag.IsZero(o.MetricsResolutions) { // not required
@@ -6311,6 +6973,7 @@ GetAgentOKBodyValkeyExporterMetricsResolutions MetricsResolutions represents Pro
 swagger:model GetAgentOKBodyValkeyExporterMetricsResolutions
 */
 type GetAgentOKBodyValkeyExporterMetricsResolutions struct {
+
 	// High resolution. In JSON should be represented as a string with number of seconds with `s` suffix.
 	Hr string `json:"hr,omitempty"`
 
@@ -6356,6 +7019,7 @@ GetAgentOKBodyVmagent VMAgent runs on Generic or Container Node alongside pmm-ag
 swagger:model GetAgentOKBodyVmagent
 */
 type GetAgentOKBodyVmagent struct {
+
 	// Unique randomly generated instance identifier.
 	AgentID string `json:"agent_id,omitempty"`
 

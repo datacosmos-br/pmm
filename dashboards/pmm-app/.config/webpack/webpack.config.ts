@@ -74,6 +74,134 @@ const config = async (env): Promise<Configuration> => {
 
     mode: env.production ? 'production' : 'development',
 
+    optimization: {
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          default: false,
+          defaultVendors: false,
+          antdCore: {
+            test: /[\\/]node_modules[\\/]antd[\\/]/,
+            name: 'pmm-qan/vendor-antd-core',
+            priority: 40,
+            enforce: true,
+          },
+          antdDesign: {
+            test: /[\\/]node_modules[\\/]@ant-design[\\/]/,
+            name: 'pmm-qan/vendor-ant-design',
+            priority: 39,
+            enforce: true,
+          },
+          rcComponents: {
+            test: /[\\/]node_modules[\\/]rc-[^\\/]+[\\/]/,
+            name: 'pmm-qan/vendor-rc',
+            priority: 38,
+            enforce: true,
+          },
+          scopedRcComponents: {
+            test: /[\\/]node_modules[\\/]@rc-component[\\/]/,
+            name: 'pmm-qan/vendor-rc-scoped',
+            priority: 38,
+            enforce: true,
+          },
+          horizontalStackedBar: {
+            test: /[\\/]node_modules[\\/]react-horizontal-stacked-bar-chart[\\/]/,
+            name: 'pmm-qan/vendor-horizontal-stacked-bar',
+            priority: 37,
+            enforce: true,
+          },
+          tippy: {
+            test: /[\\/]node_modules[\\/](@tippyjs[\\/]react|tippy\.js|@popperjs[\\/]core)[\\/]/,
+            name: 'pmm-qan/vendor-tippy',
+            priority: 36,
+            enforce: true,
+          },
+          table: {
+            test: /[\\/]node_modules[\\/]react-table[\\/]/,
+            name: 'pmm-qan/vendor-table',
+            priority: 35,
+            enforce: true,
+          },
+          formState: {
+            test: /[\\/]node_modules[\\/](final-form|react-final-form)[\\/]/,
+            name: 'pmm-qan/vendor-form-state',
+            priority: 34,
+            enforce: true,
+          },
+          simplebar: {
+            test: /[\\/]node_modules[\\/](simplebar-core|simplebar-react)[\\/]/,
+            name: 'pmm-qan/vendor-simplebar',
+            priority: 33,
+            enforce: true,
+          },
+          resizeObserver: {
+            test: /[\\/]node_modules[\\/]resize-observer-polyfill[\\/]/,
+            name: 'pmm-qan/vendor-resize-observer',
+            priority: 32,
+            enforce: true,
+          },
+          viewport: {
+            test: /[\\/]node_modules[\\/](react-viewport-list|react-split-pane)[\\/]/,
+            name: 'pmm-qan/vendor-viewport',
+            priority: 31,
+            enforce: true,
+          },
+          axios: {
+            test: /[\\/]node_modules[\\/]axios[\\/]/,
+            name: 'pmm-qan/vendor-axios',
+            priority: 30,
+            enforce: true,
+          },
+          uiUtilities: {
+            test: /[\\/]node_modules[\\/](react-style-proptype|@ctrl[\\/]tinycolor|throttle-debounce|exponential-backoff|react-lifecycles-compat|prop-types)[\\/]/,
+            name: 'pmm-qan/vendor-ui-utilities',
+            priority: 30,
+            enforce: true,
+          },
+          charts: {
+            test: /[\\/]node_modules[\\/](chart\.js|react-chartjs-2|chartjs-plugin-datalabels)[\\/]/,
+            name: 'pmm-qan/vendor-charts',
+            priority: 29,
+            enforce: true,
+          },
+          highlight: {
+            test: /[\\/]node_modules[\\/]highlight\.js[\\/]/,
+            name: 'pmm-qan/vendor-highlight',
+            priority: 20,
+            enforce: true,
+          },
+          sqlFormatter: {
+            test: /[\\/]node_modules[\\/]sql-formatter[\\/]/,
+            name: 'pmm-qan/vendor-sql-formatter',
+            priority: 19,
+            enforce: true,
+          },
+          reactJsonView: {
+            test: /[\\/]node_modules[\\/]@microlink[\\/]react-json-view[\\/]/,
+            name: 'pmm-qan/vendor-react-json-view',
+            priority: 18,
+            enforce: true,
+          },
+          lodash: {
+            test: /[\\/]node_modules[\\/](lodash|lodash-es)[\\/]/,
+            name: 'pmm-qan/vendor-lodash',
+            priority: 10,
+            enforce: true,
+          },
+          runtime: {
+            test: /[\\/]node_modules[\\/](classnames|numeral|react-is|regenerator-runtime)[\\/]/,
+            name: 'pmm-qan/vendor-runtime',
+            priority: 9,
+            enforce: true,
+          },
+        },
+      },
+    },
+
+    performance: {
+      assetFilter: (assetFilename) => assetFilename.endsWith('.js'),
+    },
+
     module: {
       rules: [
         {

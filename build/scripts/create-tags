@@ -1,13 +1,13 @@
 #!/bin/bash
-# Important: This script should never cause the pipeline to fail, so that the tags can be created outside of it.
 # To run it locally, you need pass the version, i.e. export VERSION=2.39.x
 # If run locally, it:
 # - clones pmm-submodules repository and checks out the branch corresponding to the version
-# - skips git ssh configuration and expects the user to set it up ahead of time
+# - expects git ssh configuration to be set up ahead of time
 # - uses the current user's creds and email to push tags to the repos, therefore sufficient git permissions are required
 
-set +o errexit
-set +o nounset
+set -o errexit
+set -o nounset
+set -o pipefail
 set -o xtrace
 
 # List of repositories whose release branches need to be tagged
@@ -31,15 +31,16 @@ fi
 TAG="v${VERSION}"
 echo "We will be tagging repos with a tag: $TAG"
 
+PMM_SUBMODULES_REPO=${PMM_SUBMODULES_REPO:-https://github.com/datacosmos-br/pmm-submodules.git}
 REPO_DIR=pmm-submodules
 if [ -d "$REPO_DIR" ]; then
     echo "Error: the directory $REPO_DIR already exists, exiting..."
-    exit 0 # this is on purpose, we don't want to fail the pipeline
+    exit 1
 fi
 
-if ! git clone --branch "pmm-${VERSION}" --single-branch https://github.com/Percona-Lab/pmm-submodules "$REPO_DIR"; then
+if ! git clone --branch "pmm-${VERSION}" --single-branch "$PMM_SUBMODULES_REPO" "$REPO_DIR"; then
     echo "Fatal: failed to clone pmm-submodules, branch pmm-${VERSION}"
-    exit 0
+    exit 1
 fi
 
 cd "$REPO_DIR" >/dev/null
@@ -52,7 +53,7 @@ for REPO in "${repos[@]}"; do
 
         if git tag -l | grep "$TAG"; then
             echo "Fatal: tag $TAG already exists in $REPO, exiting..."
-            break
+            exit 1
         fi
 
         echo "Tagging SHA: $(git rev-parse HEAD)"
@@ -66,7 +67,7 @@ for REPO in "${repos[@]}"; do
         if ! git push origin "$TAG"; then
             echo "Fatal: failed to tag the repository $REPO with $TAG, exiting..."
             popd >/dev/null
-            break
+            exit 1
         fi
     popd >/dev/null
 done

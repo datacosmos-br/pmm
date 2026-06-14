@@ -52,10 +52,26 @@ settings.json
 /dev/clickhouse-backups/
 encryption.key
 
+# datacosmos build artifacts (kept outside the repo by Makefile.datacosmos)
+/build-root/
+/pmm-build-root/
+/pmm-artifacts/
+/artifacts/
+/sources
+/bin/
+
+# agent governance — local to the workspace, never committed
+/.agents/
+
 # Exclude local AI skills/settings; team rules live in .cursor/rules/
 .claude/
+.codex/
 .cursor/*
 !.cursor/rules/
 !.cursor/rules/**
 .cursorrules/
+build/.cache/
+.serena/
 CLAUDE.md
+
+*.pyc

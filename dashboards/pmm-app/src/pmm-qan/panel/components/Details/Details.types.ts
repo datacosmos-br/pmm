@@ -1,6 +1,11 @@
 import { ActionResult } from 'shared/components/Actions';
 
-export type DatabasesType = 'mysql' | 'postgresql' | 'mongodb' | undefined;
+export type DatabasesType =
+  | 'mysql'
+  | 'postgresql'
+  | 'mongodb'
+  | 'clickhouse'
+  | undefined;
 
 export interface DetailsState {
   examples?: any;

@@ -3,6 +3,15 @@
 > **Parent guide**: [AGENTS.md](../AGENTS.md) — product overview, architecture, domain model, global conventions
 > **Related**: [managed/AGENTS.md](../managed/AGENTS.md) (server backend) · [api/AGENTS.md](../api/AGENTS.md) (API definitions) · [admin/AGENTS.md](../admin/AGENTS.md) (CLI)
 
+## Strongest Rule: No Bypass, No Hidden Failure
+
+pmm-agent tests must run against the real daemon/container dependencies they
+exercise. Do not replace a failing MongoDB, PostgreSQL, Valkey, ClickHouse, or
+PMM Server path with a synthetic unit, skipped package, relaxed assertion,
+ignored exit code, or fallback just to make `make test` green. Fix the daemon,
+compose wiring, test data, timeout root cause, or production code path and
+validate with the real upstream target.
+
 **pmm-agent** is the client-side monitoring agent for PMM. It runs on every monitored host, managing metric exporters as child processes, running built-in QAN and Real-Time Analytics (RTA) collectors in-process, executing on-demand actions (explain, PT summary), and performing backup/restore jobs. It communicates with pmm-managed on the PMM Server over a persistent bidirectional gRPC stream.
 
 ## Architecture

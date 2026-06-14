@@ -390,6 +390,47 @@ func (m *AddServiceRequest) validate(all bool) error {
 			}
 		}
 
+	case *AddServiceRequest_Clickhouse:
+		if v == nil {
+			err := AddServiceRequestValidationError{
+				field:  "Service",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouse()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AddServiceRequestValidationError{
+						field:  "Clickhouse",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AddServiceRequestValidationError{
+						field:  "Clickhouse",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouse()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AddServiceRequestValidationError{
+					field:  "Clickhouse",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -461,8 +502,7 @@ func (e AddServiceRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddServiceRequestValidationError{}
@@ -826,6 +866,47 @@ func (m *AddServiceResponse) validate(all bool) error {
 			}
 		}
 
+	case *AddServiceResponse_Clickhouse:
+		if v == nil {
+			err := AddServiceResponseValidationError{
+				field:  "Service",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetClickhouse()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AddServiceResponseValidationError{
+						field:  "Clickhouse",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AddServiceResponseValidationError{
+						field:  "Clickhouse",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetClickhouse()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AddServiceResponseValidationError{
+					field:  "Clickhouse",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -897,8 +978,7 @@ func (e AddServiceResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = AddServiceResponseValidationError{}
@@ -1004,8 +1084,7 @@ func (e RemoveServiceRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = RemoveServiceRequestValidationError{}
@@ -1107,8 +1186,7 @@ func (e RemoveServiceResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = RemoveServiceResponseValidationError{}
@@ -1332,8 +1410,7 @@ func (e UniversalServiceValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = UniversalServiceValidationError{}
@@ -1441,8 +1518,7 @@ func (e ListServicesRequestValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ListServicesRequestValidationError{}
@@ -1578,8 +1654,7 @@ func (e ListServicesResponseValidationError) Error() string {
 		key,
 		e.field,
 		e.reason,
-		cause,
-	)
+		cause)
 }
 
 var _ error = ListServicesResponseValidationError{}

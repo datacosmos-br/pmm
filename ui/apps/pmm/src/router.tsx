@@ -1,15 +1,8 @@
 import React from 'react';
 import { Navigate, createBrowserRouter } from 'react-router-dom';
-import { Settings } from 'pages/settings';
-import { Updates } from 'pages/updates';
-import { UpdateClients } from 'pages/update-clients/UpdateClients';
 import { MainWithNav } from 'components/main/MainWithNav';
-import { NotFoundPage } from 'pages/not-found';
-import { HelpCenter } from 'pages/help-center';
-import { RealtimeSelection } from 'pages/rta/selection';
 import Providers from 'Providers';
 import { PMM_NEW_NAV_PATH } from 'lib/constants';
-import { RealtimeSessionsPage } from 'pages/rta/sessions';
 import { Redirect, SettingsRedirect } from 'components/redirect';
 import RealtimeOverviewPage from 'pages/rta/overview/RealtimeOverview';
 import RealtimeTab from 'pages/rta/tab/RealtimeTab';
@@ -38,19 +31,28 @@ const router = createBrowserRouter(
             },
             {
               path: 'updates',
-              element: <Updates />,
+              lazy: async () => ({
+                Component: (await import('pages/updates')).Updates,
+              }),
             },
             {
               path: 'updates/clients',
-              element: <UpdateClients />,
+              lazy: async () => ({
+                Component: (await import('pages/update-clients/UpdateClients'))
+                  .UpdateClients,
+              }),
             },
             {
               path: 'help',
-              element: <HelpCenter />,
+              lazy: async () => ({
+                Component: (await import('pages/help-center')).HelpCenter,
+              }),
             },
             {
               path: 'settings/:tab?',
-              element: <Settings />,
+              lazy: async () => ({
+                Component: (await import('pages/settings')).Settings,
+              }),
             },
             {
               path: 'adre',
@@ -89,19 +91,32 @@ const router = createBrowserRouter(
               children: [
                 {
                   path: '',
-                  element: <RealtimeTab />,
+                  lazy: async () => ({
+                    Component: (await import('pages/rta/tab/RealtimeTab'))
+                      .default,
+                  }),
                 },
                 {
                   path: 'selection',
-                  element: <RealtimeSelection />,
+                  lazy: async () => ({
+                    Component: (await import('pages/rta/selection'))
+                      .RealtimeSelection,
+                  }),
                 },
                 {
                   path: 'sessions',
-                  element: <RealtimeSessionsPage />,
+                  lazy: async () => ({
+                    Component: (await import('pages/rta/sessions'))
+                      .RealtimeSessionsPage,
+                  }),
                 },
                 {
                   path: 'overview',
-                  element: <RealtimeOverviewPage />,
+                  lazy: async () => ({
+                    Component: (
+                      await import('pages/rta/overview/RealtimeOverview')
+                    ).default,
+                  }),
                 },
               ],
             },
@@ -117,7 +132,9 @@ const router = createBrowserRouter(
             },
             {
               path: '*',
-              element: <NotFoundPage />,
+              lazy: async () => ({
+                Component: (await import('pages/not-found')).NotFoundPage,
+              }),
             },
           ],
         },

@@ -116,6 +116,27 @@ func ValkeyOptionsFromRequest(params ValkeyOptionsParams) ValkeyOptions {
 	return res
 }
 
+// ClickHouseOptionsParams contains methods to create a ClickHouseOptions object.
+type ClickHouseOptionsParams interface {
+	GetTls() bool
+	GetTlsCa() string
+	GetTlsCert() string
+	GetTlsKey() string
+	GetProtocol() string
+}
+
+// ClickHouseOptionsFromRequest creates ClickHouseOptions object from request.
+func ClickHouseOptionsFromRequest(params ClickHouseOptionsParams) ClickHouseOptions {
+	res := ClickHouseOptions{}
+	res.TLS = params.GetTls()
+	res.SSLCa = params.GetTlsCa()
+	res.SSLCert = params.GetTlsCert()
+	res.SSLKey = params.GetTlsKey()
+	res.Protocol = params.GetProtocol()
+
+	return res
+}
+
 // MongoDBOptionsParams contains methods to create MongoDBOptions object.
 type MongoDBOptionsParams interface {
 	GetTlsCertificateKey() string
@@ -368,6 +389,11 @@ func FindDBConfigForService(q *reform.Querier, serviceID string) (*DBConfig, err
 			MongoDBExporterType,
 			QANMongoDBProfilerAgentType,
 			RTAMongoDBAgentType,
+		}
+	case ClickHouseServiceType:
+		agentTypes = []AgentType{
+			ClickHouseExporterType,
+			QANClickHouseQueryLogAgentType,
 		}
 	case ExternalServiceType, HAProxyServiceType, ProxySQLServiceType:
 		fallthrough
@@ -839,6 +865,7 @@ type CreateAgentParams struct {
 	MySQLOptions             MySQLOptions
 	PostgreSQLOptions        PostgreSQLOptions
 	ValkeyOptions            ValkeyOptions
+	ClickHouseOptions        ClickHouseOptions
 }
 
 func compatibleNodeAndAgent(nodeType NodeType, agentType AgentType) bool {
@@ -908,6 +935,12 @@ func compatibleServiceAndAgent(serviceType ServiceType, agentType AgentType) boo
 		},
 		QANPostgreSQLPgStatementsAgentType: {
 			PostgreSQLServiceType,
+		},
+		ClickHouseExporterType: {
+			ClickHouseServiceType,
+		},
+		QANClickHouseQueryLogAgentType: {
+			ClickHouseServiceType,
 		},
 		ExternalExporterType: {
 			ExternalServiceType,
@@ -980,6 +1013,7 @@ func CreateAgent(q *reform.Querier, agentType AgentType, params *CreateAgentPara
 		MySQLOptions:      params.MySQLOptions,
 		PostgreSQLOptions: params.PostgreSQLOptions,
 		ValkeyOptions:     params.ValkeyOptions,
+		ClickHouseOptions: params.ClickHouseOptions,
 		LogLevel:          pointer.ToStringOrNil(params.LogLevel),
 		Disabled:          params.Disabled,
 	}
@@ -1108,6 +1142,14 @@ type ChangeValkeyOptions struct {
 	SSLKey  *string
 }
 
+// ChangeClickHouseOptions contains ClickHouseOptions fields that can be changed.
+type ChangeClickHouseOptions struct {
+	SSLCa    *string
+	SSLCert  *string
+	SSLKey   *string
+	Protocol *string
+}
+
 // ChangeAgentParams contains parameters that can be changed for all Agent types.
 type ChangeAgentParams struct {
 	// Common fields for all agents
@@ -1128,6 +1170,7 @@ type ChangeAgentParams struct {
 	MySQLOptions      *ChangeMySQLOptions
 	PostgreSQLOptions *ChangePostgreSQLOptions
 	ValkeyOptions     *ChangeValkeyOptions
+	ClickHouseOptions *ChangeClickHouseOptions
 	RTAOptions        *RTAOptions
 
 	// Simple fields that don't fit into options structs
@@ -1237,6 +1280,23 @@ func ChangeAgent(q *reform.Querier, agentID string, params *ChangeAgentParams) (
 		}
 		if params.ValkeyOptions.SSLKey != nil {
 			row.ValkeyOptions.SSLKey = *params.ValkeyOptions.SSLKey
+		}
+	}
+
+	// Update ClickHouseOptions fields
+	if params.ClickHouseOptions != nil {
+		if params.ClickHouseOptions.SSLCa != nil {
+			row.ClickHouseOptions.SSLCa = *params.ClickHouseOptions.SSLCa
+		}
+
+		if params.ClickHouseOptions.SSLCert != nil {
+			row.ClickHouseOptions.SSLCert = *params.ClickHouseOptions.SSLCert
+		}
+		if params.ClickHouseOptions.SSLKey != nil {
+			row.ClickHouseOptions.SSLKey = *params.ClickHouseOptions.SSLKey
+		}
+		if params.ClickHouseOptions.Protocol != nil {
+			row.ClickHouseOptions.Protocol = *params.ClickHouseOptions.Protocol
 		}
 	}
 

@@ -2,27 +2,33 @@ import React, { HTMLProps, useCallback } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { useStyles2 } from '@grafana/ui';
 import { css, cx } from '@emotion/css';
+import {
+  getThemeActionFocusColor,
+  getThemeCanvasBackgroundColor,
+  getThemePrimaryColor,
+  getThemePrimaryTextColor,
+} from 'shared/components/helpers/getPmmTheme';
 
 export interface CheckboxProps extends Omit<HTMLProps<HTMLInputElement>, 'value'> {
   label?: string;
   value?: boolean;
 }
 
-export const getFocusCss = ({ v1: { colors } }: GrafanaTheme2) => css`
+export const getFocusCss = (theme: GrafanaTheme2) => css`
   outline: 2px dotted transparent;
   outline-offset: 2px;
-  box-shadow: 0 0 0 2px ${(colors as any).pageBg}, 0 0 0px 4px ${colors.formFocusOutline};
+  box-shadow: 0 0 0 2px ${getThemeCanvasBackgroundColor(theme)}, 0 0 0px 4px ${getThemeActionFocusColor(theme)};
   transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 `;
 
-export const getLabelStyles = ({ v1: { typography, spacing, colors } }: GrafanaTheme2) => ({
+export const getLabelStyles = (theme: GrafanaTheme2) => ({
   label: css`
-      font-size: ${typography.size.sm};
-      font-weight: ${typography.weight.semibold};
-      line-height: 1.25;
-      margin: ${spacing.formLabelMargin};
-      padding: ${spacing.formLabelPadding};
-      color: ${colors.formLabel};
+      font-size: ${theme.typography.bodySmall.fontSize};
+      font-weight: ${theme.typography.fontWeightMedium};
+      line-height: ${theme.typography.bodySmall.lineHeight};
+      margin: 0 0 ${theme.spacing(0.5)} 0;
+      padding: 0;
+      color: ${getThemePrimaryTextColor(theme)};
       max-width: 480px;
     `,
 });
@@ -30,14 +36,13 @@ export const getLabelStyles = ({ v1: { typography, spacing, colors } }: GrafanaT
 export const getCheckboxStyles = (theme: GrafanaTheme2) => {
   const labelStyles = getLabelStyles(theme);
   const checkboxSize = '16px';
-  // @ts-ignore-next-line
-  const { main: primaryMain, shade: primaryShade, contrastText: primaryContrastText } = theme.colors.primary;
+  const { main: primaryMain, shade: primaryShade, contrastText: primaryContrastText } = getThemePrimaryColor(theme);
 
   return {
     label: cx(
       labelStyles.label,
       css`
-        padding-left: ${theme.v1.spacing.formSpacingBase}px;
+        padding-left: ${theme.spacing(1)};
       `,
     ),
     wrapper: css`
@@ -78,16 +83,16 @@ export const getCheckboxStyles = (theme: GrafanaTheme2) => {
       display: inline-block;
       width: ${checkboxSize};
       height: ${checkboxSize};
-      border-radius: ${theme.v1.border.radius.sm};
-      margin-right: ${theme.v1.spacing.formSpacingBase}px;
-      background: ${(theme.v1.colors as any).formCheckboxBg};
-      border: 1px solid ${theme.v1.colors.formInputBorder};
+      border-radius: ${theme.shape.radius.sm};
+      margin-right: ${theme.spacing(1)};
+      background: ${theme.components.input.background};
+      border: 1px solid ${theme.components.input.borderColor};
       position: absolute;
       top: 1px;
       left: 0;
       &:hover {
         cursor: pointer;
-        border-color: ${theme.v1.colors.formInputBorderHover};
+        border-color: ${theme.components.input.borderHover};
       }
     `,
   };

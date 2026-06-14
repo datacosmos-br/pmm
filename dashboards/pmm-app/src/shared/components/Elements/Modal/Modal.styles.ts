@@ -1,8 +1,7 @@
-import { stylesFactory } from '@grafana/ui';
 import { GrafanaTheme } from '@grafana/data';
 import { css } from '@emotion/css';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
+export const getStyles = (theme: GrafanaTheme) => ({
   background: css`
       position: fixed;
       top: 0;
@@ -52,4 +51,4 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
       justify-content: flex-end;
       margin-right: ${theme.spacing.sm};
     `,
-}));
+});

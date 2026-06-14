@@ -102,6 +102,8 @@ func (ss *ServicesService) ListActiveServiceTypes(ctx context.Context) ([]invent
 			res = append(res, inventoryv1.ServiceType_SERVICE_TYPE_POSTGRESQL_SERVICE)
 		case models.ValkeyServiceType:
 			res = append(res, inventoryv1.ServiceType_SERVICE_TYPE_VALKEY_SERVICE)
+		case models.ClickHouseServiceType:
+			res = append(res, inventoryv1.ServiceType_SERVICE_TYPE_CLICKHOUSE_SERVICE)
 		case models.ProxySQLServiceType:
 			res = append(res, inventoryv1.ServiceType_SERVICE_TYPE_PROXYSQL_SERVICE)
 		case models.HAProxyServiceType:
@@ -227,6 +229,28 @@ func (ss *ServicesService) AddValkey(ctx context.Context, params *models.AddDBMS
 		return nil, err
 	}
 	return res.(*inventoryv1.ValkeyService), nil //nolint:forcetypeassert
+}
+
+// AddClickHouse inserts ClickHouse Service with given parameters.
+func (ss *ServicesService) AddClickHouse(ctx context.Context, params *models.AddDBMSServiceParams) (*inventoryv1.ClickHouseService, error) {
+	service := &models.Service{}
+	e := ss.db.InTransactionContext(ctx, nil, func(tx *reform.TX) error {
+		var err error
+		service, err = models.AddNewService(tx.Querier, models.ClickHouseServiceType, params)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if e != nil {
+		return nil, e
+	}
+
+	res, err := services.ToAPIService(service)
+	if err != nil {
+		return nil, err
+	}
+	return res.(*inventoryv1.ClickHouseService), nil //nolint:forcetypeassert
 }
 
 // AddProxySQL inserts ProxySQL Service with given parameters.

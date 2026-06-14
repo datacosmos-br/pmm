@@ -1,8 +1,7 @@
-import { stylesFactory } from '@grafana/ui';
 import { GrafanaTheme } from '@grafana/data';
 import { css } from '@emotion/css';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme) => {
+export const getStyles = (theme: GrafanaTheme) => {
   const mq = `@media (max-width: ${theme.breakpoints.md})`;
 
   return {
@@ -18,4 +17,4 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
     }
   `,
   };
-});
+};

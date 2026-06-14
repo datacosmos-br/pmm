@@ -16,6 +16,7 @@ export const shouldShowAddService = (
     postgresql: 2,
     proxysql: 1,
     valkey: 1,
+    clickhouse: 1,
   };
 
   return (

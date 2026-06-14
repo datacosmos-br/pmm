@@ -44,7 +44,11 @@ if [ -n "${PMM_GROUP}" ] ; then
 fi
 
 # Check if PMM_DIR has the right permission to install files into it
-mkdir -p "${PMM_DIR}" || true
+if ! mkdir -p "${PMM_DIR}"; then
+    echo -e "Error: cannot create ${PMM_DIR}. \nPlease make sure the user $(id -un) has permissions to create this directory\n\n"
+    usage
+    exit 1
+fi
 if [ -w "${PMM_DIR}" ]; then
     echo "Installing into $(realpath "${PMM_DIR}")..."
 else
@@ -112,4 +116,4 @@ else
   fi
 fi
 
-cd "${CURRENT_DIR}" || true
+cd "${CURRENT_DIR}"
