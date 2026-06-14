@@ -111,6 +111,41 @@ dc-sync: dc-upstream
 dc-status: ## Show Git-derived upstream, tag, bump, and worktree status
 	@bash build/scripts/dc-git-status --sync
 
+.PHONY: dc-doctor
+dc-doctor: ## Validate build preconditions: no merge, clean tree, immutable fork pins, sane submodule recursion
+	@rc=0; \
+	if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1 || git rev-parse -q --verify CHERRY_PICK_HEAD >/dev/null 2>&1; then \
+		echo "FAIL: merge/cherry-pick in progress"; rc=1; \
+	else echo "OK: no merge/cherry-pick in progress"; fi; \
+	dirty=$$(git status --porcelain --untracked-files=no -- . ':(exclude)pmm-submodules'); \
+	if [ -n "$$dirty" ]; then echo "FAIL: uncommitted tracked changes:"; echo "$$dirty"; rc=1; \
+	else echo "OK: working tree clean (benign pmm-submodules pointer churn ignored)"; fi; \
+	sub_sha=$$(git rev-parse HEAD:pmm-submodules 2>/dev/null); \
+	if [ -z "$$sub_sha" ]; then echo "FAIL: pmm-submodules gitlink missing"; rc=1; \
+	else echo "OK: pmm-submodules pinned at immutable gitlink $$sub_sha"; fi; \
+	dump_branch=$$(git -C pmm-submodules config -f .gitmodules submodule.pmm-dump.branch 2>/dev/null || true); \
+	case "$$dump_branch" in \
+		v[0-9]*) echo "OK: pmm-dump pinned to tag $$dump_branch" ;; \
+		'') echo "WARN: pmm-dump branch pin not readable (submodule not initialized?)" ;; \
+		*) echo "FAIL: pmm-dump pinned to moving branch '$$dump_branch' (expected a vX.Y.Z-dcN tag)"; rc=1 ;; \
+	esac; \
+	if git -C pmm-submodules submodule status sources/pmm/src/github.com/percona/pmm 2>/dev/null | grep -q '^[^-]'; then \
+		echo "WARN: circular pmm sub-submodule is checked out (must stay uninitialized to avoid recursion)"; \
+	else echo "OK: circular pmm sub-submodule not initialized"; fi; \
+	exit $$rc
+
+.PHONY: dc-sync-upstream
+dc-sync-upstream: ## Dry-run an upstream sync (APPLY=Y to merge); NEVER runs implicitly during a build
+	@if [ "$(APPLY)" = "Y" ]; then \
+		echo "Applying upstream sync (UPSTREAM_TARGET=$(UPSTREAM_TARGET))..."; \
+		$(MAKE) dc-upstream; \
+	else \
+		echo "DRY-RUN — set APPLY=Y to merge upstream. These datacosmos files must survive any sync:"; \
+		printf '  %s\n' $(DC_RELEASE_COMMIT_PATHS); \
+		echo "Current upstream sync position:"; \
+		bash build/scripts/dc-git-status --sync || true; \
+	fi
+
 .PHONY: dc-test-env-up
 dc-test-env-up: ## Start upstream service containers used by local tests
 	@if [[ "$${DOCKER_HOST:-}" == tcp://* ]]; then \
@@ -276,7 +311,7 @@ dc-release: .dc-clean-worktree .dc-fetch-tags ## Create and push next release ta
 dc-tag: dc-release
 
 .PHONY: dc-build
-dc-build: .dc-prepare ## Build native linux images and collect artifacts
+dc-build: .dc-guard .dc-prepare ## Build native linux images and collect artifacts
 	# build-server already invokes build-client; pass both tags to avoid a duplicate client build.
 	cd $(ROOT_DIR) && ROOT_DIR=$(ROOT_DIR) RPMBUILD_DIST=$(DIST) SKIP_S3_CACHE=1 DOCKER_CLIENT_TAG=$(CLIENT_IMAGE) DOCKER_TAG=$(SERVER_IMAGE) \
 		$(CURDIR)/build/scripts/build-server
@@ -329,6 +364,19 @@ dc-clean: ## Remove datacosmos external build and artifact dirs
 	mkdir -p $(ROOT_DIR)/sources/pmm/src/github.com/percona
 	git clone --local --no-checkout $(CURDIR) $(ROOT_DIR)/sources/pmm/src/github.com/percona/pmm
 	git -C $(ROOT_DIR)/sources/pmm/src/github.com/percona/pmm checkout --detach $$(git rev-parse HEAD)
+
+.PHONY: .dc-guard
+.dc-guard: ## Fail-fast: no merge/cherry-pick in progress and no uncommitted tracked changes
+	@if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1 || git rev-parse -q --verify CHERRY_PICK_HEAD >/dev/null 2>&1; then \
+		echo "ERROR: merge/cherry-pick in progress; resolve+commit before building (dc-build clones HEAD)."; \
+		exit 1; \
+	fi
+	@dirty=$$(git status --porcelain --untracked-files=no -- . ':(exclude)pmm-submodules'); \
+	if [ -n "$$dirty" ]; then \
+		echo "ERROR: uncommitted tracked changes; dc-build clones HEAD and would SILENTLY ignore them. Commit or stash first:"; \
+		echo "$$dirty"; \
+		exit 1; \
+	fi
 
 .PHONY: .dc-clean-worktree
 .dc-clean-worktree:
