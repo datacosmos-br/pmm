@@ -310,7 +310,13 @@ dc-clean: ## Remove datacosmos external build and artifact dirs
 
 .PHONY: .dc-prepare
 .dc-prepare:
-	git submodule update --init --recursive --jobs 10
+	# Bounded submodule init: the pmm <-> pmm-submodules graph is circular
+	# (pmm-submodules/sources/pmm is percona/pmm, which re-references
+	# pmm-submodules), so a plain `--recursive` recurses forever. Init the top
+	# level, then recurse into pmm-submodules' real leaves while skipping the
+	# circular `pmm` sub-submodule (the build re-clones pmm from $(CURDIR) below).
+	git submodule update --init --jobs 10
+	git -C pmm-submodules -c submodule.pmm.update=none submodule update --init --recursive --jobs 10
 	rm -rf $(ROOT_DIR)/sources $(ROOT_DIR)/tmp/source $(ROOT_DIR)/tmp/binary
 	mkdir -p $(ROOT_DIR)/sources $(ROOT_DIR)/tmp $(ROOT_DIR)/results $(ARTIFACT_DIR)
 	chmod 0777 $(ROOT_DIR)/tmp $(ROOT_DIR)/results

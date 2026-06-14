@@ -49,12 +49,13 @@ cp -rpav public %{buildroot}%{_datadir}/grafana
 cp -rpav tools %{buildroot}%{_datadir}/grafana
 
 install -d -p %{buildroot}%{_sbindir}
-# bin/linux-*/ - `make build-go` builds one platform (linux-amd64 or
-# linux-arm64); the glob picks it without hardcoding the arch.
-cp bin/linux-*/grafana-server %{buildroot}%{_sbindir}/
-cp bin/linux-*/grafana %{buildroot}%{_sbindir}/
+# `make build-go` builds one platform under bin/, but the layout varies by
+# grafana version (bin/linux-amd64/ vs bin/linux/amd64/). Locate each binary by
+# name so %install works regardless of the arch-subdir convention.
+cp "$(find bin -type f -name grafana-server | head -1)" %{buildroot}%{_sbindir}/grafana-server
+cp "$(find bin -type f -name grafana | head -1)" %{buildroot}%{_sbindir}/grafana
 install -d -p %{buildroot}%{_bindir}
-cp bin/linux-*/grafana-cli %{buildroot}%{_bindir}/
+cp "$(find bin -type f -name grafana-cli | head -1)" %{buildroot}%{_bindir}/grafana-cli
 
 install -d -p %{buildroot}%{_sysconfdir}/grafana
 cp conf/sample.ini %{buildroot}%{_sysconfdir}/grafana/grafana.ini
