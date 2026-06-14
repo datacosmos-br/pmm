@@ -1,0 +1,25 @@
+# pmm/build/Makefile.clickhouse
+.PHONY: build-clickhouse clean-clickhouse docker-build-clickhouse
+
+# Diretório do código do módulo
+CLICKHOUSE_DIR := agent/agents/clickhouse
+# Diretório de saída para os binários
+BIN_DIR := bin
+# Nome do binário resultante (exportador)
+CLICKHOUSE_BIN := $(BIN_DIR)/clickhouse_exporter
+
+# Build do exportador ClickHouse usando Go
+build-clickhouse:
+	@echo "Compilando ClickHouse Exporter..."
+	@mkdir -p $(BIN_DIR)
+	go build -o $(CLICKHOUSE_BIN) $(CLICKHOUSE_DIR)/collector.go
+	@echo "Exportador compilado: $(CLICKHOUSE_BIN)"
+
+clean-clickhouse:
+	@echo "Limpando binário do ClickHouse Exporter..."
+	rm -f $(CLICKHOUSE_BIN)
+
+# Exemplo: Build de imagem Docker para o ClickHouse Exporter
+docker-build-clickhouse: build-clickhouse
+	@echo "Construindo imagem Docker do ClickHouse Exporter..."
+	docker build -t datacosmos-br/clickhouse_exporter:$(VERSION) -f $(CLICKHOUSE_DIR)/Dockerfile .
