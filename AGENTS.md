@@ -42,6 +42,23 @@ specific upstream commit, follow this protocol:
 5. **Gate green before claiming done:** `go build ./...` and `go vet ./<touched>/...` must
    return 0, with 0 conflict markers in every resolved file. Cite command + exit + output.
 
+### Datacosmos build & release targets (`Makefile.datacosmos`)
+
+- `make dc-doctor` — read-only preflight: no merge/cherry-pick in progress, clean tree
+  (benign `pmm-submodules` pointer churn ignored), `pmm-submodules` at an immutable gitlink,
+  `pmm-dump` pinned to a tag (fails on a moving branch), circular `pmm` sub-submodule
+  uninitialized. Run this before `dc-build`/`dc-release`.
+- `make dc-build` — depends on `.dc-guard` (fails fast on a merge/cherry-pick or any
+  uncommitted tracked change, because the build **clones HEAD** and would silently ignore
+  working-tree edits) then `.dc-prepare` (bounded submodule init that skips the circular
+  `pmm` graph). Produces `pmm-local/pmm-server` + `pmm-client` images.
+- `make dc-next` — prints the **computed** release tag (stable sync point → `vX.Y.Z-dcN`,
+  else date-based `v3-<date>-dcN`). Never hardcode the tag.
+- `make dc-release` — `.dc-clean-worktree` gate → tag the computed version → CI publishes
+  per-arch GHCR tags (`<DC_VERSION>-amd64`/`-arm64`, leading `v` stripped).
+- `make dc-sync-upstream` — explicit dry-run-default (`APPLY=Y` to merge) upstream sync;
+  never runs implicitly during a build. Lists the protected `DC_RELEASE_COMMIT_PATHS`.
+
 ## How AI tools load this document
 
 This file is the **single authoritative entry point** for AI agents. Tools are wired to it as follows:
