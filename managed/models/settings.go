@@ -26,6 +26,7 @@ import (
 
 // Default values for settings. These values are used when settings are not set.
 const (
+<<<<<<< HEAD
 	AdvisorsEnabledDefault                    = true
 	AlertingEnabledDefault                    = true
 	NativeQanEnabledDefault                   = false
@@ -48,6 +49,18 @@ const (
 	// AdreSchemaVersionCurrent is bumped when a one-way ADRE settings migration runs in fillDefaults.
 	AdreSchemaVersionCurrent = 2
 	awsPartitionID           = "aws"
+=======
+	AdvisorsEnabledDefault             = true
+	AlertingEnabledDefault             = true
+	TelemetryEnabledDefault            = true
+	UpdatesEnabledDefault              = true
+	BackupManagementEnabledDefault     = true
+	VictoriaMetricsCacheEnabledDefault = false
+	AzureDiscoverEnabledDefault        = false
+	AccessControlEnabledDefault        = false
+	InternalPgQANEnabledDefault        = false
+	awsPartitionID                     = "aws"
+>>>>>>> 22fbb58dafa28b7992b4dcbde1be1d17ce7e1e19
 )
 
 // MetricsResolutions contains standard VictoriaMetrics metrics resolutions.

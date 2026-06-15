@@ -345,11 +345,19 @@ dc-clean: ## Remove datacosmos external build and artifact dirs
 
 .PHONY: .dc-prepare
 .dc-prepare:
+<<<<<<< HEAD
 	# Bounded submodule init: the pmm <-> pmm-submodules graph is circular
 	# (pmm-submodules/sources/pmm is percona/pmm, which re-references
 	# pmm-submodules), so a plain `--recursive` recurses forever. Init the top
 	# level, then recurse into pmm-submodules' real leaves while skipping the
 	# circular `pmm` sub-submodule (the build re-clones pmm from $(CURDIR) below).
+=======
+	# Bounded submodule init. The `pmm` submodule (sources/pmm/src/github.com/percona/pmm)
+	# re-embeds pmm-submodules, so a plain `--recursive` walks the pmm <-> pmm-submodules
+	# self-reference until it hits an unfetchable deep ref and aborts (Error 128). The pmm
+	# source tree is discarded and re-cloned from $(CURDIR) below, so its nested submodules
+	# are never used: skip it and recurse only into the real leaf component repos.
+>>>>>>> 22fbb58dafa28b7992b4dcbde1be1d17ce7e1e19
 	git submodule update --init --jobs 10
 	git -C pmm-submodules -c submodule.pmm.update=none submodule update --init --recursive --jobs 10
 	rm -rf $(ROOT_DIR)/sources $(ROOT_DIR)/tmp/source $(ROOT_DIR)/tmp/binary

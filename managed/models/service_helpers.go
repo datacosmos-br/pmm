@@ -96,7 +96,7 @@ type ServiceFilters struct {
 // FindServices returns Services by filters.
 func FindServices(q *reform.Querier, filters ServiceFilters) ([]*Service, error) {
 	var conditions []string
-	var args []any
+	var args []interface{}
 	idx := 1
 	if filters.NodeID != "" {
 		conditions = append(conditions, fmt.Sprintf("node_id = %s", q.Placeholder(idx)))
@@ -143,8 +143,7 @@ func FindActiveServiceTypes(q *reform.Querier) ([]ServiceType, error) {
 	}
 
 	defer func() {
-		rowsErr := rows.Close()
-		if rowsErr != nil {
+		if rowsErr := rows.Close(); rowsErr != nil {
 			logrus.Debug(rowsErr)
 		}
 	}()
@@ -152,8 +151,7 @@ func FindActiveServiceTypes(q *reform.Querier) ([]ServiceType, error) {
 	var res []ServiceType
 	for rows.Next() {
 		var serviceType ServiceType
-		err = rows.Scan(&serviceType)
-		if err != nil {
+		if err = rows.Scan(&serviceType); err != nil {
 			return nil, err
 		}
 
@@ -172,8 +170,7 @@ func FindActiveUserServiceTypes(q *reform.Querier) ([]ServiceType, error) {
 	}
 
 	defer func() {
-		rowsErr := rows.Close()
-		if rowsErr != nil {
+		if rowsErr := rows.Close(); rowsErr != nil {
 			logrus.Debug(rowsErr)
 		}
 	}()
@@ -181,8 +178,7 @@ func FindActiveUserServiceTypes(q *reform.Querier) ([]ServiceType, error) {
 	var res []ServiceType
 	for rows.Next() {
 		var serviceType ServiceType
-		err = rows.Scan(&serviceType)
-		if err != nil {
+		if err = rows.Scan(&serviceType); err != nil {
 			return nil, err
 		}
 
@@ -296,17 +292,14 @@ func AddNewService(q *reform.Querier, serviceType ServiceType, params *AddDBMSSe
 	}
 
 	id := uuid.New().String()
-	err := checkServiceUniqueID(q, id)
-	if err != nil {
+	if err := checkServiceUniqueID(q, id); err != nil {
 		return nil, err
 	}
-	err = checkServiceUniqueName(q, params.ServiceName)
-	if err != nil {
+	if err := checkServiceUniqueName(q, params.ServiceName); err != nil {
 		return nil, err
 	}
 
-	_, err = FindNodeByID(q, params.NodeID)
-	if err != nil {
+	if _, err := FindNodeByID(q, params.NodeID); err != nil {
 		return nil, err
 	}
 
@@ -332,17 +325,14 @@ func AddNewService(q *reform.Querier, serviceType ServiceType, params *AddDBMSSe
 		Socket:         params.Socket,
 		ExternalGroup:  params.ExternalGroup,
 	}
-	err = row.SetCustomLabels(params.CustomLabels)
-	if err != nil {
+	if err := row.SetCustomLabels(params.CustomLabels); err != nil {
 		return nil, err
 	}
-	err = q.Insert(row)
-	if err != nil {
+	if err := q.Insert(row); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	err = initSoftwareVersions(q, id, serviceType)
-	if err != nil {
+	if err := initSoftwareVersions(q, id, serviceType); err != nil {
 		return nil, err
 	}
 
@@ -396,28 +386,24 @@ func RemoveService(q *reform.Querier, id string, mode RemoveMode) error { //noli
 		}
 	case RemoveCascade:
 		for _, a := range agents {
-			_, err = RemoveAgent(q, a.AgentID, RemoveCascade)
-			if err != nil {
+			if _, err := RemoveAgent(q, a.AgentID, RemoveCascade); err != nil {
 				return err
 			}
 		}
 		for _, a := range artifacts {
-			_, err = UpdateArtifact(q, a.ID, UpdateArtifactParams{
+			if _, err := UpdateArtifact(q, a.ID, UpdateArtifactParams{
 				ServiceID: new(""),
-			})
-			if err != nil {
+			}); err != nil {
 				return err
 			}
 		}
 		for _, i := range restoreItems {
-			err = RemoveRestoreHistoryItem(q, i.ID)
-			if err != nil {
+			if err := RemoveRestoreHistoryItem(q, i.ID); err != nil {
 				return err
 			}
 		}
 		for _, t := range tasks {
-			err = RemoveScheduledTask(q, t.ID)
-			if err != nil {
+			if err := RemoveScheduledTask(q, t.ID); err != nil {
 				return err
 			}
 		}
@@ -498,13 +484,12 @@ func initSoftwareVersions(q *reform.Querier, serviceID string, serviceType Servi
 	case MySQLServiceType:
 		fallthrough
 	case MongoDBServiceType:
-		_, err := CreateServiceSoftwareVersions(q, CreateServiceSoftwareVersionsParams{
+		if _, err := CreateServiceSoftwareVersions(q, CreateServiceSoftwareVersionsParams{
 			ServiceID:        serviceID,
 			ServiceType:      serviceType,
 			SoftwareVersions: []SoftwareVersion{},
 			NextCheckAt:      time.Now(),
-		})
-		if err != nil {
+		}); err != nil {
 			return errors.Wrapf(err, "couldn't initialize software versions for service %s", serviceID)
 		}
 	default:
