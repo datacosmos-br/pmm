@@ -51,7 +51,9 @@ cp -rpav tools %{buildroot}%{_datadir}/grafana
 install -d -p %{buildroot}%{_sbindir}
 # `make build-go` builds one platform under bin/, but the layout varies by
 # grafana version (bin/linux-amd64/ vs bin/linux/amd64/). Locate each binary by
-# name so %install works regardless of the arch-subdir convention.
+# name so the install section works regardless of the arch-subdir convention.
+# (Do not write a percent-install literal here: EL9 rpmbuild parses a percent
+# section keyword inside a comment as a duplicate section and fails to parse.)
 cp "$(find bin -type f -name grafana-server | head -1)" %{buildroot}%{_sbindir}/grafana-server
 cp "$(find bin -type f -name grafana | head -1)" %{buildroot}%{_sbindir}/grafana
 install -d -p %{buildroot}%{_bindir}
