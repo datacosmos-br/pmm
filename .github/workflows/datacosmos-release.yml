@@ -40,10 +40,17 @@ jobs:
       # (../pmm-artifacts). ROOT_DIR (the heavy build tree) stays out.
       ARTIFACT_DIR: ${{ github.workspace }}/pmm-artifacts
     steps:
-      - name: Checkout (with submodules)
+      - name: Checkout
         uses: actions/checkout@v6.0.3
         with:
-          submodules: recursive
+          # NOT 'recursive': the pmm <-> pmm-submodules graph is circular
+          # (pmm-submodules/sources/pmm is percona/pmm, which re-references
+          # pmm-submodules), so a recursive checkout recurses forever and dies
+          # on an unpushed nested ref (e.g. upload-pack: not our ref ...).
+          # `make dc-build` -> .dc-prepare does the correct bounded init
+          # (git -C pmm-submodules -c submodule.pmm.update=none ...), mirroring
+          # the working local build, so no submodule init is needed here.
+          submodules: false
           fetch-depth: 0
 
       - name: Derive datacosmos version
