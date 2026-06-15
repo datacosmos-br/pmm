@@ -1,15 +1,15 @@
 %undefine _missing_build_ids_terminate_build
 
 %global repo            pmm-dump
-%global provider        github.com/percona/%{repo}
-%global commit          8353b46afd09746c07a6d1c001dd1ef72e6c4761
+%global provider        github.com/datacosmos-br/%{repo}
+%global commit          dcc5549ac5ce927e2480daaad0e9e6e901ad6d52
 %global shortcommit     %(c=%{commit}; echo ${c:0:7})
 %define build_timestamp %(date -u +"%y%m%d%H%M")
 %define release         1
 %define rpm_release     %{release}.%{build_timestamp}.%{shortcommit}%{?dist}
 
 Name:		pmm-dump
-Version:	0.8.0-ga
+Version:	0.8.1
 Release:	%{rpm_release}
 Summary:	Percona PMM Dump allows to export and import monitoring metrics and query analytics.
 
@@ -37,6 +37,11 @@ install -p -m 0755 pmm-dump %{buildroot}%{_sbindir}/pmm-dump
 
 
 %changelog
+* Mon Jun 15 2026 Marlon Costa <marlon.costa@datacosmos.com.br> - 0.8.1-dc2
+- Pin pmm-dump to datacosmos-br fork tag v0.8.1-dc2 (commit dcc5549) as SSOT
+- Aligns the committed spec with pmm-submodules/sources/pmm-dump so offline
+  rpmspec and the build-time fork-provider override converge
+
 * Wed Apr 22 2026 Maxim Kondratenko <maxim.kondratenko@percona.com> - 3.7.1
 - PMM-14441 Upgrade pmm-dump to support encryption
 
