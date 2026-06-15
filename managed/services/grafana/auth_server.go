@@ -266,7 +266,7 @@ func (s *AuthServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		// copy grpc-gateway behavior: set correct codes, set both "error" and "message"
 		m := map[string]any{
 			"code":    int(authErr.code),
-			"error":   authErr.message,
+			"error":   authErr.message, //nolint:goconst
 			"message": authErr.message, //nolint:goconst
 		}
 		s.returnError(rw, m, l)

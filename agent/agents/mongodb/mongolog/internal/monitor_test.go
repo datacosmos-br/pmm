@@ -215,7 +215,7 @@ func dataToJSON(t *testing.T, data []proto.SystemProfile) ([]byte, error) {
 func writeData(t *testing.T, data []proto.SystemProfile, name string) error {
 	t.Helper()
 
-	file, err := os.Create(name + ".json") //nolint:gosec
+	file, err := os.Create(name + ".json")
 	if err != nil {
 		return err
 	}
@@ -238,7 +238,7 @@ func writeData(t *testing.T, data []proto.SystemProfile, name string) error {
 func readData(t *testing.T, name string) ([]proto.SystemProfile, error) {
 	t.Helper()
 
-	file, err := os.Open(name + ".json") //nolint:gosec
+	file, err := os.Open(name + ".json")
 	if err != nil {
 		return nil, err
 	}

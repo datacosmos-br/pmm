@@ -791,7 +791,7 @@ func (c *Client) GetAlertmanagerAlerts(ctx context.Context, authHeaders http.Hea
 // Names of the dedicated pmm-managed service account and token used for server-initiated calls.
 const (
 	serverServiceAccountName = "pmm-managed-sa"
-	serverServiceTokenName   = "pmm-managed-st"
+	serverServiceTokenName   = "pmm-managed-st" //nolint:gosec // G101: service-account token *name*, not a credential value
 )
 
 // SetServerTokenStore sets where the server service-account token is persisted.

@@ -127,7 +127,7 @@ func (s *Service) processAlert(ctx context.Context, a webhookAlert) error {
 	return err
 }
 
-// buildTags derives annotation tags. service_name/node_name are added as bare tags so the
+// buildTags derives annotation tags. Service_name/node_name are added as bare tags so the
 // built-in "PMM Annotations" layer scopes the annotation to that service; without them the
 // global "pmm_annotation" tag is used.
 func buildTags(a webhookAlert, fpTag string) []string {

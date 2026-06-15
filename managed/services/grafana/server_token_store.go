@@ -42,6 +42,8 @@ type dbServerTokenStore struct {
 
 // NewServerTokenStore returns a ServerTokenStore backed by the PMM database; the token is
 // encrypted at rest via the PMM encryption key.
+//
+//nolint:ireturn // returns the ServerTokenStore abstraction by design so callers depend on the interface (mockable, DIP)
 func NewServerTokenStore(db *reform.DB) ServerTokenStore {
 	return &dbServerTokenStore{db: db}
 }

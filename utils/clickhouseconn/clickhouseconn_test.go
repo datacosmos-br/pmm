@@ -229,7 +229,7 @@ func TestConfig_DSN(t *testing.T) {
 			},
 			want: "http://default@127.0.0.1:8123/pmm",
 		},
-		{ //nolint:gosec // deterministic DSN fixture, not real credentials.
+		{
 			name: "https with ca",
 			cfg: Config{
 				Protocol: "https",
@@ -273,7 +273,7 @@ func TestConfig_DSN(t *testing.T) {
 			wantErr:     true,
 			errContains: "clickhouse host is required",
 		},
-		{ //nolint:gosec // deterministic DSN fixture, not real credentials.
+		{
 			name: "native tls with ca",
 			cfg: Config{
 				Protocol: "native",
@@ -299,7 +299,7 @@ func TestConfig_DSN(t *testing.T) {
 			},
 			want: "clickhouse://:secret@127.0.0.1:9000/pmm",
 		},
-		{ //nolint:gosec // deterministic DSN fixture, not real credentials.
+		{
 			name: "native tls with cert and key",
 			cfg: Config{
 				Protocol: "native",
