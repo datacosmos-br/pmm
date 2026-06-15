@@ -244,6 +244,7 @@ func get(args []string, cfg *Config, l *logrus.Entry) (string, error) { //nolint
 			&cfg.Paths.PTMongoDBSummary:   "tools/pt-mongodb-summary",
 			&cfg.Paths.PTMySQLSummary:     "tools/pt-mysql-summary",
 			&cfg.Paths.Nomad:              "tools/nomad",
+			&cfg.Paths.OtelCollector:      "tools/otelcol-contrib",
 		} {
 			if *sp == "" {
 				*sp = v
