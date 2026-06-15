@@ -70,12 +70,8 @@ encryption.key
 !.cursor/rules/
 !.cursor/rules/**
 .cursorrules/
-<<<<<<< HEAD
 build/.cache/
 .serena/
 CLAUDE.md
 
 *.pyc
-=======
-CLAUDE.md
->>>>>>> 22fbb58dafa28b7992b4dcbde1be1d17ce7e1e19
