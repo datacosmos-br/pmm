@@ -4,7 +4,7 @@
 %define build_timestamp %(date -u +"%y%m%d%H%M")
 %define release         116
 %define grafana_version 12.4.4
-%define full_pmm_version 3.0.0
+%define full_pmm_version 3.8.0
 %define full_version    v%{grafana_version}-%{full_pmm_version}
 %define rpm_release     %{release}.%{build_timestamp}.%{shortcommit}%{?dist}
 
