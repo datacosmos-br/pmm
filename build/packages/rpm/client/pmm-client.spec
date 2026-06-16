@@ -112,6 +112,7 @@ install -m 0755 bin/pt-mysql-summary $RPM_BUILD_ROOT/usr/local/percona/pmm/tools
 install -m 0755 bin/pt-mongodb-summary $RPM_BUILD_ROOT/usr/local/percona/pmm/tools
 install -m 0755 bin/pt-pg-summary $RPM_BUILD_ROOT/usr/local/percona/pmm/tools
 install -m 0755 bin/nomad $RPM_BUILD_ROOT/usr/local/percona/pmm/tools
+install -m 0755 bin/otelcol-contrib $RPM_BUILD_ROOT/usr/local/percona/pmm/tools
 install -m 0660 example.prom $RPM_BUILD_ROOT/usr/local/percona/pmm/collectors/textfile-collector/low-resolution/
 install -m 0660 example.prom $RPM_BUILD_ROOT/usr/local/percona/pmm/collectors/textfile-collector/medium-resolution/
 install -m 0660 example.prom $RPM_BUILD_ROOT/usr/local/percona/pmm/collectors/textfile-collector/high-resolution/
@@ -128,6 +129,7 @@ install -m 0660 queries-mr.yaml $RPM_BUILD_ROOT/usr/local/percona/pmm/collectors
 install -m 0660 queries-lr.yaml $RPM_BUILD_ROOT/usr/local/percona/pmm/collectors/custom-queries/postgresql/low-resolution/
 install -m 0755 -d $RPM_BUILD_ROOT/%{_unitdir}
 install -m 0644 config/pmm-agent.service %{buildroot}/%{_unitdir}/pmm-agent.service
+install -D -m 0755 bin/clickhouse_exporter $RPM_BUILD_ROOT/usr/local/percona/pmm-client/clickhouse_exporter
 
 
 %clean
@@ -214,6 +216,8 @@ fi
 %config %{_unitdir}/pmm-agent.service
 %attr(0660,pmm-agent,pmm-agent) %ghost /usr/local/percona/pmm/config/pmm-agent.yaml
 %attr(-,pmm-agent,pmm-agent) /usr/local/percona/pmm
+%dir /usr/local/percona/pmm-client
+/usr/local/percona/pmm-client/clickhouse_exporter
 
 %changelog
 * Sun May 17 2026 Percona LLC <feedback@percona.com>

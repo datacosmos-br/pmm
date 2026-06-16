@@ -30,6 +30,7 @@ type AddCommand struct {
 	Valkey             AddValkeyCommand             `cmd:"" name:"valkey" help:"Add Valkey to monitoring"`
 	ClickHouse         AddClickHouseCommand         `cmd:"" name:"clickhouse" help:"Add ClickHouse to monitoring"`
 	ProxySQL           AddProxySQLCommand           `cmd:"" name:"proxysql" help:"Add ProxySQL to monitoring"`
+	Otel               AddOtelCommandGroup          `cmd:"" name:"otel" help:"Create or update the single OTEL collector on this pmm-agent (logs, eBPF, traces)"`
 }
 
 // AddCommonFlags is used by Kong for CLI flags and commands.

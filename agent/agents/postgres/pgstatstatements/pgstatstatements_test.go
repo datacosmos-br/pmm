@@ -67,7 +67,7 @@ func filter(mb []*agentv1.MetricsBucket) []*agentv1.MetricsBucket {
 
 func TestPGStatStatementsQAN(t *testing.T) {
 	sqlDB := tests.OpenTestPostgreSQL(t)
-	defer sqlDB.Close() //nolint:errcheck
+	defer sqlDB.Close()
 	db := reform.NewDB(sqlDB, postgresql.Dialect, reform.NewPrintfLogger(t.Logf))
 
 	_, err := db.Exec("CREATE EXTENSION IF NOT EXISTS pg_stat_statements SCHEMA public")
@@ -285,8 +285,8 @@ func TestPGStatStatementsQAN(t *testing.T) {
 
 		const n = 500
 		placeholders := db.Placeholders(1, n)
-		args := make([]interface{}, n)
-		for i := 0; i < n; i++ {
+		args := make([]any, n)
+		for i := range n {
 			args[i] = i
 		}
 		q := fmt.Sprintf("SELECT /* AllCitiesTruncated:pgstatstatements controller='test' */ * FROM city WHERE id IN (%s)", strings.Join(placeholders, ", "))
@@ -401,18 +401,16 @@ func TestPGStatStatementsQAN(t *testing.T) {
 		var waitGroup sync.WaitGroup
 		n := 1000
 		errChan := make(chan error, 1)
-		for i := 0; i < n; i++ {
+		for i := range n {
 			id := i
-			waitGroup.Add(1)
-			go func() {
-				defer waitGroup.Done()
+			waitGroup.Go(func() {
 				_, err := db.Exec(
 					fmt.Sprintf(`INSERT /* CheckMBlkReadTime controller='test' */ INTO %s (customer_id, first_name, last_name, active) VALUES (%d, 'John', 'Dow', TRUE)`, tableName, id),
 				)
 				if err != nil {
 					errChan <- err
 				}
-			}()
+			})
 		}
 		go func() {
 			waitGroup.Wait()

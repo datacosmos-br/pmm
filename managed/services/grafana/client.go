@@ -18,6 +18,7 @@ package grafana
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	stderrors "errors"
 	"fmt"
@@ -27,6 +28,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	gapi "github.com/grafana/grafana-api-golang-client"
@@ -39,6 +41,7 @@ import (
 
 	"github.com/percona/pmm/managed/services"
 	"github.com/percona/pmm/managed/utils/auth"
+	"github.com/percona/pmm/managed/utils/envvars"
 	"github.com/percona/pmm/managed/utils/irt"
 	"github.com/percona/pmm/utils/grafana"
 )
@@ -61,6 +64,11 @@ type Client struct {
 	addr string
 	http *http.Client
 	irtm prom.Collector
+
+	// serverTokens persists the server-side service-account token; nil falls back to admin basic-auth.
+	serverTokens  ServerTokenStore
+	serverTokenMu sync.RWMutex
+	serverToken   string
 }
 
 // NewClient creates a new client for given Grafana address.
@@ -101,10 +109,10 @@ func (c *Client) Collect(ch chan<- prom.Metric) {
 
 // clientError contains error response details.
 type clientError struct {
-	Method       string
-	URL          string
-	Code         int
-	Body         string
+	Method       string `json:"-"`
+	URL          string `json:"-"`
+	Code         int    `json:"-"`
+	Body         string `json:"-"`
 	ErrorMessage string `json:"message"` // from response JSON object, if any
 }
 
@@ -195,6 +203,48 @@ func (c *Client) do(ctx context.Context, method, path, rawQuery string, headers 
 	return nil
 }
 
+// DoRaw performs an HTTP request and returns the response body and Content-Type.
+// It does not decode JSON; used for binary responses (e.g. image/png from render API).
+func (c *Client) DoRaw(ctx context.Context, method, path, rawQuery string, headers http.Header, body []byte) ([]byte, string, error) {
+	u := url.URL{
+		Scheme:   "http",
+		Host:     c.addr,
+		Path:     path,
+		RawQuery: rawQuery,
+	}
+	req, err := http.NewRequestWithContext(ctx, method, u.String(), bytes.NewReader(body))
+	if err != nil {
+		return nil, "", errors.WithStack(err)
+	}
+	if len(body) != 0 {
+		req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	}
+	for k := range headers {
+		req.Header.Set(k, headers.Get(k))
+	}
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return nil, "", errors.WithStack(err)
+	}
+	defer resp.Body.Close() //nolint:gosec,errcheck,nolintlint
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, "", errors.WithStack(err)
+	}
+	if resp.StatusCode < 200 || resp.StatusCode > 202 {
+		cErr := &clientError{
+			Method: req.Method,
+			URL:    req.URL.String(),
+			Code:   resp.StatusCode,
+			Body:   string(b),
+		}
+		_ = json.Unmarshal(b, cErr)
+		return nil, "", errors.WithStack(cErr)
+	}
+	contentType := resp.Header.Get("Content-Type")
+	return b, contentType, nil
+}
+
 type authUser struct {
 	role   role
 	userID int
@@ -273,6 +323,32 @@ func (c *Client) GetUserID(ctx context.Context) (int, error) {
 	}
 
 	return int(userID), nil
+}
+
+// GetCurrentUserLogin returns Grafana /api/user login (or uid:N fallback) for the given auth headers.
+func (c *Client) GetCurrentUserLogin(ctx context.Context, authHeaders http.Header) (string, error) {
+	var m map[string]any
+	err := c.do(ctx, http.MethodGet, "/api/user", "", authHeaders, nil, &m)
+	if err != nil {
+		return "", err
+	}
+	if login, ok := m["login"].(string); ok && login != "" {
+		return login, nil
+	}
+	if id, ok := m["id"].(float64); ok {
+		return fmt.Sprintf("uid:%d", int(id)), nil
+	}
+	return "", errors.New("Grafana user login not available")
+}
+
+// IsCurrentUserAdmin reports whether the authenticated user is a PMM admin (org Admin or Grafana
+// super-admin) — the server-side equivalent of the UI's isPMMAdmin gate.
+func (c *Client) IsCurrentUserAdmin(ctx context.Context, authHeaders http.Header) (bool, error) {
+	u, err := c.getAuthUser(ctx, authHeaders, logrus.WithField("component", "grafana/admin-check"))
+	if err != nil {
+		return false, err
+	}
+	return u.role >= admin, nil
 }
 
 var emptyUser = authUser{
@@ -657,12 +733,12 @@ func (c *Client) CreateServiceAccount(ctx context.Context, nodeName string, rere
 		return 0, "", err
 	}
 
-	serviceAccountID, err := c.createServiceAccount(ctx, admin, nodeName, reregister, authHeaders)
+	serviceAccountID, err := c.createServiceAccount(ctx, admin, fmt.Sprintf("%s-%s", pmmServiceAccountName, nodeName), reregister, authHeaders)
 	if err != nil {
 		return 0, "", err
 	}
 
-	_, serviceToken, err := c.createServiceToken(ctx, serviceAccountID, nodeName, reregister, authHeaders)
+	_, serviceToken, err := c.createServiceToken(ctx, serviceAccountID, fmt.Sprintf("%s-%s", pmmServiceTokenName, nodeName), reregister, authHeaders)
 	if err != nil {
 		return 0, "", err
 	}
@@ -689,8 +765,8 @@ func (c *Client) DeleteServiceAccount(ctx context.Context, nodeName string, forc
 	}
 
 	if !force && customsTokensCount > 0 {
-		warning = "Service account wont be deleted, because there are more not PMM agent related service tokens."
-		err = c.deletePMMAgentServiceToken(ctx, serviceAccountID, nodeName, authHeaders)
+		warning = "Service account wont be deleted, because there are more non pmm-agent related service tokens."
+		err = c.deletePMMServiceToken(ctx, serviceAccountID, fmt.Sprintf("%s-%s", pmmServiceTokenName, nodeName), authHeaders)
 	} else {
 		err = c.deleteServiceAccount(ctx, serviceAccountID, authHeaders)
 	}
@@ -699,6 +775,137 @@ func (c *Client) DeleteServiceAccount(ctx context.Context, nodeName string, forc
 	}
 
 	return warning, err
+}
+
+// GetAlertmanagerAlerts fetches firing alerts from Grafana's Alertmanager API.
+// AuthHeaders should contain Authorization and/or Cookie from the incoming request to forward user auth.
+func (c *Client) GetAlertmanagerAlerts(ctx context.Context, authHeaders http.Header) ([]byte, error) {
+	var raw json.RawMessage
+	err := c.do(ctx, http.MethodGet, "/api/alertmanager/grafana/api/v2/alerts", "active=true", authHeaders, nil, &raw)
+	if err != nil {
+		return nil, err
+	}
+	return raw, nil
+}
+
+// Names of the dedicated pmm-managed service account and token used for server-initiated calls.
+const (
+	serverServiceAccountName = "pmm-managed-sa"
+	serverServiceTokenName   = "pmm-managed-st" //nolint:gosec // G101: service-account token *name*, not a credential value
+)
+
+// SetServerTokenStore sets where the server service-account token is persisted.
+func (c *Client) SetServerTokenStore(store ServerTokenStore) {
+	c.serverTokenMu.Lock()
+	c.serverTokens = store
+	c.serverTokenMu.Unlock()
+}
+
+// serverAuthorization returns the Authorization header for server-initiated calls: the
+// service-account token, or admin basic-auth when no store is configured.
+func (c *Client) serverAuthorization(ctx context.Context) (string, error) {
+	c.serverTokenMu.RLock()
+	store := c.serverTokens
+	token := c.serverToken
+	c.serverTokenMu.RUnlock()
+
+	if store == nil {
+		return adminAuthorization(), nil
+	}
+	if token != "" {
+		return "Bearer " + token, nil
+	}
+	return c.refreshServerToken(ctx, false)
+}
+
+// refreshServerToken returns the Authorization header, loading the persisted token or (if
+// forceMint or none stored) minting and persisting a new one.
+func (c *Client) refreshServerToken(ctx context.Context, forceMint bool) (string, error) {
+	c.serverTokenMu.Lock()
+	defer c.serverTokenMu.Unlock()
+
+	store := c.serverTokens
+	if store == nil {
+		return adminAuthorization(), nil
+	}
+
+	if !forceMint {
+		if c.serverToken != "" {
+			return "Bearer " + c.serverToken, nil
+		}
+		stored, err := store.Load(ctx)
+		if err != nil {
+			return "", err
+		}
+		if stored != "" {
+			c.serverToken = stored
+			return "Bearer " + stored, nil
+		}
+	}
+
+	token, err := c.mintServerServiceToken(ctx)
+	if err != nil {
+		return "", err
+	}
+	err = store.Save(ctx, token)
+	if err != nil {
+		return "", err
+	}
+	c.serverToken = token
+	return "Bearer " + token, nil
+}
+
+// mintServerServiceToken mints a fresh "pmm-server" Admin service-account token via admin basic-auth.
+func (c *Client) mintServerServiceToken(ctx context.Context) (string, error) {
+	headers := make(http.Header)
+	headers.Set("Authorization", adminAuthorization())
+
+	serviceAccountID, err := c.createServiceAccount(ctx, admin, serverServiceAccountName, true, headers)
+	if err != nil {
+		return "", err
+	}
+	_, token, err := c.createServiceToken(ctx, serviceAccountID, serverServiceTokenName, true, headers)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+// doWithServerAuth does a request with the server token, refreshing it once on an auth error.
+// Authorization is set here; the caller may pre-populate other headers (e.g. X-Disable-Provenance).
+func (c *Client) doWithServerAuth(ctx context.Context, method, path, rawQuery string, headers http.Header, body []byte, target any) error {
+	if headers == nil {
+		headers = make(http.Header)
+	}
+
+	authz, err := c.serverAuthorization(ctx)
+	if err != nil {
+		return err
+	}
+	headers.Set("Authorization", authz)
+
+	err = c.do(ctx, method, path, rawQuery, headers, body, target)
+	if !isUnauthorized(err) {
+		return err
+	}
+
+	authz, err = c.refreshServerToken(ctx, true)
+	if err != nil {
+		return err
+	}
+	headers.Set("Authorization", authz)
+	return c.do(ctx, method, path, rawQuery, headers, body, target)
+}
+
+func isUnauthorized(err error) bool {
+	if err == nil {
+		return false
+	}
+	var cErr *clientError
+	if errors.As(err, &cErr) {
+		return cErr.Code == http.StatusUnauthorized || cErr.Code == http.StatusForbidden
+	}
+	return false
 }
 
 // CreateAlertRule creates Grafana alert rule.
@@ -872,12 +1079,11 @@ type serviceToken struct {
 	Role string `json:"role"`
 }
 
-func (c *Client) createServiceAccount(ctx context.Context, role role, nodeName string, reregister bool, authHeaders http.Header) (int, error) {
+func (c *Client) createServiceAccount(ctx context.Context, role role, serviceAccountName string, reregister bool, authHeaders http.Header) (int, error) {
 	if role == none {
 		return 0, errors.New("you cannot create service account with empty role")
 	}
 
-	serviceAccountName := fmt.Sprintf("%s-%s", pmmServiceAccountName, nodeName)
 	b, err := json.Marshal(serviceAccount{Name: serviceAccountName, Role: role.String(), Force: reregister})
 	if err != nil {
 		return 0, errors.WithStack(err)
@@ -901,14 +1107,13 @@ func (c *Client) createServiceAccount(ctx context.Context, role role, nodeName s
 	return serviceAccountID, nil
 }
 
-func (c *Client) createServiceToken(ctx context.Context, serviceAccountID int, nodeName string, reregister bool, authHeaders http.Header) (int, string, error) {
-	serviceTokenName := fmt.Sprintf("%s-%s", pmmServiceTokenName, nodeName)
-	exists, err := c.serviceTokenExists(ctx, serviceAccountID, nodeName, authHeaders)
+func (c *Client) createServiceToken(ctx context.Context, serviceAccountID int, serviceTokenName string, reregister bool, authHeaders http.Header) (int, string, error) {
+	exists, err := c.serviceTokenExists(ctx, serviceAccountID, serviceTokenName, authHeaders)
 	if err != nil {
 		return 0, "", err
 	}
 	if exists && reregister {
-		err := c.deletePMMAgentServiceToken(ctx, serviceAccountID, nodeName, authHeaders)
+		err := c.deletePMMServiceToken(ctx, serviceAccountID, serviceTokenName, authHeaders)
 		if err != nil {
 			return 0, "", err
 		}
@@ -930,14 +1135,13 @@ func (c *Client) createServiceToken(ctx context.Context, serviceAccountID int, n
 	return serviceTokenID, serviceTokenKey, nil
 }
 
-func (c *Client) serviceTokenExists(ctx context.Context, serviceAccountID int, nodeName string, authHeaders http.Header) (bool, error) {
+func (c *Client) serviceTokenExists(ctx context.Context, serviceAccountID int, serviceTokenName string, authHeaders http.Header) (bool, error) {
 	var tokens []serviceToken
 	err := c.do(ctx, "GET", fmt.Sprintf("/api/serviceaccounts/%d/tokens", serviceAccountID), "", authHeaders, nil, &tokens)
 	if err != nil {
 		return false, err
 	}
 
-	serviceTokenName := fmt.Sprintf("%s-%s", pmmServiceTokenName, nodeName)
 	for _, token := range tokens {
 		if !strings.HasPrefix(token.Name, grafana.SanitizeSAName(serviceTokenName)) {
 			continue
@@ -949,14 +1153,13 @@ func (c *Client) serviceTokenExists(ctx context.Context, serviceAccountID int, n
 	return false, nil
 }
 
-func (c *Client) deletePMMAgentServiceToken(ctx context.Context, serviceAccountID int, nodeName string, authHeaders http.Header) error {
+func (c *Client) deletePMMServiceToken(ctx context.Context, serviceAccountID int, serviceTokenName string, authHeaders http.Header) error {
 	var tokens []serviceToken
 	err := c.do(ctx, "GET", fmt.Sprintf("/api/serviceaccounts/%d/tokens", serviceAccountID), "", authHeaders, nil, &tokens)
 	if err != nil {
 		return err
 	}
 
-	serviceTokenName := fmt.Sprintf("%s-%s", pmmServiceTokenName, nodeName)
 	for _, token := range tokens {
 		if strings.HasPrefix(token.Name, grafana.SanitizeSAName(serviceTokenName)) {
 			err := c.do(ctx, "DELETE", fmt.Sprintf("/api/serviceaccounts/%d/tokens/%d", serviceAccountID, token.ID), "", authHeaders, nil, nil)
@@ -977,11 +1180,14 @@ func (c *Client) deleteServiceAccount(ctx context.Context, serviceAccountID int,
 
 // Annotation contains grafana annotation response.
 type annotation struct {
-	Time time.Time `json:"-"`
-	Tags []string  `json:"tags,omitempty"`
-	Text string    `json:"text,omitempty"`
+	ID      int       `json:"id,omitempty"`
+	Time    time.Time `json:"-"`
+	TimeEnd time.Time `json:"-"`
+	Tags    []string  `json:"tags,omitempty"`
+	Text    string    `json:"text,omitempty"`
 
-	TimeInt int64 `json:"time,omitempty"`
+	TimeInt    int64 `json:"time,omitempty"`
+	TimeEndInt int64 `json:"timeEnd,omitempty"`
 }
 
 // encode annotation before sending request.
@@ -991,6 +1197,12 @@ func (a *annotation) encode() {
 		t = a.Time.UnixNano() / int64(time.Millisecond)
 	}
 	a.TimeInt = t
+
+	var te int64
+	if !a.TimeEnd.IsZero() {
+		te = a.TimeEnd.UnixNano() / int64(time.Millisecond)
+	}
+	a.TimeEndInt = te
 }
 
 // decode annotation after receiving response.
@@ -1000,6 +1212,12 @@ func (a *annotation) decode() {
 		t = time.Unix(0, a.TimeInt*int64(time.Millisecond))
 	}
 	a.Time = t
+
+	var te time.Time
+	if a.TimeEndInt != 0 {
+		te = time.Unix(0, a.TimeEndInt*int64(time.Millisecond))
+	}
+	a.TimeEnd = te
 }
 
 // CreateAnnotation creates annotation with given text and tags ("pmm_annotation" is added automatically)
@@ -1055,6 +1273,77 @@ func (c *Client) findAnnotations(ctx context.Context, from, to time.Time, author
 		response[i] = r
 	}
 	return response, nil
+}
+
+// adminAuthorization returns an admin basic-auth header from env, used to mint the server token
+// and as a fallback when no token store is set.
+func adminAuthorization() string {
+	user := envvars.GetEnv("GF_SECURITY_ADMIN_USER", "admin")
+	password := envvars.GetEnv("GF_SECURITY_ADMIN_PASSWORD", "admin")
+	return "Basic " + base64.StdEncoding.EncodeToString([]byte(user+":"+password))
+}
+
+// CreateAlertAnnotation creates a point annotation for a fired alert and returns its Grafana id.
+func (c *Client) CreateAlertAnnotation(ctx context.Context, tags []string, start time.Time, text string) (int, error) {
+	request := &annotation{
+		Tags: tags,
+		Text: text,
+		Time: start,
+	}
+	request.encode()
+
+	b, err := json.Marshal(request)
+	if err != nil {
+		return 0, errors.Wrap(err, "failed to marshal request")
+	}
+
+	var response struct {
+		ID      int    `json:"id"`
+		Message string `json:"message"`
+	}
+	err = c.doWithServerAuth(ctx, http.MethodPost, "/api/annotations", "", nil, b, &response)
+	if err != nil {
+		return 0, errors.Wrap(err, "failed to create annotation")
+	}
+	return response.ID, nil
+}
+
+// SetAlertAnnotationEnd turns an existing annotation into a region by setting its end time.
+func (c *Client) SetAlertAnnotationEnd(ctx context.Context, id int, end time.Time) error {
+	request := &annotation{TimeEnd: end}
+	request.encode()
+
+	b, err := json.Marshal(request)
+	if err != nil {
+		return errors.Wrap(err, "failed to marshal request")
+	}
+
+	err = c.doWithServerAuth(ctx, http.MethodPatch, fmt.Sprintf("/api/annotations/%d", id), "", nil, b, nil)
+	if err != nil {
+		return errors.Wrap(err, "failed to update annotation")
+	}
+	return nil
+}
+
+// FindAlertAnnotationID returns the id of the most recent annotation matching all given tags
+// within the time range, or 0 if none is found.
+func (c *Client) FindAlertAnnotationID(ctx context.Context, tags []string, from, to time.Time) (int, error) {
+	params := url.Values{
+		"from": []string{strconv.FormatInt(from.UnixNano()/int64(time.Millisecond), 10)},
+		"to":   []string{strconv.FormatInt(to.UnixNano()/int64(time.Millisecond), 10)},
+		"type": []string{"annotation"},
+		"tags": tags,
+	}.Encode()
+
+	var response []annotation
+	err := c.doWithServerAuth(ctx, http.MethodGet, "/api/annotations", params, nil, nil, &response)
+	if err != nil {
+		return 0, errors.Wrap(err, "failed to find annotations")
+	}
+	if len(response) == 0 {
+		return 0, nil
+	}
+	return response[0].ID, nil
 }
 
 type grafanaHealthResponse struct {

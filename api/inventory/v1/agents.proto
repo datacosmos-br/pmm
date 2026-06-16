@@ -34,8 +34,9 @@ enum AgentType {
   AGENT_TYPE_AZURE_DATABASE_EXPORTER = 15;
   AGENT_TYPE_NOMAD_AGENT = 16;
   AGENT_TYPE_RTA_MONGODB_AGENT = 19;
-  AGENT_TYPE_CLICKHOUSE_EXPORTER = 20;
-  AGENT_TYPE_QAN_CLICKHOUSE_QUERYLOG_AGENT = 21;
+  AGENT_TYPE_OTEL_COLLECTOR = 20;
+  AGENT_TYPE_CLICKHOUSE_EXPORTER = 21;
+  AGENT_TYPE_QAN_CLICKHOUSE_QUERYLOG_AGENT = 22;
 }
 
 // PMMAgent runs on Generic or Container Node.
@@ -98,6 +99,16 @@ message NomadAgent {
   string process_exec_path = 11;
   // Listen port for scraping metrics.
   uint32 listen_port = 12;
+}
+
+// OtelCollector runs on the same node as pmm-agent and collects logs (and later traces, profiles) for OTEL.
+message OtelCollector {
+  string agent_id = 1;
+  string pmm_agent_id = 2;
+  bool disabled = 3;
+  map<string, string> custom_labels = 4;
+  AgentStatus status = 10;
+  string process_exec_path = 11;
 }
 
 // NodeExporter runs on Generic or Container Node and exposes its metrics.
@@ -881,8 +892,9 @@ message ListAgentsResponse {
   repeated NomadAgent nomad_agent = 16;
   repeated ValkeyExporter valkey_exporter = 17;
   repeated RTAMongoDBAgent rta_mongodb_agent = 19;
-  repeated ClickHouseExporter clickhouse_exporter = 20;
-  repeated QANClickHouseQueryLogAgent qan_clickhouse_querylog_agent = 21;
+  repeated OtelCollector otel_collector = 20;
+  repeated ClickHouseExporter clickhouse_exporter = 21;
+  repeated QANClickHouseQueryLogAgent qan_clickhouse_querylog_agent = 22;
 }
 
 // Get
@@ -913,8 +925,9 @@ message GetAgentResponse {
     NomadAgent nomad_agent = 16;
     ValkeyExporter valkey_exporter = 17;
     RTAMongoDBAgent rta_mongodb_agent = 19;
-    ClickHouseExporter clickhouse_exporter = 20;
-    QANClickHouseQueryLogAgent qan_clickhouse_querylog_agent = 21;
+    OtelCollector otel_collector = 20;
+    ClickHouseExporter clickhouse_exporter = 21;
+    QANClickHouseQueryLogAgent qan_clickhouse_querylog_agent = 22;
   }
 }
 
@@ -955,8 +968,9 @@ message AddAgentRequest {
     AddQANPostgreSQLPgStatMonitorAgentParams qan_postgresql_pgstatmonitor_agent = 14;
     AddValkeyExporterParams valkey_exporter = 15;
     AddRTAMongoDBAgentParams rta_mongodb_agent = 17;
-    AddClickHouseExporterParams clickhouse_exporter = 18;
-    AddQANClickHouseQueryLogAgentParams qan_clickhouse_querylog_agent = 19;
+    AddOtelCollectorParams otel_collector = 18;
+    AddClickHouseExporterParams clickhouse_exporter = 19;
+    AddQANClickHouseQueryLogAgentParams qan_clickhouse_querylog_agent = 20;
   }
 }
 
@@ -979,8 +993,9 @@ message AddAgentResponse {
     QANPostgreSQLPgStatMonitorAgent qan_postgresql_pgstatmonitor_agent = 14;
     ValkeyExporter valkey_exporter = 15;
     RTAMongoDBAgent rta_mongodb_agent = 17;
-    ClickHouseExporter clickhouse_exporter = 18;
-    QANClickHouseQueryLogAgent qan_clickhouse_querylog_agent = 19;
+    OtelCollector otel_collector = 18;
+    ClickHouseExporter clickhouse_exporter = 19;
+    QANClickHouseQueryLogAgent qan_clickhouse_querylog_agent = 20;
   }
 }
 
@@ -1007,8 +1022,9 @@ message ChangeAgentRequest {
     ChangeNomadAgentParams nomad_agent = 15;
     ChangeValkeyExporterParams valkey_exporter = 16;
     ChangeRTAMongoDBAgentParams rta_mongodb_agent = 18;
-    ChangeClickHouseExporterParams clickhouse_exporter = 19;
-    ChangeQANClickHouseQueryLogAgentParams qan_clickhouse_querylog_agent = 20;
+    ChangeOtelCollectorParams otel_collector = 19;
+    ChangeClickHouseExporterParams clickhouse_exporter = 20;
+    ChangeQANClickHouseQueryLogAgentParams qan_clickhouse_querylog_agent = 21;
   }
 }
 
@@ -1033,8 +1049,9 @@ message ChangeAgentResponse {
     NomadAgent nomad_agent = 15;
     ValkeyExporter valkey_exporter = 16;
     RTAMongoDBAgent rta_mongodb_agent = 18;
-    ClickHouseExporter clickhouse_exporter = 19;
-    QANClickHouseQueryLogAgent qan_clickhouse_querylog_agent = 20;
+    OtelCollector otel_collector = 19;
+    ClickHouseExporter clickhouse_exporter = 20;
+    QANClickHouseQueryLogAgent qan_clickhouse_querylog_agent = 21;
   }
 }
 
@@ -2276,6 +2293,37 @@ message AddRTAMongoDBAgentParams {
   string authentication_mechanism = 13;
   // Real-Time Analytics options.
   RTAOptions rta_options = 14;
+}
+
+// LogSource binds a log file path to a parser preset (e.g. mysql_error or raw for no parsing).
+message LogSource {
+  string path = 1 [(validate.rules).string.min_len = 1];
+  string preset = 2; // Preset name from log_parser_presets table, or "raw" for no operators.
+}
+
+message AddOtelCollectorParams {
+  string pmm_agent_id = 1 [(validate.rules).string.min_len = 1];
+  map<string, string> custom_labels = 2;
+  repeated string log_file_paths = 3; // Deprecated: use log_sources for per-path preset. If log_sources is empty, these are used with preset "raw".
+  repeated LogSource log_sources = 4;
+}
+
+// ChangeOtelCollectorParams patches the single otel_collector agent per pmm-agent (merge_labels must not use keys log_sources or log_file_paths).
+message ChangeOtelCollectorParams {
+  // Enable this Agent. Agents are enabled by default when they get added.
+  optional bool enable = 1;
+  // Keys to merge into custom labels (overwrite per key). Reserved keys log_sources and log_file_paths are rejected.
+  map<string, string> merge_labels = 2;
+  // Append or update log sources; same path appears twice — last preset wins.
+  repeated LogSource add_log_sources = 3;
+  // If true, remove legacy log_file_paths label when present.
+  bool remove_legacy_log_file_paths = 4;
+  // Replace log_sources entirely (mutually exclusive with add_log_sources in one request).
+  repeated LogSource set_log_sources = 5;
+  // Remove log source entries by file path.
+  repeated string remove_log_source_paths = 6;
+  // When true, set_log_sources replaces log_sources (including empty list to clear).
+  bool replace_log_sources = 7;
 }
 
 message ChangeRTAMongoDBAgentParams {

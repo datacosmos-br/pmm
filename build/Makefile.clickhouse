@@ -1,16 +1,47 @@
-# Makefile.clickhouse — ClickHouse exporter and QAN agent build/test helpers.
-#
-# Included by the root Makefile. Keeps the ClickHouse-specific targets in one
-# place so the upstream build wiring stays minimal and easy to review.
+# pmm/build/Makefile.clickhouse
+.PHONY: build-clickhouse clean-clickhouse docker-build-clickhouse
 
-.PHONY: build-clickhouse-exporter test-clickhouse-unit test-clickhouse-matrix
+# Diretório do código do módulo
+CLICKHOUSE_DIR := agent/agents/clickhouse
+# Diretório de saída para os binários
+BIN_DIR := bin
+# Nome do binário resultante (exportador)
+CLICKHOUSE_BIN := $(BIN_DIR)/clickhouse_exporter
 
-build-clickhouse-exporter:        ## Build the clickhouse_exporter binary into bin/
-	go build -o bin/clickhouse_exporter ./agent/cmd/clickhouse_exporter
+# Build do exportador ClickHouse usando Go. O main real do exporter é
+# agent/cmd/clickhouse_exporter (mesmo pacote que build-client-binary compila);
+# compilar collector.go (package clickhouse) produzia um objeto NÃO-executável.
+CLICKHOUSE_MAIN := ./agent/cmd/clickhouse_exporter
+build-clickhouse:
+	@echo "Compilando ClickHouse Exporter..."
+	@mkdir -p $(BIN_DIR)
+	go build -o $(CLICKHOUSE_BIN) $(CLICKHOUSE_MAIN)
+	@echo "Exportador compilado: $(CLICKHOUSE_BIN)"
 
-test-clickhouse-unit:             ## Run ClickHouse exporter and QAN unit tests
-	go test ./agent/agents/clickhouse/... ./agent/cmd/clickhouse_exporter/...
-	# Both packages run together so the exporter main package is covered too.
+clean-clickhouse:
+	@echo "Limpando binário do ClickHouse Exporter..."
+	rm -f $(CLICKHOUSE_BIN)
 
-test-clickhouse-matrix:           ## Run the ClickHouse integration matrix (Docker required)
-	bash agent/agents/clickhouse/testdata/run-matrix.sh
+# Exemplo: Build de imagem Docker para o ClickHouse Exporter
+docker-build-clickhouse: build-clickhouse
+	@echo "Construindo imagem Docker do ClickHouse Exporter..."
+	docker build -t datacosmos-br/clickhouse_exporter:$(VERSION) -f $(CLICKHOUSE_DIR)/Dockerfile .
+
+.PHONY: test-clickhouse-unit test-clickhouse-matrix
+
+# ClickHouse exporter unit tests (no Docker; clickhouse_integration-tagged tests excluded).
+test-clickhouse-unit:
+	go test -race -count=1 ./agent/agents/clickhouse/...
+
+# ClickHouse exporter integration "matrix": runs the clickhouse_integration-tagged
+# tests against a containerized ClickHouse. CLICKHOUSE_TEST_ENDPOINTS is a
+# comma-separated list of name=dsn pairs (the version matrix); defaults to the
+# qan-api2 test container (clickhouse/clickhouse-server:25.3.6.56, host port 19000).
+CLICKHOUSE_MATRIX_ENDPOINTS ?= single-25.3=clickhouse://default:clickhouse@127.0.0.1:19000/default
+test-clickhouse-matrix: build-clickhouse
+	-$(MAKE) -C qan-api2 test-env-down
+	$(MAKE) -C qan-api2 test-env-up
+	CLICKHOUSE_TEST_ENDPOINTS="$(CLICKHOUSE_MATRIX_ENDPOINTS)" \
+	CLICKHOUSE_EXPORTER_BIN="$(abspath $(CLICKHOUSE_BIN))" \
+		go test -race -count=1 -tags=clickhouse_integration ./agent/agents/clickhouse/...
+	$(MAKE) -C qan-api2 test-env-down

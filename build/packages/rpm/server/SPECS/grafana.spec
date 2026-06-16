@@ -4,7 +4,7 @@
 %define build_timestamp %(date -u +"%y%m%d%H%M")
 %define release         116
 %define grafana_version 12.4.4
-%define full_pmm_version 3.0.0
+%define full_pmm_version 3.8.0
 %define full_version    v%{grafana_version}-%{full_pmm_version}
 %define rpm_release     %{release}.%{build_timestamp}.%{shortcommit}%{?dist}
 
@@ -49,12 +49,15 @@ cp -rpav public %{buildroot}%{_datadir}/grafana
 cp -rpav tools %{buildroot}%{_datadir}/grafana
 
 install -d -p %{buildroot}%{_sbindir}
-# bin/linux/<arch>/ - `make build-go` builds one platform (linux/amd64 or
-# linux/arm64); the glob picks it without hardcoding the arch.
-cp bin/linux/*/grafana-server %{buildroot}%{_sbindir}/
-cp bin/linux/*/grafana %{buildroot}%{_sbindir}/
+# `make build-go` builds one platform under bin/, but the layout varies by
+# grafana version (bin/linux-amd64/ vs bin/linux/amd64/). Locate each binary by
+# name so the install section works regardless of the arch-subdir convention.
+# (Do not write a percent-install literal here: EL9 rpmbuild parses a percent
+# section keyword inside a comment as a duplicate section and fails to parse.)
+cp "$(find bin -type f -name grafana-server | head -1)" %{buildroot}%{_sbindir}/grafana-server
+cp "$(find bin -type f -name grafana | head -1)" %{buildroot}%{_sbindir}/grafana
 install -d -p %{buildroot}%{_bindir}
-cp bin/linux/*/grafana-cli %{buildroot}%{_bindir}/
+cp "$(find bin -type f -name grafana-cli | head -1)" %{buildroot}%{_bindir}/grafana-cli
 
 install -d -p %{buildroot}%{_sysconfdir}/grafana
 cp conf/sample.ini %{buildroot}%{_sysconfdir}/grafana/grafana.ini

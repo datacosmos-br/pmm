@@ -84,6 +84,7 @@
               "AGENT_TYPE_AZURE_DATABASE_EXPORTER",
               "AGENT_TYPE_NOMAD_AGENT",
               "AGENT_TYPE_RTA_MONGODB_AGENT",
+              "AGENT_TYPE_OTEL_COLLECTOR",
               "AGENT_TYPE_CLICKHOUSE_EXPORTER",
               "AGENT_TYPE_QAN_CLICKHOUSE_QUERYLOG_AGENT"
             ],
@@ -332,6 +333,9 @@
         "rta_mongodb_agent": {
           "$ref": "#/definitions/v1ChangeRTAMongoDBAgentParams"
         },
+        "otel_collector": {
+          "$ref": "#/definitions/v1ChangeOtelCollectorParams"
+        },
         "clickhouse_exporter": {
           "$ref": "#/definitions/v1ChangeClickHouseExporterParams"
         },
@@ -452,6 +456,9 @@
         "rta_mongodb_agent": {
           "$ref": "#/definitions/v1AddRTAMongoDBAgentParams"
         },
+        "otel_collector": {
+          "$ref": "#/definitions/v1AddOtelCollectorParams"
+        },
         "clickhouse_exporter": {
           "$ref": "#/definitions/v1AddClickHouseExporterParams"
         },
@@ -513,6 +520,9 @@
         },
         "rta_mongodb_agent": {
           "$ref": "#/definitions/v1RTAMongoDBAgent"
+        },
+        "otel_collector": {
+          "$ref": "#/definitions/v1OtelCollector"
         },
         "clickhouse_exporter": {
           "$ref": "#/definitions/v1ClickHouseExporter"
@@ -935,6 +945,34 @@
         "expose_exporter": {
           "type": "boolean",
           "title": "Expose the node_exporter process on all public interfaces"
+        }
+      }
+    },
+    "v1AddOtelCollectorParams": {
+      "type": "object",
+      "properties": {
+        "pmm_agent_id": {
+          "type": "string"
+        },
+        "custom_labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "log_file_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Deprecated: use log_sources for per-path preset. If log_sources is empty, these are used with preset \"raw\"."
+        },
+        "log_sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LogSource"
+          }
         }
       }
     },
@@ -1837,6 +1875,7 @@
         "AGENT_TYPE_AZURE_DATABASE_EXPORTER",
         "AGENT_TYPE_NOMAD_AGENT",
         "AGENT_TYPE_RTA_MONGODB_AGENT",
+        "AGENT_TYPE_OTEL_COLLECTOR",
         "AGENT_TYPE_CLICKHOUSE_EXPORTER",
         "AGENT_TYPE_QAN_CLICKHOUSE_QUERYLOG_AGENT"
       ],
@@ -1958,6 +1997,9 @@
         },
         "rta_mongodb_agent": {
           "$ref": "#/definitions/v1RTAMongoDBAgent"
+        },
+        "otel_collector": {
+          "$ref": "#/definitions/v1OtelCollector"
         },
         "clickhouse_exporter": {
           "$ref": "#/definitions/v1ClickHouseExporter"
@@ -2411,6 +2453,55 @@
           "description": "Enable this Agent. Agents are enabled by default when they get added."
         }
       }
+    },
+    "v1ChangeOtelCollectorParams": {
+      "type": "object",
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "x-nullable": true,
+          "description": "Enable this Agent. Agents are enabled by default when they get added."
+        },
+        "merge_labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Keys to merge into custom labels (overwrite per key). Reserved keys log_sources and log_file_paths are rejected."
+        },
+        "add_log_sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LogSource"
+          },
+          "description": "Append or update log sources; same path appears twice — last preset wins."
+        },
+        "remove_legacy_log_file_paths": {
+          "type": "boolean",
+          "description": "If true, remove legacy log_file_paths label when present."
+        },
+        "set_log_sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1LogSource"
+          },
+          "description": "Replace log_sources entirely (mutually exclusive with add_log_sources in one request)."
+        },
+        "remove_log_source_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Remove log source entries by file path."
+        },
+        "replace_log_sources": {
+          "type": "boolean",
+          "description": "When true, set_log_sources replaces log_sources (including empty list to clear)."
+        }
+      },
+      "description": "ChangeOtelCollectorParams patches the single otel_collector agent per pmm-agent (merge_labels must not use keys log_sources or log_file_paths)."
     },
     "v1ChangePostgresExporterParams": {
       "type": "object",
@@ -3563,6 +3654,9 @@
         "rta_mongodb_agent": {
           "$ref": "#/definitions/v1RTAMongoDBAgent"
         },
+        "otel_collector": {
+          "$ref": "#/definitions/v1OtelCollector"
+        },
         "clickhouse_exporter": {
           "$ref": "#/definitions/v1ClickHouseExporter"
         },
@@ -3707,6 +3801,13 @@
             "$ref": "#/definitions/v1RTAMongoDBAgent"
           }
         },
+        "otel_collector": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OtelCollector"
+          }
+        },
         "clickhouse_exporter": {
           "type": "array",
           "items": {
@@ -3736,6 +3837,19 @@
       "default": "LOG_LEVEL_UNSPECIFIED",
       "description": "- LOG_LEVEL_UNSPECIFIED: Auto",
       "title": "Log level for exporters"
+    },
+    "v1LogSource": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "preset": {
+          "type": "string",
+          "description": "Preset name from log_parser_presets table, or \"raw\" for no operators."
+        }
+      },
+      "description": "LogSource binds a log file path to a parser preset (e.g. mysql_error or raw for no parsing)."
     },
     "v1MongoDBExporter": {
       "type": "object",
@@ -4045,6 +4159,33 @@
           "description": "Listen port for scraping metrics."
         }
       }
+    },
+    "v1OtelCollector": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string"
+        },
+        "pmm_agent_id": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean"
+        },
+        "custom_labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "$ref": "#/definitions/v1AgentStatus"
+        },
+        "process_exec_path": {
+          "type": "string"
+        }
+      },
+      "description": "OtelCollector runs on the same node as pmm-agent and collects logs (and later traces, profiles) for OTEL."
     },
     "v1PMMAgent": {
       "type": "object",

@@ -103,8 +103,9 @@ type Paths struct {
 	ValkeyExporter     string `yaml:"valkey_exporter"`
 	ClickHouseExporter string `yaml:"clickhouse_exporter"`
 
-	VMAgent string `yaml:"vmagent"`
-	Nomad   string `yaml:"nomad"`
+	VMAgent       string `yaml:"vmagent"`
+	Nomad         string `yaml:"nomad"`
+	OtelCollector string `yaml:"otel_collector"`
 
 	TempDir      string `yaml:"tempdir"`
 	NomadDataDir string `yaml:"nomad_data_dir"`
@@ -243,6 +244,7 @@ func get(args []string, cfg *Config, l *logrus.Entry) (string, error) { //nolint
 			&cfg.Paths.PTMongoDBSummary:   "tools/pt-mongodb-summary",
 			&cfg.Paths.PTMySQLSummary:     "tools/pt-mysql-summary",
 			&cfg.Paths.Nomad:              "tools/nomad",
+			&cfg.Paths.OtelCollector:      "tools/otelcol-contrib",
 		} {
 			if *sp == "" {
 				*sp = v
@@ -284,6 +286,7 @@ func get(args []string, cfg *Config, l *logrus.Entry) (string, error) { //nolint
 			"Percona Toolkit pt-mongodb-summary": &cfg.Paths.PTMongoDBSummary,
 			"Percona Toolkit pt-mysql-summary":   &cfg.Paths.PTMySQLSummary,
 			"Nomad binary":                       &cfg.Paths.Nomad,
+			"OTEL Collector":                     &cfg.Paths.OtelCollector,
 		} {
 			if !filepath.IsAbs(*sp) {
 				*sp = filepath.Join(cfg.Paths.PathsBase, *sp)

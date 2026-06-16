@@ -87,6 +87,7 @@ const (
 	ClickHouseExporterType              AgentType = "clickhouse_exporter"
 	QANClickHouseQueryLogAgentType      AgentType = "qan-clickhouse-querylog-agent"
 	RTAMongoDBAgentType                 AgentType = "rta-mongodb-agent"
+	OtelCollectorType                   AgentType = "otel-collector"
 )
 
 // GetRTAAgentTypes returns all Real-Time Analytics Agent types.

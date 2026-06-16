@@ -100,6 +100,8 @@ var rules = map[string]role{
 	"/v1/qan":  viewer,
 	"/v1/qan:": viewer,
 
+	"/otlp": viewer, // OTLP ingest from pmm-agent (logs/traces); viewer is enough for push
+
 	"/prometheus":      admin,
 	"/victoriametrics": admin,
 	"/nomad":           admin,
@@ -120,6 +122,19 @@ var rules = map[string]role{
 	"/v1/realtimeanalytics/sessions":       viewer,
 	"/v1/realtimeanalytics/services":       viewer,
 	"/v1/realtimeanalytics/queries:search": viewer,
+
+	// ADRE (Autonomous Database Reliability Engineer) / HolmesGPT.
+	"/v1/adre/qan-insights/servicenow": admin,
+	"/v1/adre/settings":                viewer,
+	"/v1/adre":                         viewer,
+
+	// Grafana panel render (image or JSON with image_url/dashboard_url).
+	"/v1/grafana/render": viewer,
+	// Observability map (intent-based dashboard/panel routing for ADRE/Holmes).
+	"/v1/grafana/observability-map": viewer,
+
+	// Investigations (AI Investigations).
+	"/v1/investigations": viewer,
 
 	// "/auth_request"  has auth_request disabled in nginx config
 
@@ -251,7 +266,7 @@ func (s *AuthServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		// copy grpc-gateway behavior: set correct codes, set both "error" and "message"
 		m := map[string]any{
 			"code":    int(authErr.code),
-			"error":   authErr.message,
+			"error":   authErr.message, //nolint:goconst
 			"message": authErr.message, //nolint:goconst
 		}
 		s.returnError(rw, m, l)

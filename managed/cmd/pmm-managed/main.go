@@ -76,9 +76,12 @@ import (
 	serverv1 "github.com/percona/pmm/api/server/v1"
 	userv1 "github.com/percona/pmm/api/user/v1"
 	"github.com/percona/pmm/managed/models"
+	"github.com/percona/pmm/managed/services/adre"
+	"github.com/percona/pmm/managed/services/adre/deployment"
 	"github.com/percona/pmm/managed/services/agents"
 	agentgrpc "github.com/percona/pmm/managed/services/agents/grpc"
 	"github.com/percona/pmm/managed/services/alerting"
+	"github.com/percona/pmm/managed/services/alerting/annotator"
 	"github.com/percona/pmm/managed/services/backup"
 	"github.com/percona/pmm/managed/services/checks"
 	"github.com/percona/pmm/managed/services/config" //nolint:staticcheck
@@ -87,6 +90,7 @@ import (
 	"github.com/percona/pmm/managed/services/ha"
 	"github.com/percona/pmm/managed/services/inventory"
 	inventorygrpc "github.com/percona/pmm/managed/services/inventory/grpc"
+	"github.com/percona/pmm/managed/services/investigations"
 	"github.com/percona/pmm/managed/services/management"
 	managementbackup "github.com/percona/pmm/managed/services/management/backup"
 	"github.com/percona/pmm/managed/services/management/common"
@@ -98,6 +102,7 @@ import (
 	"github.com/percona/pmm/managed/services/realtimeanalytics"
 	"github.com/percona/pmm/managed/services/scheduler"
 	"github.com/percona/pmm/managed/services/server"
+	"github.com/percona/pmm/managed/services/slackbot"
 	"github.com/percona/pmm/managed/services/supervisord"
 	"github.com/percona/pmm/managed/services/telemetry"
 	"github.com/percona/pmm/managed/services/user"
@@ -197,6 +202,74 @@ func addLogsHandler(mux *http.ServeMux, logs *server.Logs) {
 			l.Errorf("%+v", err)
 		}
 	})
+}
+
+func addAdreHandlers(mux *http.ServeMux, db *reform.DB, grafanaClient adre.GrafanaAuth, vm v1.API, ch adre.ClickHousePools) {
+	// Seed the shipped HolmesGPT config.yaml and skills on first run (idempotent: no-op once populated).
+	err := deployment.SeedDefaultConfig(db)
+	if err != nil {
+		logrus.Warnf("Failed to seed default ADRE config.yaml: %v", err)
+	}
+	err = deployment.SeedBuiltinSkills(db)
+	if err != nil {
+		logrus.Warnf("Failed to seed built-in ADRE skills: %v", err)
+	}
+	h := adre.NewHandlers(db, grafanaClient, vm, ch)
+	mux.HandleFunc("/v1/adre/settings", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			h.GetSettings(w, r)
+		case http.MethodPost:
+			h.PostSettings(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+	mux.HandleFunc("/v1/adre/models", h.GetModels)
+	mux.HandleFunc("/v1/adre/chat", h.PostChat)
+	mux.HandleFunc("/v1/adre/alerts", h.GetAlerts)
+	mux.HandleFunc("/v1/adre/qan-insights", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			h.GetQanInsights(w, r)
+		case http.MethodPost:
+			h.PostQanInsights(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+	mux.HandleFunc("/v1/adre/qan-insights/servicenow", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		h.PostQanInsightsServiceNow(w, r)
+	})
+	mux.HandleFunc("/v1/adre/conversations", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			h.ListConversations(w, r)
+		case http.MethodPost:
+			h.CreateConversation(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+	mux.HandleFunc("/v1/adre/conversations/", h.ServeConversationSubroutes)
+	mux.HandleFunc("/v1/adre/deployment", h.ServeDeploymentSubroutes)
+	mux.HandleFunc("/v1/adre/deployment/", h.ServeDeploymentSubroutes)
+	mux.HandleFunc("/v1/adre/messages/search", h.SearchMessages)
+	mux.HandleFunc("/v1/adre/usage/summary", h.GetUsageSummary)
+	mux.HandleFunc("/v1/adre/usage/events", h.GetUsageEvents)
+	mux.HandleFunc("/v1/adre/usage/", h.ServeUsageSubroutes)
+	mux.HandleFunc("/v1/adre/metrics/snapshot", h.PostMetricsSnapshot)
+	mux.HandleFunc("/v1/adre/clickhouse/query", h.PostClickHouseQuery)
+}
+
+func addInvestigationsHandlers(mux *http.ServeMux, db *reform.DB) {
+	h := investigations.NewHandlers(db)
+	mux.Handle("/v1/investigations", h)
+	mux.Handle("/v1/investigations/", h)
 }
 
 type gRPCServerDeps struct {
@@ -353,7 +426,12 @@ func runGRPCServer(ctx context.Context, deps *gRPCServerDeps) {
 type http1ServerDeps struct {
 	logs               *server.Logs
 	authServer         *grafana.AuthServer
+	db                 *reform.DB
+	grafanaClient      *grafana.Client
+	vmClient           *metrics.Client
+	clickhouse         adre.ClickHousePools
 	currentUserHandler http.Handler
+	annotatorHandler   http.Handler
 }
 
 // runHTTP1Server runs grpc-gateway and other HTTP 1.1 APIs (like auth_request and logs.zip)
@@ -434,9 +512,19 @@ func runHTTP1Server(ctx context.Context, deps *http1ServerDeps) {
 
 	mux := http.NewServeMux()
 	addLogsHandler(mux, deps.logs)
+	addAdreHandlers(mux, deps.db, deps.grafanaClient, v1.NewAPI(*deps.vmClient), deps.clickhouse)
+	go adre.RunAdreChatRetentionLoop(ctx, deps.db, logrus.WithField("component", "adre-retention"), 24*time.Hour) //nolint:mnd
+	mux.Handle("/v1/grafana/render", grafana.NewLegacyGETRenderGoneHandler())
+	mux.Handle("/v1/grafana/render/resolve", grafana.NewResolveHandler(deps.grafanaClient))
+	mux.Handle("/v1/grafana/observability-map", grafana.NewObservabilityMapHandler(deps.grafanaClient))
+	mux.Handle("/v1/grafana/render/blob/", grafana.NewBlobHandler())
+	addInvestigationsHandlers(mux, deps.db)
 	mux.Handle("/auth_request", deps.authServer)
 	mux.Handle("/v1/users/current/orgs", deps.currentUserHandler)
 	mux.Handle("/v1/users/current", deps.currentUserHandler)
+	// No-proxy endpoint (nginx does not proxy /internal/) that receives Grafana
+	// alerting webhook notifications and turns them into annotations.
+	mux.Handle("/internal/webhook", deps.annotatorHandler)
 	mux.Handle("/", proxyMux)
 
 	server := &http.Server{ //nolint:gosec
@@ -980,6 +1068,7 @@ func main() { //nolint:gocognit,maintidx,cyclop
 
 	grafanaClient := grafana.NewClient(*grafanaAddrF)
 	prom.MustRegister(grafanaClient)
+	grafanaClient.SetServerTokenStore(grafana.NewServerTokenStore(db))
 
 	nomadClientConfig := &models.NomadClient{
 		GCInterval:            *nomadGCIntervalF,
@@ -1022,6 +1111,13 @@ func main() { //nolint:gocognit,maintidx,cyclop
 	if err != nil {
 		l.Fatalf("Could not create Clickhouse client: %s", err)
 	}
+	otelChURI := chParams.URL()
+	otelChURI.Path = "otel"
+	clickhouseOTelClient, err := newClickhouseDB(otelChURI.String(), clickhouseMaxIdleConns, clickhouseMaxOpenConns)
+	if err != nil {
+		l.Fatalf("Could not create Clickhouse otel client: %s", err)
+	}
+	adreClickHouse := adre.ClickHousePools{PMM: clickhouseClient, OTel: clickhouseOTelClient}
 	externalExporterStatusSvc := agents.NewExternalExporterStatusService(db, v1.NewAPI(vmClient))
 
 	checksService := checks.New(db, actionsService, v1.NewAPI(vmClient), clickhouseClient)
@@ -1127,6 +1223,28 @@ func main() { //nolint:gocognit,maintidx,cyclop
 		}()
 	}
 
+	// Provision the webhook contact point + notification-policy route used to turn alert
+	// notifications into annotations. Retries in the background until Grafana is reachable.
+	go func() {
+		webhookURL := "http://" + http1Addr + "/internal/webhook"
+		const delay = 5 * time.Second
+		for {
+			err := grafanaClient.EnsureAlertAnnotationsContactPoint(ctx, webhookURL)
+			if err == nil {
+				l.Info("Alert annotations contact point provisioned.")
+				return
+			}
+			l.Warnf("Failed to provision alert annotations contact point, retrying in %s: %s", delay, err)
+
+			sleepCtx, sleepCancel := context.WithTimeout(ctx, delay)
+			<-sleepCtx.Done()
+			sleepCancel()
+			if ctx.Err() != nil {
+				return
+			}
+		}
+	}()
+
 	settings, err := models.GetSettings(sqlDB)
 	if err != nil {
 		l.Fatalf("Failed to get settings: %+v.", err)
@@ -1223,7 +1341,12 @@ func main() { //nolint:gocognit,maintidx,cyclop
 		runHTTP1Server(ctx, &http1ServerDeps{
 			logs:               logs,
 			authServer:         authServer,
+			db:                 db,
+			grafanaClient:      grafanaClient,
+			vmClient:           &vmClient,
+			clickhouse:         adreClickHouse,
 			currentUserHandler: user.NewCurrentHTTPHandler(grafanaClient),
+			annotatorHandler:   annotator.New(grafanaClient),
 		})
 	})
 
@@ -1234,6 +1357,11 @@ func main() { //nolint:gocognit,maintidx,cyclop
 	haService.AddLeaderService(ha.NewContextService("cleaner", func(ctx context.Context) error {
 		cleaner.Run(ctx, cleanInterval, cleanOlderThan)
 		return nil
+	}))
+
+	adreSlackL := logrus.WithField("component", "adre-slack")
+	haService.AddLeaderService(ha.NewContextService("adre-slack", func(ctx context.Context) error {
+		return slackbot.Run(ctx, db, adreSlackL)
 	}))
 
 	wg.Go(func() {
