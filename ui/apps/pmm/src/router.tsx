@@ -4,8 +4,6 @@ import { MainWithNav } from 'components/main/MainWithNav';
 import Providers from 'Providers';
 import { PMM_NEW_NAV_PATH } from 'lib/constants';
 import { Redirect, SettingsRedirect } from 'components/redirect';
-import RealtimeOverviewPage from 'pages/rta/overview/RealtimeOverview';
-import RealtimeTab from 'pages/rta/tab/RealtimeTab';
 import AdrePage from 'pages/adre/AdrePage';
 import AdreUsagePage from 'pages/adre/AdreUsagePage';
 import AdreSettingsPage from 'pages/configuration/AdreSettingsPage';

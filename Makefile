@@ -52,7 +52,8 @@ rotate-encryption: 							## Rotate encryption key
 	go run ./encryption-rotation/main.go
 
 include Makefile.datacosmos
-include build/Makefile.clickhouse
+# build/Makefile.clickhouse is already pulled in via the `-include` near the top;
+# a second include here duplicated every clickhouse recipe (override warnings).
 
 ###############################################################################
 # Packaging Targets: Build completo (tarball, RPM, DEB e release)

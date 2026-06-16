@@ -94,9 +94,19 @@ prepare_specs() {
         # provider so spectool downloads from the correct repository.
         # Only update if the remote URL looks like a real remote (http/https/git),
         # never a local filesystem path — local paths break %prep symlinks.
+        # Skip repo_name=pmm: the pmm monorepo's Go import path is
+        # github.com/percona/pmm regardless of which org hosts the fork (go.mod is
+        # unchanged), and its %prep builds a src/github.com/percona/pmm GOPATH
+        # symlink. Rewriting its provider to the datacosmos-br fork org makes %prep
+        # try `ln -s ... src/github.com/datacosmos-br/pmm` whose parent dir does not
+        # exist -> build fails. The fork source is still used: the commit override
+        # below pins it and the local git-archive (not a network download) supplies
+        # Source0. (In the old layout pmm had a local-path origin, so this guard
+        # was implicit; the aggregator-root layout gives sources/pmm a real https
+        # remote, so the guard must be explicit.)
         local remote_url=$(git -C "${git_dir}" remote get-url origin 2>/dev/null || echo "")
         if [[ -n "${remote_url}" && "${remote_url}" != *"percona"* && \
-              "${remote_url}" =~ ^(https?://|git@) ]]; then
+              "${remote_url}" =~ ^(https?://|git@) && "${repo_name}" != "pmm" ]]; then
             local provider=$(echo "${remote_url}" | sed -e 's/\.git$//' -e 's|^https://||' -e 's|^git@github.com:|github.com/|')
             sed -i -e "s|%global provider.*|%global provider ${provider}|" ${rpmbuild_dir}/SOURCES/${spec_name}.spec
         fi
