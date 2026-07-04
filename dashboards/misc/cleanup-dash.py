@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-import json
-import copy
 import argparse
+import copy
+import json
+import pathlib
+import sys
 
 
 def set_dashboard_id_to_null(dashboard):
@@ -16,7 +18,7 @@ def set_dashboard_id_to_null(dashboard):
 
 def set_editable(dashboard):
     """Set Editable Dashboard."""
-    if "editable" not in dashboard.keys():
+    if "editable" not in dashboard:
         return dashboard
 
     dashboard["editable"] = False
@@ -25,7 +27,7 @@ def set_editable(dashboard):
 
 def set_refresh(dashboard):
     """Set Dashboard refresh."""
-    if "refresh" not in dashboard.keys():
+    if "refresh" not in dashboard:
         return dashboard
 
     dashboard["refresh"] = False
@@ -34,26 +36,24 @@ def set_refresh(dashboard):
 
 def set_timezone(dashboard):
     """Set Dashboard Time zone."""
-
     dashboard["timezone"] = ""
     return dashboard
 
 
 def set_time(dashboard):
     """Set Dashboard Time Range."""
-
     dashboard["time"]["from"] = "now-12h"
     dashboard["time"]["to"] = "now"
     return dashboard
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Dashboard cleaner")
     parser.add_argument("dashboard_file", type=str, help="dashboard file to cleanup")
     parser.add_argument("--check-only", action="store_true", help="check only mode")
     args = parser.parse_args()
 
-    with open(args.dashboard_file, "r") as dashboard_file:
+    with pathlib.Path(args.dashboard_file).open(encoding="utf-8") as dashboard_file:
         dashboard = json.loads(dashboard_file.read())
         raw_dashboard = copy.deepcopy(dashboard)
 
@@ -78,8 +78,7 @@ def main():
 
     if args.check_only:
         if raw_dashboard == dashboard:
-            print("Dashboard is already cleaned up.")
-            exit(0)
+            sys.exit(0)
         else:
 
             def jv(v):
@@ -88,41 +87,43 @@ def main():
             issues = []
             if raw_dashboard.get("editable") != dashboard.get("editable"):
                 issues.append(
-                    f"  editable: {jv(raw_dashboard.get('editable'))} -> {jv(dashboard.get('editable'))}"
+                    f"  editable: {jv(raw_dashboard.get('editable'))} -> {jv(dashboard.get('editable'))}",
                 )
             if raw_dashboard.get("refresh") != dashboard.get("refresh"):
                 issues.append(
-                    f"  refresh: {jv(raw_dashboard.get('refresh'))} -> {jv(dashboard.get('refresh'))}"
+                    f"  refresh: {jv(raw_dashboard.get('refresh'))} -> {jv(dashboard.get('refresh'))}",
                 )
             if raw_dashboard.get("timezone") != dashboard.get("timezone"):
                 issues.append(
-                    f"  timezone: {jv(raw_dashboard.get('timezone'))} -> {jv(dashboard.get('timezone'))}"
+                    f"  timezone: {jv(raw_dashboard.get('timezone'))} -> {jv(dashboard.get('timezone'))}",
                 )
             if raw_dashboard.get("time", {}).get("from") != dashboard.get(
-                "time", {}
+                "time",
+                {},
             ).get("from"):
                 issues.append(
-                    f"  time.from: {jv(raw_dashboard.get('time', {}).get('from'))} -> {jv(dashboard.get('time', {}).get('from'))}"
+                    f"  time.from: {jv(raw_dashboard.get('time', {}).get('from'))} -> {jv(dashboard.get('time', {}).get('from'))}",
                 )
             if raw_dashboard.get("time", {}).get("to") != dashboard.get("time", {}).get(
-                "to"
+                "to",
             ):
                 issues.append(
-                    f"  time.to: {jv(raw_dashboard.get('time', {}).get('to'))} -> {jv(dashboard.get('time', {}).get('to'))}"
+                    f"  time.to: {jv(raw_dashboard.get('time', {}).get('to'))} -> {jv(dashboard.get('time', {}).get('to'))}",
                 )
             if raw_dashboard.get("id") != dashboard.get("id"):
                 issues.append(
-                    f"  id: {jv(raw_dashboard.get('id'))} -> {jv(dashboard.get('id'))}"
+                    f"  id: {jv(raw_dashboard.get('id'))} -> {jv(dashboard.get('id'))}",
                 )
-            print(f"Dashboard: {args.dashboard_file}")
-            for issue in issues:
-                print(issue)
-            exit(1)
+            for _issue in issues:
+                pass
+            sys.exit(1)
 
-    with open(args.dashboard_file, "w") as dashboard_file:
+    with pathlib.Path(args.dashboard_file).open(
+        "w",
+        encoding="utf-8",
+    ) as dashboard_file:
         dashboard_file.write(dashboard_json)
         dashboard_file.write("\n")
-        print("Dashboard is cleaned up successfully.")
 
 
 if __name__ == "__main__":

@@ -1,32 +1,32 @@
 #! /usr/bin/env python3
 # Write md files containing PMM dashboard panel titles and descriptions to current dir
 
-import os
 import glob
 import json
+import pathlib
 
 # Path to local git clone of https://github.com/percona/grafana-dashboards/
 repo_src = "../../grafana-dashboards/dashboards/"
 
-if not os.path.isdir(repo_src):
-    print(repo_src + " not a directory")
+if not pathlib.Path(repo_src).is_dir():
     exit
 
 # Dict of dashboard files
 dashboard_files = glob.glob(repo_src + "*.json")
-print(dashboard_files)
 # For each, open the file, read in fields
 for filename in dashboard_files:
-    print(filename)
-    with open(filename, "r") as fp:
+    with pathlib.Path(filename).open(encoding="utf-8") as fp:
         # Title and image come from filename
-        title = os.path.basename(filename).replace("_", " ").replace(".json", "")
-        image = "PMM_" + os.path.basename(filename).replace(".json", "") + ".jpg"
+        title = pathlib.Path(filename).name.replace("_", " ").replace(".json", "")
+        image = "PMM_" + pathlib.Path(filename).name.replace(".json", "") + ".jpg"
         titlelc = (
-            os.path.basename(filename).replace("_", "-").replace(".json", "").lower()
+            pathlib.Path(filename).name.replace("_", "-").replace(".json", "").lower()
         )
 
-        with open("dashboard-" + titlelc + ".md", "w") as md:
+        with pathlib.Path("dashboard-" + titlelc + ".md").open(
+            "w",
+            encoding="utf-8",
+        ) as md:
             x = json.load(fp)
             md.write("# " + title + "\n\n")
             md.write("![image](../images/" + image + ")\n\n")
@@ -41,7 +41,7 @@ for filename in dashboard_files:
 
                     if "panels" in p:
                         for p2 in p["panels"]:
-                            if p2["type"] in ["graph", "singlestat"]:
+                            if p2["type"] in {"graph", "singlestat"}:
                                 if "title" in p2 and "description" in p2:
                                     md.write("### " + p2["title"] + "\n\n")
                                     md.write(p2["description"] + "\n\n")
