@@ -1,50 +1,60 @@
 #! /usr/bin/env python3
-# Write md files containing PMM dashboard panel titles and descriptions to current dir
+"""Writes md files with PMM dashboard panel titles/descriptions to the cwd.
 
-import glob
+Reads every dashboard JSON from a local clone of
+https://github.com/percona/grafana-dashboards/ (expected at ``repo_src``) and
+emits one ``dashboard-<name>.md`` file per dashboard, preserving the historical
+output contract (titles, image links, and panel descriptions).
+"""
+
 import json
 import pathlib
 
 # Path to local git clone of https://github.com/percona/grafana-dashboards/
-repo_src = "../../grafana-dashboards/dashboards/"
+REPO_SRC = pathlib.Path("../../grafana-dashboards/dashboards/")
 
-if not pathlib.Path(repo_src).is_dir():
-    exit
+PANEL_TYPES = {"graph", "singlestat"}
 
-# Dict of dashboard files
-dashboard_files = glob.glob(repo_src + "*.json")
-# For each, open the file, read in fields
-for filename in dashboard_files:
-    with pathlib.Path(filename).open(encoding="utf-8") as fp:
-        # Title and image come from filename
-        title = pathlib.Path(filename).name.replace("_", " ").replace(".json", "")
-        image = "PMM_" + pathlib.Path(filename).name.replace(".json", "") + ".jpg"
-        titlelc = (
-            pathlib.Path(filename).name.replace("_", "-").replace(".json", "").lower()
-        )
 
-        with pathlib.Path("dashboard-" + titlelc + ".md").open(
-            "w",
-            encoding="utf-8",
-        ) as md:
-            x = json.load(fp)
-            md.write("# " + title + "\n\n")
-            md.write("![image](../images/" + image + ")\n\n")
+def _write_dashboard(path: pathlib.Path) -> None:
+    """Renders one dashboard JSON file into its markdown description file."""
+    # Title and image come from the filename.
+    title = path.name.replace("_", " ").replace(".json", "")
+    image = "PMM_" + path.name.replace(".json", "") + ".jpg"
+    titlelc = path.name.replace("_", "-").replace(".json", "").lower()
 
-            for p in x["panels"]:
-                if p["type"] == "row":
-                    if "title" in p:
-                        md.write("## " + p["title"] + "\n\n")
+    with path.open(encoding="utf-8") as fp:
+        dashboard = json.load(fp)
 
-                    if "description" in p:
-                        md.write(p["description"] + "\n\n")
+    md_path = pathlib.Path("dashboard-" + titlelc + ".md")
+    with md_path.open("w", encoding="utf-8") as md:
+        md.write("# " + title + "\n\n")
+        md.write("![image](../images/" + image + ")\n\n")
 
-                    if "panels" in p:
-                        for p2 in p["panels"]:
-                            if p2["type"] in {"graph", "singlestat"}:
-                                if "title" in p2 and "description" in p2:
-                                    md.write("### " + p2["title"] + "\n\n")
-                                    md.write(p2["description"] + "\n\n")
+        for panel in dashboard["panels"]:
+            if panel["type"] != "row":
+                continue
+            if "title" in panel:
+                md.write("## " + panel["title"] + "\n\n")
+            if "description" in panel:
+                md.write(panel["description"] + "\n\n")
+            for sub in panel.get("panels", []):
+                if (
+                    sub["type"] in PANEL_TYPES
+                    and "title" in sub
+                    and "description" in sub
+                ):
+                    md.write("### " + sub["title"] + "\n\n")
+                    md.write(sub["description"] + "\n\n")
 
-        md.close
-    fp.close
+
+def main() -> None:
+    """Entry point: renders all dashboards found under REPO_SRC."""
+    if not REPO_SRC.is_dir():
+        return
+    for path in sorted(REPO_SRC.glob("*.json")):
+        _write_dashboard(path)
+
+
+if __name__ == "__main__":
+    main()
